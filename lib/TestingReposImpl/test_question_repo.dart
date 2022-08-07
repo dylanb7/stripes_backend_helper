@@ -1,0 +1,188 @@
+// ignore_for_file: constant_identifier_names
+
+import 'package:stripes_backend_helper/QuestionModel/question.dart';
+import 'package:stripes_backend_helper/RepositoryBase/AuthBase/auth_user.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
+
+class TestQuestionRepo extends QuestionRepo {
+  TestQuestionRepo({super.authUser = const AuthUser.empty()});
+
+  @override
+  Future<QuestionHome> get questions => Future.value(QuestionHomeInst());
+}
+
+const String q1 = '1';
+const String q2 = '2';
+const String q3 = '3';
+const String q4 = '4';
+const String q6 = '6';
+const String q7 = '7';
+const String q8 = '8';
+const String q9 = '9';
+const String q10 = '10';
+const String q11 = '11';
+const String q12 = '12';
+const String q13 = '13';
+const String q14 = '14';
+const String q15 = '15';
+const String q16 = '16';
+const String q17 = '17';
+const String q18 = '18';
+const String q19 = '19';
+const String q20 = '20';
+const String q21 = '21';
+const String q22 = '22';
+const String q23 = '23';
+const String q24 = '24';
+const String q25 = '25';
+const String q26 = '26';
+
+const Map<String, String> questions = {
+  q1: 'Abdominal Pain',
+  q2: 'Nausea',
+  q3: 'Severe gastrointestinal pain lasting 2 hours or longer that interrupts participation in all activities',
+  q4: 'Average BM type(1-7)',
+  q6: 'Pain with BM',
+  q7: 'Rush to the bathroom for BM',
+  q8: 'Straining with BM',
+  q9: 'Black tarry BM',
+  q10: 'Spit up',
+  q11: 'Regurgitated',
+  q12: 'Experienced wretching',
+  q13: 'Vomiting',
+  q14: 'Tilted head to side and arched back',
+  q15: 'Missed Activities due to pain',
+  q16: 'Missed Activities due to reflux',
+  q17: 'Missed Activities due to BM',
+  q18: 'Applied pressure to abdomen with hands or furniture',
+  q19:
+      'Choked, gagged coughed or made sound (gurgling) with throat during or after swallowing or meals',
+  q20: 'Refused foods they once ate',
+  q21: 'Insomnia (difficulty falling asleep at beginning of night)',
+  q22: 'Awakenings',
+  q23: 'Restless sleep',
+  q24: 'Irritability',
+  q25: 'Aggressive/violent behaviors towards others',
+  q26: 'Self injurious behaviors',
+};
+
+class QuestionHomeInst extends QuestionHome {
+  QuestionHomeInst() {
+    all.addAll({
+      q1: Numeric(
+          id: q1, prompt: questions[q1]!, type: Symptoms.PAIN, min: 1, max: 5),
+      q2: Numeric(
+          id: q2,
+          prompt: questions[q2]!,
+          type: Symptoms.REFLUX,
+          min: 1,
+          max: 5),
+      q3: Check(id: q3, prompt: questions[q3]!, type: Symptoms.BM),
+      q4: Numeric(
+          id: q4, prompt: questions[q4]!, type: Symptoms.BM, min: 1, max: 7),
+      q6: Numeric(
+          id: q6, prompt: questions[q6]!, type: Symptoms.BM, min: 1, max: 5),
+      q7: Numeric(
+          id: q7, prompt: questions[q7]!, type: Symptoms.BM, min: 1, max: 5),
+      q8: Numeric(
+          id: q8, prompt: questions[q8]!, type: Symptoms.BM, min: 1, max: 5),
+      q9: Check(id: q9, prompt: questions[q9]!, type: Symptoms.BM),
+      q10: Numeric(
+          id: q10,
+          prompt: questions[q10]!,
+          type: Symptoms.REFLUX,
+          min: 1,
+          max: 5),
+      q11: Numeric(
+          id: q11,
+          prompt: questions[q11]!,
+          type: Symptoms.REFLUX,
+          min: 1,
+          max: 5),
+      q12: Numeric(
+          id: q12,
+          prompt: questions[q12]!,
+          type: Symptoms.REFLUX,
+          min: 1,
+          max: 5),
+      q13: Numeric(
+          id: q13,
+          prompt: questions[q13]!,
+          type: Symptoms.REFLUX,
+          min: 1,
+          max: 5),
+      q14: Check(id: q14, prompt: questions[q14]!, type: Symptoms.PAIN),
+      q15: Check(id: q15, prompt: questions[q15]!, type: Symptoms.PAIN),
+      q16: Check(id: q16, prompt: questions[q16]!, type: Symptoms.REFLUX),
+      q17: Check(id: q17, prompt: questions[q17]!, type: Symptoms.BM),
+      q18: Check(id: q18, prompt: questions[q18]!, type: Symptoms.PAIN),
+      q19: Check(id: q19, prompt: questions[q19]!, type: Symptoms.REFLUX),
+      q20: Check(id: q20, prompt: questions[q20]!, type: Symptoms.REFLUX),
+      q21: Check(id: q21, prompt: questions[q21]!, type: Symptoms.NB),
+      q22: Check(id: q22, prompt: questions[q22]!, type: Symptoms.NB),
+      q23: Check(id: q23, prompt: questions[q23]!, type: Symptoms.NB),
+      q24: Numeric(
+          id: q24, prompt: questions[q24]!, type: Symptoms.NB, min: 1, max: 5),
+      q25: Numeric(
+          id: q25, prompt: questions[q25]!, type: Symptoms.NB, min: 1, max: 5),
+      q26: Numeric(
+          id: q26, prompt: questions[q26]!, type: Symptoms.NB, min: 1, max: 5),
+    });
+  }
+
+  List<Question> get severityQuestions => [
+        fromID(q1),
+        fromID(q2),
+        fromID(q6),
+        fromID(q7),
+        fromID(q8),
+        fromID(q10),
+        fromID(q11),
+        fromID(q12),
+        fromID(q13),
+        fromID(q24),
+        fromID(q25),
+        fromID(q26),
+      ];
+
+  List<Question> get bm1 => [fromID(q4)];
+
+  List<Question> get bm2 =>
+      [fromID(q3), fromID(q6), fromID(q7), fromID(q8), fromID(q9), fromID(q17)];
+
+  List<Question> get reflux => [
+        fromID(q2),
+        fromID(q10),
+        fromID(q11),
+        fromID(q12),
+        fromID(q13),
+        fromID(q16),
+        fromID(q19),
+        fromID(q20)
+      ];
+
+  List<Question> get pain => [
+        fromID(q1),
+        fromID(q14),
+        fromID(q15),
+        fromID(q18),
+      ];
+
+  List<Question> get nb => [
+        fromID(q21),
+        fromID(q22),
+        fromID(q23),
+        fromID(q24),
+        fromID(q25),
+        fromID(q26),
+      ];
+}
+
+class Symptoms {
+  static const String BM = 'Bowel Movement';
+  static const String PAIN = 'Pain';
+  static const String REFLUX = 'Reflux';
+  static const String NB = 'Neurological Behavior';
+
+  static List<String> ordered() => [BM, PAIN, REFLUX, NB];
+}

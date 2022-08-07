@@ -1,0 +1,213 @@
+import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
+import 'package:stripes_backend_helper/QuestionModel/question.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
+import 'package:stripes_backend_helper/db_keys.dart';
+
+import '../RepositoryBase/StampBase/stamp.dart';
+
+@immutable
+abstract class Response<E extends Question> extends Stamp with EquatableMixin {
+  final E question;
+
+  Response({
+    required this.question,
+    required int stamp,
+  }) : super(stamp: stamp, type: question.type);
+
+  Response.fromJson(Map<String, dynamic> json, QuestionHome home)
+      : question = home.fromID(json[ID_FIELD]) as E,
+        super.fromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {...super.toJson(), ID_FIELD: question.id};
+  }
+}
+
+class OpenResponse extends Response<FreeResponse> {
+  final String response;
+
+  OpenResponse({
+    required FreeResponse question,
+    required int stamp,
+    required this.response,
+  }) : super(question: question, stamp: stamp);
+
+  OpenResponse.fromJson(Map<String, dynamic> json, QuestionHome home)
+      : response = json[RESPONSE_FIELD],
+        super.fromJson(json, home);
+
+  @override
+  Map<String, dynamic> toJson() =>
+      {...super.toJson(), ID_FIELD: question.id, RESPONSE_FIELD: response};
+
+  @override
+  List<Object?> get props => [
+        ...super.props,
+        response,
+        question,
+      ];
+}
+
+class NumericResponse extends Response<Numeric> {
+  final num response;
+  NumericResponse({
+    required Numeric question,
+    required int stamp,
+    required this.response,
+  }) : super(question: question, stamp: stamp);
+
+  NumericResponse.fromJson(Map<String, dynamic> json, QuestionHome home)
+      : response = json[NUMERIC_RESPONSE_FIELD],
+        super.fromJson(json, home);
+
+  @override
+  Map<String, dynamic> toJson() => {
+        ...super.toJson(),
+        ID_FIELD: question.id,
+        NUMERIC_RESPONSE_FIELD: response,
+      };
+
+  @override
+  List<Object?> get props => [
+        ...super.props,
+        response,
+        question,
+      ];
+}
+
+class Selected extends Response<Check> {
+  Selected({required Check question, required int stamp})
+      : super(question: question, stamp: stamp);
+
+  Selected.fromJson(Map<String, dynamic> json, QuestionHome home)
+      : super.fromJson(json, home);
+
+  @override
+  Map<String, dynamic> toJson() => {
+        ...super.toJson(),
+        ID_FIELD: question.id,
+      };
+
+  @override
+  List<Object?> get props => [
+        ...super.props,
+        question,
+      ];
+}
+
+class MultiResponse extends Response<MultipleChoice> {
+  final int index;
+
+  MultiResponse(
+      {required MultipleChoice question,
+      required int stamp,
+      required this.index})
+      : super(question: question, stamp: stamp);
+
+  MultiResponse.fromJson(Map<String, dynamic> json, QuestionHome home)
+      : index = json[SELECTED_FIELD],
+        super.fromJson(json, home);
+
+  @override
+  Map<String, dynamic> toJson() =>
+      {...super.toJson(), ID_FIELD: question.id, SELECTED_FIELD: index};
+
+  String get choice => question.choices[index];
+
+  @override
+  List<Object?> get props => [...super.props, index, question];
+}
+
+class AllResponse extends Response<AllThatApply> {
+  final List<int> responses;
+
+  AllResponse(
+      {required AllThatApply question,
+      required int stamp,
+      required this.responses})
+      : super(question: question, stamp: stamp);
+
+  AllResponse.fromJson(Map<String, dynamic> json, QuestionHome home)
+      : responses = json[SELECTED_FIELDS],
+        super.fromJson(json, home);
+
+  @override
+  Map<String, dynamic> toJson() =>
+      {...super.toJson(), ID_FIELD: question.id, SELECTED_FIELDS: responses};
+
+  List<String> get choices =>
+      responses.map((res) => question.choices[res]).toList();
+
+  @override
+  List<Object?> get props => [...super.props, responses, question];
+}
+
+class DetailResponse extends Response {
+  final String description;
+
+  final List<Response> responses;
+
+  DetailResponse({
+    required this.description,
+    required this.responses,
+    required int stamp,
+    String? detailType,
+  }) : super(
+            question: Question.ofType(
+                type: detailType ??
+                    (responses.isEmpty ? 'Description' : responses.first.type)),
+            stamp: stamp);
+
+  DetailResponse.fromJson(Map<String, dynamic> json, QuestionHome home)
+      : description = json[DESCRIPTION_FIELD],
+        responses = responsesFromJson(json, home),
+        super.fromJson(json, home);
+
+  @override
+  Map<String, dynamic> toJson() => {
+        ...super.toJson(),
+        ...responesToJson(responses),
+        DESCRIPTION_FIELD: description,
+      };
+
+  @override
+  List<Object?> get props => [...super.props, description, responses];
+}
+
+Map<String, dynamic> responesToJson(List<Response> responses) {
+  Map<String, dynamic> res = {};
+  for (int i = 0; i < responses.length; i++) {
+    res['$i'] = responses[i].toJson();
+  }
+  return res;
+}
+
+Response responseFromJson(Map<String, dynamic> json, QuestionHome home) {
+  if (json.containsKey(SELECTED_FIELDS)) {
+    return AllResponse.fromJson(json, home);
+  }
+  if (json.containsKey(SELECTED_FIELD)) {
+    return MultiResponse.fromJson(json, home);
+  }
+  if (json.containsKey(NUMERIC_RESPONSE_FIELD)) {
+    return NumericResponse.fromJson(json, home);
+  }
+  if (json.containsKey(RESPONSE_FIELD)) {
+    return OpenResponse.fromJson(json, home);
+  }
+  if (json.containsKey(DESCRIPTION_FIELD)) {
+    DetailResponse.fromJson(json, home);
+  }
+  return Selected.fromJson(json, home);
+}
+
+List<Response> responsesFromJson(Map<String, dynamic> json, QuestionHome home) {
+  List<Response> res = [];
+  for (int i = 0; true; i++) {
+    final String key = '$i';
+    if (!json.containsKey(key)) return res;
+    res.add(responseFromJson(json[key], home));
+  }
+}

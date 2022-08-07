@@ -6,7 +6,7 @@ import '../RepositoryBase/AuthBase/auth_user.dart';
 import '../RepositoryBase/AuthBase/base_auth_repo.dart';
 
 class TestAuth extends AuthRepo {
-  AuthUser _user = AuthUser.empty();
+  AuthUser _user = const AuthUser.empty();
 
   final StreamController<AuthUser> _authUser = StreamController();
   @override
@@ -18,7 +18,7 @@ class TestAuth extends AuthRepo {
 
   @override
   Future<void> logOut() async {
-    _user = AuthUser.empty();
+    _user = const AuthUser.empty();
     _authUser.add(_user);
   }
 

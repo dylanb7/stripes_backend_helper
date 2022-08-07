@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:stripes_backend_helper/RepositoryBase/StampBase/stamp.dart';
-import 'package:stripes_backend_helper/date_format.dart';
 import 'package:stripes_backend_helper/stripes_backend_helper.dart';
 
 abstract class TestObj {

@@ -1,5 +1,4 @@
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
-import 'package:stripes_backend_helper/RepositoryBase/StampBase/stamp.dart';
 import 'package:stripes_backend_helper/RepositoryBase/TestBase/test_obj.dart';
 import 'package:stripes_backend_helper/date_format.dart';
 

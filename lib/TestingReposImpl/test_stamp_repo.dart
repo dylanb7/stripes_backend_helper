@@ -16,13 +16,13 @@ class TestResponseRepo extends StampRepo<Response> {
   final StreamController<List<Response>> _stream = StreamController();
 
   TestResponseRepo(SubUser subUser)
-      : super(authUser: AuthUser.empty(), currentUser: subUser) {
+      : super(authUser: const AuthUser.empty(), currentUser: subUser) {
     _stream.add([]);
   }
 
   TestResponseRepo.filledSinguler(SubUser current, int amount, Numeric question,
       [int daysBack = 31])
-      : super(authUser: AuthUser.empty(), currentUser: current) {
+      : super(authUser: const AuthUser.empty(), currentUser: current) {
     if (!_responses.containsKey(currentUser)) {
       _responses[currentUser] = [];
     }

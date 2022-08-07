@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import '../RepositoryBase/AccessBase/base_access_repo.dart';
 
 class TestAccessRepo extends AccessCodeRepo {

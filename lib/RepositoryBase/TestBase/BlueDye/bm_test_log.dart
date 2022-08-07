@@ -1,9 +1,6 @@
 // ignore_for_file: constant_identifier_names, must_call_super
 
 import 'package:equatable/equatable.dart';
-import 'package:stripes_backend_helper/QuestionModel/question.dart';
-import 'package:stripes_backend_helper/QuestionModel/response.dart';
-import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
 import 'package:stripes_backend_helper/stripes_backend_helper.dart';
 
 const String DETAIL_RES_KEY = 'detail_res';

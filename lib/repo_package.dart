@@ -1,3 +1,4 @@
+import 'package:stripes_backend_helper/RepositoryBase/TestBase/BlueDye/blue_dye_impl.dart';
 import 'package:stripes_backend_helper/TestingReposImpl/test_question_repo.dart';
 
 import 'QuestionModel/question.dart';
@@ -26,7 +27,7 @@ abstract class StripesRepoPackage {
 
   StampRepo<Response> stamp({required AuthUser user, required SubUser subUser});
 
-  TestRepo test(
+  TestRepo<BlueDyeTest> test(
       {required AuthUser user,
       required SubUser subUser,
       required StampRepo stampRepo});
@@ -57,7 +58,7 @@ class LocalRepoPackage extends StripesRepoPackage {
   }
 
   @override
-  TestRepo test(
+  TestRepo<BlueDyeTest> test(
       {required AuthUser user,
       required SubUser subUser,
       required StampRepo<Stamp> stampRepo}) {

@@ -2,6 +2,7 @@ name: stripes_backend_helper
 description: Stripes basic dataflow.
 version: 0.0.1
 homepage: https://github.com/dylanb7/stripes_backend_helper
+publish_to: none
 
 environment:
   sdk: '>=2.18.0-281.0.dev <3.0.0'

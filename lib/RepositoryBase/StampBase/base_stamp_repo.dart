@@ -12,4 +12,5 @@ abstract class StampRepo<T extends Stamp> {
   addStamp(T stamp);
   removeStamp(T stamp);
   updateStamp(T stamp);
+  set earliestDate(DateTime time) => earliest = time;
 }

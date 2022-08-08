@@ -61,31 +61,6 @@ class BlueDyeTest extends TestObj {
   }
 }
 
-enum TestState {
-  initial,
-  started,
-  logs,
-  logsSubmit;
-
-  bool get testInProgress => this != TestState.initial;
-}
-
-TestState stateFromTestOBJ(BlueDyeTest? obj) {
-  if (obj == null) return TestState.initial;
-  if (obj.finishedEating == null) return TestState.started;
-  bool startsBlue = false;
-  bool endsNormal = false;
-  for (BMTestLog log in obj.logs) {
-    if (log.isBlue) {
-      startsBlue = true;
-    } else if (startsBlue) {
-      endsNormal = true;
-    }
-  }
-  if (endsNormal) return TestState.logsSubmit;
-  return TestState.logs;
-}
-
 DateTime? toDate(int? time) {
   if (time == null) return null;
   return dateFromStamp(time);

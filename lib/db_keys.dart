@@ -94,7 +94,7 @@ const String CONTROL_FIELD = 'control';
 //Response constants
 
 const String STAMP_FIELD = 'stamp';
-const TYPE_FIELD = 'type';
+const String TYPE_FIELD = 'type';
 const String ID_FIELD = 'qid';
 const String RESPONSE_FIELD = 'response';
 const String SELECTED_FIELD = 'selected';

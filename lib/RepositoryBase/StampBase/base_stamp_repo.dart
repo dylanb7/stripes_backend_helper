@@ -6,7 +6,8 @@ import 'stamp.dart';
 abstract class StampRepo<T extends Stamp> {
   final AuthUser authUser;
   final SubUser currentUser;
-  StampRepo({required this.authUser, required this.currentUser});
+  DateTime? earliest;
+  StampRepo({required this.authUser, required this.currentUser, this.earliest});
   Stream<List<T>> get stamps;
   addStamp(T stamp);
   removeStamp(T stamp);

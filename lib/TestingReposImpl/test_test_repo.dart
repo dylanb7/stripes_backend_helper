@@ -19,7 +19,7 @@ class TestTestRepo extends TestRepo<BlueDyeTest> {
             subUser: subUser,
             authUser: const AuthUser.empty()) {
     _repo[subUser] = null;
-    _streamController.add(_repo[subUser]!);
+    _streamController.add(null);
   }
 
   @override

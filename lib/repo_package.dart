@@ -70,3 +70,39 @@ class LocalRepoPackage extends StripesRepoPackage {
     return TestQuestionRepo();
   }
 }
+
+class LocalStockedRepoPackage extends StripesRepoPackage {
+  @override
+  AccessCodeRepo access() {
+    return TestAccessRepo();
+  }
+
+  @override
+  AuthRepo auth() {
+    return TestAuth();
+  }
+
+  @override
+  QuestionRepo<QuestionHome> questions({required AuthUser user}) {
+    return TestQuestionRepo();
+  }
+
+  @override
+  StampRepo<Response<Question>> stamp(
+      {required AuthUser user, required SubUser subUser}) {
+    return TestResponseRepo.filled(subUser, 200);
+  }
+
+  @override
+  SubUserRepo sub({required AuthUser user}) {
+    return TestSubRepo(user);
+  }
+
+  @override
+  TestRepo<BlueDyeTest> test(
+      {required AuthUser user,
+      required SubUser subUser,
+      required StampRepo<Stamp> stampRepo}) {
+    return TestTestRepo(stampRepo, subUser);
+  }
+}

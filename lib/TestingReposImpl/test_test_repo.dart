@@ -34,7 +34,6 @@ class TestTestRepo extends TestRepo<BlueDyeTest> {
   @override
   setValue(BlueDyeTest obj) {
     _repo[subUser] = obj;
-    print(obj);
     _streamController.add(_repo[subUser]!);
   }
 

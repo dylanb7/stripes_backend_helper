@@ -18,7 +18,10 @@ class TestResponseRepo extends StampRepo<Response> {
 
   TestResponseRepo(SubUser subUser)
       : super(authUser: const AuthUser.empty(), currentUser: subUser) {
-    _stream.add([]);
+    if (!_responses.containsKey(currentUser)) {
+      _responses[currentUser] = [];
+    }
+    _stream.add(_responses[currentUser]!);
   }
 
   TestResponseRepo.filled(SubUser current, int amount, [int daysBack = 31])

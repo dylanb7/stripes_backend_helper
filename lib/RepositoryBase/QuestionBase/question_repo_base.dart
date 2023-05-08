@@ -6,7 +6,7 @@ abstract class QuestionRepo<T extends QuestionHome> {
 
   QuestionRepo({required this.authUser});
 
-  Future<T> get questions;
+  T get questions;
 }
 
 abstract class QuestionHome {

@@ -8,7 +8,7 @@ class TestQuestionRepo extends QuestionRepo {
   TestQuestionRepo({super.authUser = const AuthUser.empty()});
 
   @override
-  Future<QuestionHome> get questions => Future.value(QuestionHomeInst());
+  QuestionHome get questions => QuestionHomeInst();
 }
 
 const String q1 = '1';

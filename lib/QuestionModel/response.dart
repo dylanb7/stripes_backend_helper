@@ -149,26 +149,30 @@ class DetailResponse extends Response {
 
   final List<Response> responses;
 
+  final String detailType;
+
   DetailResponse({
     required this.description,
     required this.responses,
     required int stamp,
-    String? detailType,
+    required this.detailType,
   }) : super(
             question: Question.ofType(
-                type: detailType ??
+                type:
                     (responses.isEmpty ? 'Description' : responses.first.type)),
             stamp: stamp);
 
   DetailResponse.fromJson(Map<String, dynamic> json, QuestionHome home)
       : description = json[DESCRIPTION_FIELD],
         responses = responsesFromJson(json, home),
+        detailType = json[TYPE_FIELD],
         super.fromJson(json, home);
 
   @override
   Map<String, dynamic> toJson() => {
         ...super.toJson(),
         ...responesToJson(responses),
+        TYPE_FIELD: detailType,
         DESCRIPTION_FIELD: description,
       };
 

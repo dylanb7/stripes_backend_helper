@@ -18,7 +18,7 @@ class PageLayout {
 
   final String? header;
 
-  const PageLayout(this.questions, this.header);
+  const PageLayout({required this.questions, this.header});
 }
 
 abstract class QuestionHome {

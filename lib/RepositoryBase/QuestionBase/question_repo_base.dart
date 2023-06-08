@@ -16,7 +16,7 @@ abstract class QuestionRepo<T extends QuestionHome> {
 class PageLayout {
   final List<Question> questions;
 
-  final String header;
+  final String? header;
 
   const PageLayout(this.questions, this.header);
 }

@@ -26,11 +26,7 @@ class SubUser {
       SubUser(name: '', gender: '', birthYear: 0, isControl: false, id: '');
 
   factory SubUser.marker() => SubUser(
-      name: '',
-      gender: '',
-      birthYear: 0,
-      isControl: false,
-      id: '|single_user|');
+      name: '', gender: '', birthYear: 0, isControl: false, id: 'singleuser');
 
   factory SubUser.fromJson({required Map<String, dynamic> json}) => SubUser(
       name: json[NAME_FIELD],
@@ -54,5 +50,5 @@ class SubUser {
 
   static bool isEmpty(SubUser user) => user.uid == '';
 
-  static bool isMarker(SubUser user) => user.uid == '|single_user|';
+  static bool isMarker(SubUser user) => user.uid == 'singleuser';
 }

@@ -4,8 +4,8 @@ import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/QuestionModel/response.dart';
 import 'package:stripes_backend_helper/RepositoryBase/TestBase/BlueDye/blue_dye_impl.dart';
 import 'package:stripes_backend_helper/date_format.dart';
+import 'package:stripes_backend_helper/db_keys.dart';
 
-const String START_EAT_KEY = 'startedEatingKey';
 const String EATING_DURATION = 'mealDurationKey';
 const String NORMAL_BOWEL_MOVEMENTS = 'normalBowelMovementsKey';
 const String BLUE_BOWEL_MOVEMENTS = 'blueBowelMovementsKey';
@@ -49,7 +49,7 @@ class BlueDyeResp extends Response {
   }
 
   factory BlueDyeResp.fromJson(Map<String, dynamic> json) => BlueDyeResp(
-      startEating: dateFromStamp(json[START_EAT_KEY]),
+      startEating: dateFromStamp(json[STAMP_FIELD]),
       eatingDuration: Duration(milliseconds: json[EATING_DURATION]),
       normalBowelMovements: json[NORMAL_BOWEL_MOVEMENTS],
       blueBowelMovements: json[BLUE_BOWEL_MOVEMENTS],
@@ -60,7 +60,7 @@ class BlueDyeResp extends Response {
   // ignore: must_call_super
   Map<String, dynamic> toJson() {
     return {
-      START_EAT_KEY: dateToStamp(startEating),
+      STAMP_FIELD: dateToStamp(startEating),
       EATING_DURATION: eatingDuration.inMilliseconds,
       NORMAL_BOWEL_MOVEMENTS: normalBowelMovements,
       BLUE_BOWEL_MOVEMENTS: blueBowelMovements,

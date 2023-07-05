@@ -16,6 +16,10 @@ class AuthUser extends Equatable {
       : uid = '',
         email = null;
 
+  const AuthUser.localCode(String code)
+      : uid = code,
+        email = 'LocalCode';
+
   factory AuthUser.from({required Map<String, dynamic> json}) => AuthUser(
       uid: json[UID_FIELD],
       email: json.containsKey(EMAIL_FIELD) ? json[EMAIL_FIELD] : null);
@@ -29,6 +33,8 @@ class AuthUser extends Equatable {
   }
 
   static bool isEmpty(AuthUser user) => user.uid == '';
+
+  static bool isLocalCode(AuthUser user) => user.email == 'LocalCode';
 
   @override
   String toString() {

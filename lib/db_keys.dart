@@ -99,7 +99,7 @@ const String ID_FIELD = 'qid';
 const String RESPONSE_FIELD = 'response';
 const String SELECTED_FIELD = 'selected';
 const String SELECTED_FIELDS = 'all_selected';
-const String NUMERIC_RESPONSE_FIELD = 'numeric_reponse';
+const String NUMERIC_RESPONSE_FIELD = 'numeric_response';
 const String DETAIL_TYPE_KEY = 'detailTypeKey';
 
 const String DESCRIPTION_FIELD = 'desc';

@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+const String localAccessKey = 'LocalAccessKey';
+
 abstract class AccessCodeRepo {
   String? currentCode;
 

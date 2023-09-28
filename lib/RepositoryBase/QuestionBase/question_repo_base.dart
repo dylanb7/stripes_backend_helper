@@ -7,7 +7,7 @@ abstract class QuestionRepo<T extends QuestionHome> {
 
   QuestionRepo({required this.authUser});
 
-  Map<String, List<PageLayout>> getLayouts() => {};
+  Map<String, RecordPath> getLayouts() => {};
 
   T get questions;
 }

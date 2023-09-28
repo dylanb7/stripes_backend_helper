@@ -12,6 +12,18 @@ abstract class QuestionRepo<T extends QuestionHome> {
   T get questions;
 }
 
+enum RecordType {
+  checkIn,
+  occurance;
+}
+
+@immutable
+class RecordPath {
+  final List<PageLayout> pages;
+  final RecordType type;
+  const RecordPath(this.pages, this.type);
+}
+
 @immutable
 class PageLayout {
   final List<Question> questions;

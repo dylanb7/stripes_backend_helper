@@ -16,7 +16,7 @@ abstract class QuestionRepo<T extends QuestionHome> {
 class RecordPath {
   final List<PageLayout> pages;
   final Period? period;
-  const RecordPath(this.pages, this.period);
+  const RecordPath({required this.pages, this.period});
 }
 
 @immutable

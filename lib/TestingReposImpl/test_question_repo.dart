@@ -48,7 +48,7 @@ const Map<String, String> questions = {
   q9: 'Black tarry BM',
   q10: 'Spit up',
   q11: 'Regurgitated',
-  q12: 'Experienced wretching',
+  q12: 'Experienced retching',
   q13: 'Vomiting',
   q14: 'Tilted head to side and arched back',
   q15: 'Missed Activities due to pain',

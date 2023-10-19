@@ -25,7 +25,10 @@ abstract class StripesRepoPackage {
 
   SubUserRepo sub({required AuthUser user});
 
-  StampRepo<Response> stamp({required AuthUser user, required SubUser subUser});
+  StampRepo<Response> stamp(
+      {required AuthUser user,
+      required SubUser subUser,
+      required QuestionHome home});
 
   TestRepo<BlueDyeTest> test(
       {required AuthUser user,
@@ -48,7 +51,9 @@ class LocalRepoPackage extends StripesRepoPackage {
 
   @override
   StampRepo<Response<Question>> stamp(
-      {required AuthUser user, required SubUser subUser}) {
+      {required AuthUser user,
+      required SubUser subUser,
+      required QuestionHome home}) {
     return TestResponseRepo(subUser);
   }
 
@@ -89,7 +94,9 @@ class LocalStockedRepoPackage extends StripesRepoPackage {
 
   @override
   StampRepo<Response<Question>> stamp(
-      {required AuthUser user, required SubUser subUser}) {
+      {required AuthUser user,
+      required SubUser subUser,
+      required QuestionHome home}) {
     return TestResponseRepo.filled(subUser, 200);
   }
 

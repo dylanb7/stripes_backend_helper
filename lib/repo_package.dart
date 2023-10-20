@@ -33,7 +33,8 @@ abstract class StripesRepoPackage {
   TestRepo<BlueDyeTest> test(
       {required AuthUser user,
       required SubUser subUser,
-      required StampRepo stampRepo});
+      required StampRepo stampRepo,
+      required QuestionRepo questionRepo});
 
   QuestionRepo questions({required AuthUser user});
 }
@@ -66,7 +67,8 @@ class LocalRepoPackage extends StripesRepoPackage {
   TestRepo<BlueDyeTest> test(
       {required AuthUser user,
       required SubUser subUser,
-      required StampRepo<Stamp> stampRepo}) {
+      required StampRepo<Stamp> stampRepo,
+      required QuestionRepo questionRepo}) {
     return TestTestRepo(stampRepo, subUser);
   }
 
@@ -109,7 +111,8 @@ class LocalStockedRepoPackage extends StripesRepoPackage {
   TestRepo<BlueDyeTest> test(
       {required AuthUser user,
       required SubUser subUser,
-      required StampRepo<Stamp> stampRepo}) {
+      required StampRepo<Stamp> stampRepo,
+      required QuestionRepo questionRepo}) {
     return TestTestRepo(stampRepo, subUser);
   }
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:stripes_backend_helper/RepositoryBase/AuthBase/auth_user.dart';
 import 'package:stripes_backend_helper/RepositoryBase/SubBase/sub_user.dart';
 import 'package:stripes_backend_helper/RepositoryBase/TestBase/BlueDye/blue_dye_impl.dart';
+import 'package:stripes_backend_helper/TestingReposImpl/test_question_repo.dart';
 
 import '../RepositoryBase/StampBase/base_stamp_repo.dart';
 import '../RepositoryBase/TestBase/BlueDye/blue_dye_response.dart';
@@ -17,7 +18,8 @@ class TestTestRepo extends TestRepo<BlueDyeTest> {
       : super(
             stampRepo: testResponseRepo,
             subUser: subUser,
-            authUser: const AuthUser.empty()) {
+            authUser: const AuthUser.empty(),
+            questionRepo: TestQuestionRepo()) {
     _repo[subUser] = null;
     _streamController.add(null);
   }

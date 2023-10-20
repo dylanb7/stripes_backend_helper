@@ -96,6 +96,7 @@ const String CONTROL_FIELD = 'control';
 const String STAMP_FIELD = 'stamp';
 const String TYPE_FIELD = 'type';
 const String ID_FIELD = 'qid';
+const String STAMP_ID = 'STAMP_ID';
 const String RESPONSE_FIELD = 'response';
 const String SELECTED_FIELD = 'selected';
 const String SELECTED_FIELDS = 'all_selected';

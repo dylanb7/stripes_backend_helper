@@ -11,7 +11,7 @@ class BMTestLog extends Response with EquatableMixin {
 
   final bool isBlue;
 
-  BMTestLog({required this.response, required this.isBlue})
+  BMTestLog({required this.response, required this.isBlue, super.id})
       : super(question: Question.empty(), stamp: response.stamp);
 
   BMTestLog.fromJson(Map<String, dynamic> json, QuestionHome home)

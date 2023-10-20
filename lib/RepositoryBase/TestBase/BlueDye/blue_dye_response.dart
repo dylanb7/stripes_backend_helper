@@ -25,7 +25,8 @@ class BlueDyeResp extends Response {
       required this.normalBowelMovements,
       required this.blueBowelMovements,
       required this.firstBlue,
-      required this.lastBlue})
+      required this.lastBlue,
+      super.id})
       : super(
             question:
                 const Check(type: 'Test', id: '', prompt: 'Blue Dye Test'),

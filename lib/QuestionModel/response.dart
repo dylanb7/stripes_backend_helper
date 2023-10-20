@@ -10,10 +10,8 @@ import '../RepositoryBase/StampBase/stamp.dart';
 abstract class Response<E extends Question> extends Stamp with EquatableMixin {
   final E question;
 
-  Response({
-    required this.question,
-    required int stamp,
-  }) : super(stamp: stamp, type: question.type);
+  Response({required this.question, required super.stamp, super.id})
+      : super(type: question.type);
 
   Response.fromJson(Map<String, dynamic> json, QuestionHome home)
       : question = home.fromID(json[ID_FIELD]) as E,
@@ -28,11 +26,12 @@ abstract class Response<E extends Question> extends Stamp with EquatableMixin {
 class OpenResponse extends Response<FreeResponse> {
   final String response;
 
-  OpenResponse({
-    required FreeResponse question,
-    required int stamp,
-    required this.response,
-  }) : super(question: question, stamp: stamp);
+  OpenResponse(
+      {required FreeResponse question,
+      required super.stamp,
+      required this.response,
+      super.id})
+      : super(question: question);
 
   OpenResponse.fromJson(Map<String, dynamic> json, QuestionHome home)
       : response = json[RESPONSE_FIELD],
@@ -52,11 +51,12 @@ class OpenResponse extends Response<FreeResponse> {
 
 class NumericResponse extends Response<Numeric> {
   final num response;
-  NumericResponse({
-    required Numeric question,
-    required int stamp,
-    required this.response,
-  }) : super(question: question, stamp: stamp);
+  NumericResponse(
+      {required Numeric question,
+      required int stamp,
+      required this.response,
+      super.id})
+      : super(question: question, stamp: stamp);
 
   NumericResponse.fromJson(Map<String, dynamic> json, QuestionHome home)
       : response = json[NUMERIC_RESPONSE_FIELD],
@@ -78,7 +78,7 @@ class NumericResponse extends Response<Numeric> {
 }
 
 class Selected extends Response<Check> {
-  Selected({required Check question, required int stamp})
+  Selected({required Check question, required int stamp, super.id})
       : super(question: question, stamp: stamp);
 
   Selected.fromJson(Map<String, dynamic> json, QuestionHome home)
@@ -103,7 +103,8 @@ class MultiResponse extends Response<MultipleChoice> {
   MultiResponse(
       {required MultipleChoice question,
       required int stamp,
-      required this.index})
+      required this.index,
+      super.id})
       : super(question: question, stamp: stamp);
 
   MultiResponse.fromJson(Map<String, dynamic> json, QuestionHome home)
@@ -126,7 +127,8 @@ class AllResponse extends Response<AllThatApply> {
   AllResponse(
       {required AllThatApply question,
       required int stamp,
-      required this.responses})
+      required this.responses,
+      super.id})
       : super(question: question, stamp: stamp);
 
   AllResponse.fromJson(Map<String, dynamic> json, QuestionHome home)
@@ -151,12 +153,13 @@ class DetailResponse extends Response {
 
   final String detailType;
 
-  DetailResponse({
-    required this.description,
-    required this.responses,
-    required int stamp,
-    required this.detailType,
-  }) : super(
+  DetailResponse(
+      {required this.description,
+      required this.responses,
+      required int stamp,
+      required this.detailType,
+      super.id})
+      : super(
             question: Question.ofType(
                 type:
                     (responses.isEmpty ? 'Description' : responses.first.type)),

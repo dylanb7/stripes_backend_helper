@@ -13,7 +13,10 @@ class BlueDyeTest extends TestObj {
   List<BMTestLog> logs;
 
   BlueDyeTest(
-      {required DateTime startTime, this.finishedEating, required this.logs})
+      {required DateTime startTime,
+      this.finishedEating,
+      required this.logs,
+      super.id})
       : super(startTime: startTime);
 
   BlueDyeTest.fromJson(Map<String, dynamic> json, QuestionHome home)

@@ -18,7 +18,7 @@ abstract class TestRepo<T extends TestObj> {
 
   Stream<T?> get obj;
 
-  submit(DateTime submitTime);
-  setValue(T obj);
-  cancel();
+  Future<void> submit(DateTime submitTime);
+  Future<void> setValue(T obj);
+  Future<void> cancel();
 }

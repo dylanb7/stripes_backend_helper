@@ -25,7 +25,7 @@ class TestTestRepo extends TestRepo<BlueDyeTest> {
   }
 
   @override
-  cancel() {
+  Future<void> cancel() async {
     _repo[subUser] = null;
     _streamController.add(null);
   }
@@ -34,13 +34,13 @@ class TestTestRepo extends TestRepo<BlueDyeTest> {
   Stream<BlueDyeTest?> get obj => _streamController.stream;
 
   @override
-  setValue(BlueDyeTest obj) {
+  Future<void> setValue(BlueDyeTest obj) async {
     _repo[subUser] = obj;
     _streamController.add(_repo[subUser]!);
   }
 
   @override
-  submit(DateTime submitTime) {
+  Future<void> submit(DateTime submitTime) async {
     stampRepo.addStamp(BlueDyeResp.from(_repo[subUser]!));
     cancel();
   }

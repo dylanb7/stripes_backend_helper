@@ -71,8 +71,7 @@ const Map<String, String> questions = {
 class QuestionHomeInst extends QuestionHome {
   QuestionHomeInst() {
     all.addAll({
-      q1: Numeric(
-          id: q1, prompt: questions[q1]!, type: Symptoms.PAIN, min: 1, max: 5),
+      q1: Check(id: q1, prompt: questions[q1]!, type: Symptoms.PAIN),
       q2: Numeric(
           id: q2,
           prompt: questions[q2]!,

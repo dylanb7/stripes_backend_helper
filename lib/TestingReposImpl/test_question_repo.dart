@@ -24,9 +24,6 @@ const String q11 = '11';
 const String q12 = '12';
 const String q13 = '13';
 const String q14 = '14';
-const String q15 = '15';
-const String q16 = '16';
-const String q17 = '17';
 const String q18 = '18';
 const String q19 = '19';
 const String q20 = '20';
@@ -36,11 +33,15 @@ const String q23 = '23';
 const String q24 = '24';
 const String q25 = '25';
 const String q26 = '26';
+const String q27 = '27';
+const String q28 = '28';
+const String q29 = '29';
+const String q30 = '30';
 
 const Map<String, String> questions = {
-  q1: 'Abdominal Pain',
+  q1: 'Pointing to stomach/tummy as if in pain',
   q2: 'Nausea',
-  q3: 'Severe gastrointestinal pain lasting 2 hours or longer that interrupts participation in all activities',
+  q3: 'Become more active after passing a stool?',
   q4: 'Average BM type(1-7)',
   q6: 'Pain with BM',
   q7: 'Rush to the bathroom for BM',
@@ -51,9 +52,6 @@ const Map<String, String> questions = {
   q12: 'Experienced retching',
   q13: 'Vomiting',
   q14: 'Tilted head to side and arched back',
-  q15: 'Missed Activities due to pain',
-  q16: 'Missed Activities due to reflux',
-  q17: 'Missed Activities due to BM',
   q18: 'Applied pressure to abdomen with hands or furniture',
   q19:
       'Choked, gagged coughed or made sound (gurgling) with throat during or after swallowing or meals',
@@ -64,6 +62,10 @@ const Map<String, String> questions = {
   q24: 'Irritability',
   q25: 'Aggressive/violent behaviors towards others',
   q26: 'Self injurious behaviors',
+  q27: 'Gritting teeth, wincing, or grimacing for no obvious reason',
+  q28: 'Moaning or groaning for no apparent reason',
+  q29: 'Incontinence / Lack of voluntary control over urination or defecation',
+  q30: 'Flatulence or Gas',
 };
 
 class QuestionHomeInst extends QuestionHome {
@@ -112,9 +114,6 @@ class QuestionHomeInst extends QuestionHome {
           min: 1,
           max: 5),
       q14: Check(id: q14, prompt: questions[q14]!, type: Symptoms.PAIN),
-      q15: Check(id: q15, prompt: questions[q15]!, type: Symptoms.PAIN),
-      q16: Check(id: q16, prompt: questions[q16]!, type: Symptoms.REFLUX),
-      q17: Check(id: q17, prompt: questions[q17]!, type: Symptoms.BM),
       q18: Check(id: q18, prompt: questions[q18]!, type: Symptoms.PAIN),
       q19: Check(id: q19, prompt: questions[q19]!, type: Symptoms.REFLUX),
       q20: Check(id: q20, prompt: questions[q20]!, type: Symptoms.REFLUX),
@@ -127,6 +126,10 @@ class QuestionHomeInst extends QuestionHome {
           id: q25, prompt: questions[q25]!, type: Symptoms.NB, min: 1, max: 5),
       q26: Numeric(
           id: q26, prompt: questions[q26]!, type: Symptoms.NB, min: 1, max: 5),
+      q27: Check(id: q27, prompt: questions[q27]!, type: Symptoms.PAIN),
+      q28: Check(id: q28, prompt: questions[q28]!, type: Symptoms.PAIN),
+      q29: Check(id: q29, prompt: questions[q29]!, type: Symptoms.BM),
+      q30: Numeric(id: q30, prompt: questions[q30]!, type: Symptoms.BM),
     });
   }
 
@@ -147,8 +150,12 @@ class QuestionHomeInst extends QuestionHome {
 
   List<Question> get bm1 => [fromID(q4)];
 
-  List<Question> get bm2 =>
-      [fromID(q3), fromID(q6), fromID(q7), fromID(q8), fromID(q9), fromID(q17)];
+  List<Question> get bm2 => [
+        fromID(q6),
+        fromID(q7),
+        fromID(q8),
+        fromID(q9),
+      ];
 
   List<Question> get reflux => [
         fromID(q2),
@@ -156,7 +163,6 @@ class QuestionHomeInst extends QuestionHome {
         fromID(q11),
         fromID(q12),
         fromID(q13),
-        fromID(q16),
         fromID(q19),
         fromID(q20)
       ];
@@ -164,7 +170,6 @@ class QuestionHomeInst extends QuestionHome {
   List<Question> get pain => [
         fromID(q1),
         fromID(q14),
-        fromID(q15),
         fromID(q18),
       ];
 

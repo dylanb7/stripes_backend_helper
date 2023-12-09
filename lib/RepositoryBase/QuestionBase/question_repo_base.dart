@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/RepositoryBase/AuthBase/auth_user.dart';
 
@@ -69,6 +70,32 @@ enum Period {
       case Period.year:
         final DateTime end = start.add(const Duration(days: 365));
         return DateTimeRange(start: start, end: end);
+    }
+  }
+
+  String getRangeString(DateTime time, BuildContext context) {
+    DateTimeRange range = getRange(time);
+    String locale = Localizations.localeOf(context).languageCode;
+
+    final DateFormat yearFormat = DateFormat.yMMMd(locale);
+
+    switch (this) {
+      case Period.day:
+        return yearFormat.format(range.start);
+      case Period.week:
+        final bool sameYear = range.end.year == range.start.year;
+        final bool sameMonth = sameYear && range.end.month == range.start.month;
+        final String firstPortion = sameYear
+            ? DateFormat.MMMd(locale).format(range.start)
+            : yearFormat.format(range.start);
+        final String lastPortion = sameMonth
+            ? '${DateFormat.d(locale).format(range.end)}, ${DateFormat.y(locale).format(range.end)}'
+            : yearFormat.format(range.end);
+        return '$firstPortion - $lastPortion';
+      case Period.month:
+        return DateFormat.yMMM(locale).format(range.start);
+      case Period.year:
+        return DateFormat.y(locale).format(range.start);
     }
   }
 

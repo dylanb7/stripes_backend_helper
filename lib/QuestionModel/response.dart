@@ -151,17 +151,17 @@ class DetailResponse extends Response {
 
   final List<Response> responses;
 
-  final String detailType;
+  final String? detailType;
 
   DetailResponse(
       {required this.description,
       required this.responses,
       required int stamp,
-      required this.detailType,
+      this.detailType,
       super.id})
       : super(
             question: Question.ofType(
-                type:
+                type: detailType ??
                     (responses.isEmpty ? 'Description' : responses.first.type)),
             stamp: stamp);
 

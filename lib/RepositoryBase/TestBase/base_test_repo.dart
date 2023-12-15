@@ -80,17 +80,16 @@ abstract class Test<T extends TestObj> {
   final SubUser subUser;
   final AuthUser authUser;
   final QuestionRepo questionRepo;
-  final String id;
 
   final Set<String> listensTo;
 
-  Test(
-      {required this.stampRepo,
-      required this.authUser,
-      required this.subUser,
-      required this.questionRepo,
-      required this.listensTo,
-      required this.id});
+  Test({
+    required this.stampRepo,
+    required this.authUser,
+    required this.subUser,
+    required this.questionRepo,
+    required this.listensTo,
+  });
 
   Stream<T> get obj;
 

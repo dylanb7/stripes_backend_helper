@@ -24,6 +24,10 @@ class BlueDyeObj extends TestObj {
         logs = deserializeLogs(json, home),
         super.fromJson(json);
 
+  BlueDyeObj.empty()
+      : logs = [],
+        super(startTime: null);
+
   @override
   Map<String, dynamic> toJson() => {
         ...super.toJson(),

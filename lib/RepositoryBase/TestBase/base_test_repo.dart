@@ -1,5 +1,6 @@
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/subjects.dart';
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/QuestionModel/response.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
@@ -91,7 +92,7 @@ abstract class Test<T extends TestObj> {
     required this.listensTo,
   });
 
-  Stream<T> get obj;
+  BehaviorSubject<T> get obj;
 
   String getName(BuildContext context);
   List<Question> recordAdditions(BuildContext context, String type);

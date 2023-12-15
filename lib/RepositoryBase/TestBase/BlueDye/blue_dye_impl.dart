@@ -96,3 +96,28 @@ Map<String, dynamic> serializeLogs(List<BMTestLog> logs) {
   }
   return res;
 }
+
+enum TestState {
+  initial,
+  started,
+  logs,
+  logsSubmit;
+
+  bool get testInProgress => this != TestState.initial;
+}
+
+TestState stateFromTestOBJ(BlueDyeObj? obj) {
+  if (obj == null || obj.start == null) return TestState.initial;
+  if (obj.finishedEating == null) return TestState.started;
+  bool startsBlue = false;
+  bool endsNormal = false;
+  for (BMTestLog log in obj.logs) {
+    if (log.isBlue) {
+      startsBlue = true;
+    } else if (startsBlue) {
+      endsNormal = true;
+    }
+  }
+  if (endsNormal) return TestState.logsSubmit;
+  return TestState.logs;
+}

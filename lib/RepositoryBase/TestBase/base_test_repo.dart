@@ -15,7 +15,7 @@ abstract class TestsRepo {
   final AuthUser authUser;
   final QuestionRepo questionRepo;
   final List<Test> tests;
-  late final Stream<TestObj?> objects;
+  late final Stream<List<TestObj?>> objects;
 
   TestsRepo(
       {required this.stampRepo,
@@ -23,7 +23,7 @@ abstract class TestsRepo {
       required this.subUser,
       required this.questionRepo,
       required this.tests}) {
-    objects = StreamGroup.merge(tests.map((e) => e.obj));
+    objects = StreamZip(tests.map((e) => e.obj)).asBroadcastStream();
   }
 
   List<Test> _getApplicable(String type) {

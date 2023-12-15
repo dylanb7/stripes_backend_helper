@@ -30,7 +30,7 @@ abstract class StripesRepoPackage {
       required SubUser subUser,
       required QuestionRepo questionRepo});
 
-  TestRepo<BlueDyeTest> test(
+  TestsRepo test(
       {required AuthUser user,
       required SubUser subUser,
       required StampRepo stampRepo,
@@ -64,7 +64,7 @@ class LocalRepoPackage extends StripesRepoPackage {
   }
 
   @override
-  TestRepo<BlueDyeTest> test(
+  TestsRepo test(
       {required AuthUser user,
       required SubUser subUser,
       required StampRepo<Stamp> stampRepo,
@@ -108,7 +108,7 @@ class LocalStockedRepoPackage extends StripesRepoPackage {
   }
 
   @override
-  TestRepo<BlueDyeTest> test(
+  TestsRepo test(
       {required AuthUser user,
       required SubUser subUser,
       required StampRepo<Stamp> stampRepo,

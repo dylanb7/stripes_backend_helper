@@ -33,7 +33,7 @@ class BlueDyeResp extends Response {
             stamp: dateToStamp(startEating));
 
   //test obj must have atleast one log
-  factory BlueDyeResp.from(BlueDyeTest obj) {
+  factory BlueDyeResp.from(BlueDyeObj obj) {
     if (obj.logs.isEmpty) {
       throw 'Insuffient logs';
     }

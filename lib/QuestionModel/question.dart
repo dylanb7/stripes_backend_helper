@@ -9,7 +9,13 @@ abstract class Question with EquatableMixin {
 
   final String type;
 
-  const Question({required this.id, required this.prompt, required this.type});
+  final bool isRequired;
+
+  const Question(
+      {required this.id,
+      required this.prompt,
+      required this.type,
+      required this.isRequired});
 
   factory Question.ofType({required String type}) =>
       Check(id: '', prompt: '', type: type);
@@ -19,11 +25,18 @@ abstract class Question with EquatableMixin {
 
 class FreeResponse extends Question {
   const FreeResponse(
-      {required String id, required String prompt, required String type})
-      : super(id: id, prompt: prompt, type: type);
+      {required String id,
+      required String prompt,
+      required String type,
+      bool? isRequired})
+      : super(
+            id: id,
+            prompt: prompt,
+            type: type,
+            isRequired: isRequired ?? false);
 
   @override
-  List<Object?> get props => [id, prompt, type];
+  List<Object?> get props => [id, prompt, type, isRequired];
 }
 
 class Numeric extends Question {
@@ -32,21 +45,33 @@ class Numeric extends Question {
       {required String id,
       required String prompt,
       required String type,
+      bool? isRequired,
       this.min,
       this.max})
-      : super(id: id, prompt: prompt, type: type);
+      : super(
+            id: id,
+            prompt: prompt,
+            type: type,
+            isRequired: isRequired ?? false);
 
   @override
-  List<Object?> get props => [id, prompt, type, min, max];
+  List<Object?> get props => [id, prompt, type, min, max, isRequired];
 }
 
 class Check extends Question {
   const Check(
-      {required String id, required String prompt, required String type})
-      : super(id: id, prompt: prompt, type: type);
+      {required String id,
+      required String prompt,
+      required String type,
+      bool? isRequired})
+      : super(
+            id: id,
+            prompt: prompt,
+            type: type,
+            isRequired: isRequired ?? false);
 
   @override
-  List<Object?> get props => [id, prompt, type];
+  List<Object?> get props => [id, prompt, type, isRequired];
 }
 
 class MultipleChoice extends Question {
@@ -56,11 +81,16 @@ class MultipleChoice extends Question {
       {required String id,
       required String prompt,
       required String type,
-      required this.choices})
-      : super(id: id, prompt: prompt, type: type);
+      required this.choices,
+      bool? isRequired})
+      : super(
+            id: id,
+            prompt: prompt,
+            type: type,
+            isRequired: isRequired ?? false);
 
   @override
-  List<Object?> get props => [id, prompt, type, choices];
+  List<Object?> get props => [id, prompt, type, choices, isRequired];
 }
 
 class AllThatApply extends Question {
@@ -70,9 +100,14 @@ class AllThatApply extends Question {
       {required String id,
       required String prompt,
       required String type,
-      required this.choices})
-      : super(id: id, prompt: prompt, type: type);
+      required this.choices,
+      bool? isRequired})
+      : super(
+            id: id,
+            prompt: prompt,
+            type: type,
+            isRequired: isRequired ?? false);
 
   @override
-  List<Object?> get props => [id, prompt, type, choices];
+  List<Object?> get props => [id, prompt, type, choices, isRequired];
 }

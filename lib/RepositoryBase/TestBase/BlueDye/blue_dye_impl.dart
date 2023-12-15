@@ -7,19 +7,19 @@ import 'bm_test_log.dart';
 // ignore: constant_identifier_names
 const String FINISHED_KEY = 'finished_eating';
 
-class BlueDyeTest extends TestObj {
+class BlueDyeObj extends TestObj {
   Duration? finishedEating;
 
   List<BMTestLog> logs;
 
-  BlueDyeTest(
+  BlueDyeObj(
       {required DateTime startTime,
       this.finishedEating,
       required this.logs,
       super.id})
       : super(startTime: startTime);
 
-  BlueDyeTest.fromJson(Map<String, dynamic> json, QuestionHome home)
+  BlueDyeObj.fromJson(Map<String, dynamic> json, QuestionHome home)
       : finishedEating = toDuration(json[FINISHED_KEY]),
         logs = deserializeLogs(json, home),
         super.fromJson(json);

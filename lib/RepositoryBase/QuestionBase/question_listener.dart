@@ -1,8 +1,21 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/QuestionModel/response.dart';
 
-class QuestionsListener extends ChangeNotifier {
+class QuestionsListener extends ChangeNotifier with EquatableMixin {
+  QuestionsListener(
+      {List<Response>? responses, this.editId, this.submitTime, String? desc}) {
+    _description = desc;
+    responses?.forEach((res) {
+      questions[res.question] = res;
+    });
+  }
+
+  final DateTime? submitTime;
+
+  final String? editId;
+
   final Map<Question, Response> questions = {};
 
   final Set<Question> pending = {};
@@ -13,6 +26,15 @@ class QuestionsListener extends ChangeNotifier {
 
   set tried(val) {
     _tried = val;
+    notifyListeners();
+  }
+
+  String? _description;
+
+  get description => _description;
+
+  set description(desc) {
+    _description = desc;
     notifyListeners();
   }
 
@@ -37,4 +59,7 @@ class QuestionsListener extends ChangeNotifier {
     questions.remove(question);
     notifyListeners();
   }
+
+  @override
+  List<Object?> get props => [editId, questions, description, submitTime];
 }

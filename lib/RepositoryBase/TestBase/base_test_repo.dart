@@ -15,7 +15,7 @@ abstract class TestsRepo {
   final AuthUser authUser;
   final QuestionRepo questionRepo;
   final List<Test> tests;
-  late final Stream<List<TestObj?>> objects;
+  late final Stream<List<TestObj>> objects;
 
   TestsRepo(
       {required this.stampRepo,
@@ -80,18 +80,19 @@ abstract class Test<T extends TestObj> {
   final SubUser subUser;
   final AuthUser authUser;
   final QuestionRepo questionRepo;
+  final String id;
 
   final Set<String> listensTo;
 
-  Test({
-    required this.stampRepo,
-    required this.authUser,
-    required this.subUser,
-    required this.questionRepo,
-    required this.listensTo,
-  });
+  Test(
+      {required this.stampRepo,
+      required this.authUser,
+      required this.subUser,
+      required this.questionRepo,
+      required this.listensTo,
+      required this.id});
 
-  Stream<T?> get obj;
+  Stream<T> get obj;
 
   String getName(BuildContext context);
   List<Question> recordAdditions(BuildContext context, String type);

@@ -7,7 +7,6 @@ import 'package:stripes_backend_helper/RepositoryBase/AuthBase/auth_user.dart';
 import 'package:stripes_backend_helper/RepositoryBase/SubBase/sub_user.dart';
 import 'package:stripes_backend_helper/RepositoryBase/TestBase/BlueDye/blue_dye_impl.dart';
 
-import 'package:stripes_backend_helper/RepositoryBase/TestBase/test_obj.dart';
 import 'package:stripes_backend_helper/TestingReposImpl/test_question_repo.dart';
 
 import '../RepositoryBase/StampBase/base_stamp_repo.dart';
@@ -24,14 +23,10 @@ class TestTestRepo extends TestsRepo {
             stampRepo: testResponseRepo,
             subUser: subUser,
             authUser: const AuthUser.empty(),
-            questionRepo: TestQuestionRepo()) {
+            questionRepo: TestQuestionRepo(),
+            tests: []) {
     _repo[subUser] = null;
     _streamController.add(null);
-  }
-
-  @override
-  List<Test<TestObj>> getTests() {
-    return [];
   }
 }
 

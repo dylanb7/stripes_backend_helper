@@ -1,3 +1,4 @@
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/QuestionModel/response.dart';
@@ -13,17 +14,19 @@ abstract class TestsRepo {
   final SubUser subUser;
   final AuthUser authUser;
   final QuestionRepo questionRepo;
+  final List<Test> tests;
+  late final Stream<TestObj?> objects;
 
   TestsRepo(
       {required this.stampRepo,
       required this.authUser,
       required this.subUser,
-      required this.questionRepo});
-
-  List<Test> getTests();
+      required this.questionRepo,
+      required this.tests}) {
+    objects = StreamGroup.merge(tests.map((e) => e.obj));
+  }
 
   List<Test> _getApplicable(String type) {
-    List<Test> tests = getTests();
     return tests
         .where((test) => test.listensTo.contains(type))
         .toList(growable: false);

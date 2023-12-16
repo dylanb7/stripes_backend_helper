@@ -10,7 +10,7 @@ import 'package:stripes_backend_helper/RepositoryBase/SubBase/sub_user.dart';
 import '../AuthBase/auth_user.dart';
 import 'test_obj.dart';
 
-abstract class TestsRepo {
+class TestsRepo {
   final StampRepo stampRepo;
   final SubUser subUser;
   final AuthUser authUser;

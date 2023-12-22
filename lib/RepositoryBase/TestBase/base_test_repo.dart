@@ -103,5 +103,5 @@ abstract class Test<T extends TestObj> {
   Future<void> submit(DateTime submitTime);
   Future<void> setValue(T obj);
   Future<void> cancel();
-  Widget? displayState(T? obj, BuildContext context);
+  Widget? displayState(BuildContext context);
 }

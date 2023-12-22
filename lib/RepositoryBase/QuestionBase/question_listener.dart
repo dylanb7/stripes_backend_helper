@@ -46,6 +46,19 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
     notifyListeners();
   }
 
+  setResponse(Question question, {Response? response}) {
+    if (response == null) {
+      questions.remove(question);
+      if (question.isRequired) {
+        pending.add(question);
+      }
+    } else {
+      questions[question] = response;
+      pending.remove(question);
+    }
+    notifyListeners();
+  }
+
   addPending(Question question) {
     pending.add(question);
     notifyListeners();

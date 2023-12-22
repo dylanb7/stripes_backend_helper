@@ -30,7 +30,7 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
 
   bool _tried = false;
 
-  get tried => _tried;
+  bool get tried => _tried;
 
   set tried(val) {
     _tried = val;

@@ -7,11 +7,5 @@ import '../RepositoryBase/StampBase/base_stamp_repo.dart';
 import '../RepositoryBase/TestBase/base_test_repo.dart';
 
 class TestTestRepo extends TestsRepo {
-  TestTestRepo(StampRepo testResponseRepo, SubUser subUser)
-      : super(
-            stampRepo: testResponseRepo,
-            subUser: subUser,
-            authUser: const AuthUser.empty(),
-            questionRepo: TestQuestionRepo(),
-            tests: []);
+  TestTestRepo(StampRepo testResponseRepo, SubUser subUser) : super(tests: []);
 }

@@ -11,19 +11,10 @@ import '../AuthBase/auth_user.dart';
 import 'test_obj.dart';
 
 class TestsRepo {
-  final StampRepo stampRepo;
-  final SubUser subUser;
-  final AuthUser authUser;
-  final QuestionRepo questionRepo;
   final List<Test> tests;
   late final Stream<List<TestObj>> objects;
 
-  TestsRepo(
-      {required this.stampRepo,
-      required this.authUser,
-      required this.subUser,
-      required this.questionRepo,
-      required this.tests}) {
+  TestsRepo({required this.tests}) {
     objects = StreamZip(tests.map((e) => e.obj)).asBroadcastStream();
   }
 

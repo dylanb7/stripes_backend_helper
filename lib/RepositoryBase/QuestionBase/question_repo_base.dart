@@ -16,8 +16,7 @@ abstract class QuestionRepo<T extends QuestionHome> {
 
   QuestionRepo({required this.authUser});
 
-  Map<String, Widget Function(Response<Question>, BuildContext context)>?
-      displayOverrides;
+  Map<String, DisplayBuilder>? displayOverrides;
 
   Map<String, QuestionEntry>? entryOverrides;
 
@@ -25,6 +24,9 @@ abstract class QuestionRepo<T extends QuestionHome> {
 
   T get questions;
 }
+
+typedef DisplayBuilder<T extends Response<Question>> = Widget Function(
+    BuildContext, T);
 
 typedef EntryBuilder<T extends Question> = Widget Function(
     QuestionsListener, BuildContext, T);

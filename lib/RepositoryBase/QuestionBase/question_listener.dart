@@ -30,11 +30,13 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
 
   bool _tried = false;
 
-  get tried => _tried;
+  bool get tried => _tried;
 
   set tried(val) {
-    _tried = val;
-    notifyListeners();
+    if (_tried != val) {
+      _tried = val;
+      notifyListeners();
+    }
   }
 
   String? _description;
@@ -43,6 +45,19 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
 
   set description(desc) {
     _description = desc;
+    notifyListeners();
+  }
+
+  setResponse(Question question, {Response? response}) {
+    if (response == null) {
+      questions.remove(question);
+      if (question.isRequired) {
+        pending.add(question);
+      }
+    } else {
+      questions[question] = response;
+      pending.remove(question);
+    }
     notifyListeners();
   }
 

@@ -38,7 +38,7 @@ class BlueDyeResp extends Response {
       throw 'Insuffient logs';
     }
     return BlueDyeResp(
-        startEating: obj.start!,
+        startEating: obj.startTime!,
         eatingDuration: obj.finishedEating!,
         blueBowelMovements: obj.logs.where((element) => element.isBlue).length,
         normalBowelMovements:

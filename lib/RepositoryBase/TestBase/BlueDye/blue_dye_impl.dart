@@ -13,10 +13,7 @@ class BlueDyeObj extends TestObj {
   List<BMTestLog> logs;
 
   BlueDyeObj(
-      {required DateTime startTime,
-      this.finishedEating,
-      required this.logs,
-      super.id})
+      {DateTime? startTime, this.finishedEating, required this.logs, super.id})
       : super(startTime: startTime);
 
   BlueDyeObj.fromJson(Map<String, dynamic> json, QuestionHome home)
@@ -36,31 +33,15 @@ class BlueDyeObj extends TestObj {
         ...serializeLogs(logs),
       };
 
-  setLogs(List<BMTestLog> newLogs) {
-    logs = newLogs;
-  }
-
-  addLog(BMTestLog log) {
-    logs.add(log);
-  }
-
-  removeLog(BMTestLog log) {
-    logs.removeWhere((element) => element.stamp == log.stamp);
-  }
-
-  updateLog(BMTestLog log) {
-    final int index = logs.indexWhere((element) => element.stamp == log.stamp);
-    if (index < 0 || index >= logs.length) return;
-    logs[index] = log;
-  }
-
-  set setStart(DateTime start) => startTime = start;
-
-  set finished(Duration end) => finishedEating = end;
-
-  DateTime? get start => startTime;
-
-  Duration? get eatingDone => finishedEating;
+  BlueDyeObj copyWith(
+          {DateTime? startTime,
+          Duration? finishedEating,
+          List<BMTestLog>? logs}) =>
+      BlueDyeObj(
+          id: id,
+          startTime: startTime ?? this.startTime,
+          finishedEating: finishedEating ?? this.finishedEating,
+          logs: logs ?? this.logs);
 
   @override
   String toString() {
@@ -107,7 +88,7 @@ enum TestState {
 }
 
 TestState stateFromTestOBJ(BlueDyeObj? obj) {
-  if (obj == null || obj.start == null) return TestState.initial;
+  if (obj == null || obj.startTime == null) return TestState.initial;
   if (obj.finishedEating == null) return TestState.started;
   bool startsBlue = false;
   bool endsNormal = false;

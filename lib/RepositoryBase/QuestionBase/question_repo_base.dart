@@ -59,5 +59,7 @@ class PageLayout {
 abstract class QuestionHome {
   Map<String, Question> all = {};
 
+  Map<String, Question> additons = {};
+
   Question fromID(String id) => all[id] ?? Question.empty();
 }

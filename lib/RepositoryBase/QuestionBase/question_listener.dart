@@ -5,7 +5,11 @@ import 'package:stripes_backend_helper/QuestionModel/response.dart';
 
 class QuestionsListener extends ChangeNotifier with EquatableMixin {
   QuestionsListener(
-      {List<Response>? responses, this.editId, this.submitTime, String? desc}) {
+      {List<Response>? responses,
+      this.editId,
+      DateTime? submitTime,
+      String? desc}) {
+    _submitTime = submitTime;
     _description = desc;
     responses?.forEach((res) {
       questions[res.question] = res;
@@ -13,14 +17,21 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
   }
 
   QuestionsListener.copy(QuestionsListener original)
-      : submitTime = original.submitTime,
+      : _submitTime = original.submitTime,
         editId = original.editId,
         questions = original.questions,
         pending = original.pending,
         _tried = original._tried,
         _description = original._description;
 
-  final DateTime? submitTime;
+  DateTime? _submitTime;
+
+  DateTime? get submitTime => _submitTime;
+
+  set submitTime(DateTime? dateTime) {
+    _submitTime = dateTime;
+    notifyListeners();
+  }
 
   final String? editId;
 

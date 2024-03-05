@@ -147,7 +147,7 @@ class AllResponse extends Response<AllThatApply> {
 }
 
 class DetailResponse extends Response {
-  final String description;
+  final String? description;
 
   final List<Response> responses;
 

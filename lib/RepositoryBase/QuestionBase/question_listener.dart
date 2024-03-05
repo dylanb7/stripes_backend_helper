@@ -95,5 +95,6 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
   }
 
   @override
-  List<Object?> get props => [editId, questions, description, submitTime];
+  List<Object?> get props =>
+      [editId, ...questions.values, description, submitTime];
 }

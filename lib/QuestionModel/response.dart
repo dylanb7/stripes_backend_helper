@@ -14,7 +14,7 @@ abstract class Response<E extends Question> extends Stamp with EquatableMixin {
       : super(type: question.type);
 
   Response.fromJson(Map<String, dynamic> json, QuestionHome home)
-      : question = home.fromID(json[ID_FIELD]) as E,
+      : question = home.fromBank(json[ID_FIELD]) as E,
         super.fromJson(json);
 
   @override

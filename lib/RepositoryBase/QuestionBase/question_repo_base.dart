@@ -49,11 +49,11 @@ class RecordPath {
 
 @immutable
 class PageLayout {
-  final List<Question> questions;
+  final List<String> questionIds;
 
   final String? header;
 
-  const PageLayout({required this.questions, this.header});
+  const PageLayout({required this.questionIds, this.header});
 }
 
 abstract class QuestionHome {

@@ -12,7 +12,7 @@ class TestAuth extends AuthRepo {
   @override
   Future<void> logIn(Map<String, dynamic> params) async {
     print('Logged in');
-    _user = const AuthUser(uid: 'uid');
+    _user = const AuthUser(uid: 'uid', attributes: {});
     _authUser.add(_user);
   }
 
@@ -30,7 +30,7 @@ class TestAuth extends AuthRepo {
   @override
   Future<void> signUp(Map<String, dynamic> params) async {
     print('Signed up');
-    _user = const AuthUser(uid: 'uid');
+    _user = const AuthUser.uid(uid: 'uid');
     _authUser.add(_user);
   }
 

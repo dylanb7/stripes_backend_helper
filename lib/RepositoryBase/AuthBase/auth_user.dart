@@ -5,36 +5,35 @@ import 'package:stripes_backend_helper/db_keys.dart';
 @immutable
 class AuthUser extends Equatable {
   final String uid;
-  final String? email;
+
+  final Map<String, dynamic> attributes;
 
   const AuthUser({
     required this.uid,
-    this.email,
+    required this.attributes,
   });
+
+  const AuthUser.uid({required this.uid}) : attributes = const {};
 
   const AuthUser.empty()
       : uid = '',
-        email = null;
+        attributes = const {};
 
-  const AuthUser.localCode(String code)
+  AuthUser.localCode(String code)
       : uid = code,
-        email = 'LocalCode';
+        attributes = {"local": code};
 
-  factory AuthUser.from({required Map<String, dynamic> json}) => AuthUser(
-      uid: json[UID_FIELD],
-      email: json.containsKey(EMAIL_FIELD) ? json[EMAIL_FIELD] : null);
+  factory AuthUser.from({required Map<String, dynamic> json}) =>
+      AuthUser(uid: json[UID_FIELD], attributes: {...json}..remove(UID_FIELD));
 
   Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {UID_FIELD: uid};
-    if (email != null) {
-      json[EMAIL_FIELD] = email;
-    }
-    return json;
+    return {UID_FIELD: uid, ...attributes};
   }
 
   static bool isEmpty(AuthUser user) => user.uid == '';
 
-  static bool isLocalCode(AuthUser user) => user.email == 'LocalCode';
+  static bool isLocalCode(AuthUser user) =>
+      user.attributes['local'] == 'LocalCode';
 
   @override
   String toString() {
@@ -42,5 +41,5 @@ class AuthUser extends Equatable {
   }
 
   @override
-  List<Object?> get props => [uid, email];
+  List<Object?> get props => [uid, attributes];
 }

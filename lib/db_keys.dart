@@ -104,3 +104,5 @@ const String NUMERIC_RESPONSE_FIELD = 'numeric_response';
 const String DETAIL_TYPE_KEY = 'detailTypeKey';
 
 const String DESCRIPTION_FIELD = 'desc';
+
+const String ATTRIBUTES_FIELD = 'attributes';

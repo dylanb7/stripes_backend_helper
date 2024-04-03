@@ -37,7 +37,7 @@ class AuthUser extends Equatable {
 
   @override
   String toString() {
-    return 'AuthUser($uid)';
+    return 'AuthUser($uid) Attributes($attributes)';
   }
 
   @override

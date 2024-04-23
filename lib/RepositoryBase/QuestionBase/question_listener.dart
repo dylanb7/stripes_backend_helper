@@ -16,11 +16,11 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
     });
   }
 
-  QuestionsListener copy(QuestionsListener original) => QuestionsListener(
-      responses: original.questions.values.toList(),
-      editId: original.editId,
-      submitTime: original.submitTime,
-      desc: original.description);
+  QuestionsListener copy() => QuestionsListener(
+      responses: questions.values.toList(),
+      editId: editId,
+      submitTime: submitTime,
+      desc: description);
 
   DateTime? _submitTime;
 

@@ -95,5 +95,10 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
   }
 
   @override
+  String toString() {
+    return "$editId | $description | $submitTime\n\n$questions ";
+  }
+
+  @override
   List<Object?> get props => [editId, questions, description, submitTime];
 }

@@ -81,30 +81,26 @@ class QuestionHomeInst extends QuestionHome {
       q4: Numeric(
           id: q4, prompt: questions[q4]!, type: Symptoms.BM, min: 1, max: 7),
       q6: Numeric(
-          id: q6, prompt: questions[q6]!, type: Symptoms.BM, min: 1, max: 5),
-      q7: Numeric(
-          id: q7, prompt: questions[q7]!, type: Symptoms.BM, min: 1, max: 5),
-      q8: Numeric(
-          id: q8, prompt: questions[q8]!, type: Symptoms.BM, min: 1, max: 5),
+          id: q6, prompt: questions[q6]!, type: Symptoms.BM, min: 0, max: 10),
+      q7: Check(id: q7, prompt: questions[q7]!, type: Symptoms.BM),
+      q8: Check(id: q8, prompt: questions[q8]!, type: Symptoms.BM),
       q9: Check(id: q9, prompt: questions[q9]!, type: Symptoms.BM),
-      q10: Numeric(
-          id: q10,
-          prompt: questions[q10]!,
-          type: Symptoms.REFLUX,
-          min: 1,
-          max: 5),
+      q10: Check(
+        id: q10,
+        prompt: questions[q10]!,
+        type: Symptoms.REFLUX,
+      ),
       q11: Numeric(
           id: q11,
           prompt: questions[q11]!,
           type: Symptoms.REFLUX,
           min: 1,
           max: 5),
-      q12: Numeric(
-          id: q12,
-          prompt: questions[q12]!,
-          type: Symptoms.REFLUX,
-          min: 1,
-          max: 5),
+      q12: Check(
+        id: q12,
+        prompt: questions[q12]!,
+        type: Symptoms.REFLUX,
+      ),
       q13: Numeric(
           id: q13,
           prompt: questions[q13]!,
@@ -127,7 +123,7 @@ class QuestionHomeInst extends QuestionHome {
       q27: Check(id: q27, prompt: questions[q27]!, type: Symptoms.PAIN),
       q28: Check(id: q28, prompt: questions[q28]!, type: Symptoms.PAIN),
       q29: Check(id: q29, prompt: questions[q29]!, type: Symptoms.BM),
-      q30: Numeric(id: q30, prompt: questions[q30]!, type: Symptoms.BM),
+      q30: Check(id: q30, prompt: questions[q30]!, type: Symptoms.BM),
     });
   }
 

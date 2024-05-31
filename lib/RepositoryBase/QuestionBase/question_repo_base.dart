@@ -20,7 +20,9 @@ abstract class QuestionRepo<T extends QuestionHome> {
 
   Map<String, QuestionEntry>? entryOverrides;
 
-  Map<String, RecordPath> getLayouts(BuildContext context) => {};
+  Map<String, RecordPath> getLayouts(
+          BuildContext context, QuestionsListener listener) =>
+      {};
 
   T get questions;
 }

@@ -81,7 +81,12 @@ class QuestionHomeInst extends QuestionHome {
       q4: Numeric(
           id: q4, prompt: questions[q4]!, type: Symptoms.BM, min: 1, max: 7),
       q6: Numeric(
-          id: q6, prompt: questions[q6]!, type: Symptoms.BM, min: 0, max: 10),
+          id: q6,
+          prompt: questions[q6]!,
+          type: Symptoms.BM,
+          min: 0,
+          max: 10,
+          isRequired: true),
       q7: Check(id: q7, prompt: questions[q7]!, type: Symptoms.BM),
       q8: Check(id: q8, prompt: questions[q8]!, type: Symptoms.BM),
       q9: Check(id: q9, prompt: questions[q9]!, type: Symptoms.BM),

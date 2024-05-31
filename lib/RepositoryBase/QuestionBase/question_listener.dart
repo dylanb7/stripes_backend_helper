@@ -41,7 +41,7 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
 
   bool get tried => _tried;
 
-  set tried(val) {
+  set tried(bool val) {
     if (_tried != val) {
       _tried = val;
       notifyListeners();
@@ -50,9 +50,9 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
 
   String? _description;
 
-  get description => _description;
+  String? get description => _description;
 
-  set description(desc) {
+  set description(String? desc) {
     _description = desc;
     notifyListeners();
   }

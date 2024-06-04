@@ -6,18 +6,29 @@ import 'bm_test_log.dart';
 
 // ignore: constant_identifier_names
 const String FINISHED_KEY = 'finished_eating';
+// ignore: constant_identifier_names
+const String FINISHED_TIME_KEY = 'finished_time';
 
 class BlueDyeObj extends TestObj {
   Duration? finishedEating;
 
+  DateTime? finishedEatingTime;
+
   List<BMTestLog> logs;
 
   BlueDyeObj(
-      {DateTime? startTime, this.finishedEating, required this.logs, super.id})
+      {DateTime? startTime,
+      this.finishedEating,
+      this.finishedEatingTime,
+      required this.logs,
+      super.id})
       : super(startTime: startTime);
 
   BlueDyeObj.fromJson(Map<String, dynamic> json, QuestionHome home)
       : finishedEating = toDuration(json[FINISHED_KEY]),
+        finishedEatingTime = json.containsKey(FINISHED_TIME_KEY)
+            ? dateFromStamp(json[FINISHED_TIME_KEY])
+            : null,
         logs = deserializeLogs(json, home),
         super.fromJson(json);
 
@@ -30,22 +41,26 @@ class BlueDyeObj extends TestObj {
         ...super.toJson(),
         if (finishedEating != null)
           FINISHED_KEY: finishedEating!.inMilliseconds,
+        if (finishedEatingTime != null)
+          FINISHED_TIME_KEY: dateToStamp(finishedEatingTime!),
         ...serializeLogs(logs),
       };
 
   BlueDyeObj copyWith(
           {DateTime? startTime,
           Duration? finishedEating,
+          DateTime? finishedEatingTime,
           List<BMTestLog>? logs}) =>
       BlueDyeObj(
           id: id,
           startTime: startTime ?? this.startTime,
           finishedEating: finishedEating ?? this.finishedEating,
+          finishedEatingTime: finishedEatingTime ?? this.finishedEatingTime,
           logs: logs ?? this.logs);
 
   @override
   String toString() {
-    return 'start: $startTime, duration: $finishedEating, logs: $logs';
+    return 'start: $startTime, duration: $finishedEating, finish time: $finishedEatingTime, logs: $logs';
   }
 }
 

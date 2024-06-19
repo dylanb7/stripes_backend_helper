@@ -9,10 +9,14 @@ const String FINISHED_KEY = 'finished_eating';
 // ignore: constant_identifier_names
 const String FINISHED_TIME_KEY = 'finished_time';
 
+const String AMOUNT_CONSUMED = 'amount_consumed';
+
 class BlueDyeObj extends TestObj {
   Duration? finishedEating;
 
   DateTime? finishedEatingTime;
+
+  AmountConsumed? amountConsumed;
 
   List<BMTestLog> logs;
 
@@ -20,6 +24,7 @@ class BlueDyeObj extends TestObj {
       {DateTime? startTime,
       this.finishedEating,
       this.finishedEatingTime,
+      this.amountConsumed,
       required this.logs,
       super.id})
       : super(startTime: startTime);
@@ -29,6 +34,7 @@ class BlueDyeObj extends TestObj {
         finishedEatingTime = json.containsKey(FINISHED_TIME_KEY)
             ? dateFromStamp(json[FINISHED_TIME_KEY])
             : null,
+        amountConsumed = parseAmountConsumed(json[AMOUNT_CONSUMED]),
         logs = deserializeLogs(json, home),
         super.fromJson(json);
 
@@ -43,6 +49,7 @@ class BlueDyeObj extends TestObj {
           FINISHED_KEY: finishedEating!.inMilliseconds,
         if (finishedEatingTime != null)
           FINISHED_TIME_KEY: dateToStamp(finishedEatingTime!),
+        if (amountConsumed != null) AMOUNT_CONSUMED: amountConsumed.toString(),
         ...serializeLogs(logs),
       };
 
@@ -91,6 +98,39 @@ Map<String, dynamic> serializeLogs(List<BMTestLog> logs) {
     res['$i'] = logs[i].toJson();
   }
   return res;
+}
+
+enum AmountConsumed {
+  halfOrLess,
+  half,
+  moreThanHalf,
+  all;
+
+  @override
+  String toString() {
+    switch (this) {
+      case AmountConsumed.halfOrLess:
+        return "Less than half of blue meal";
+      case AmountConsumed.half:
+        return "Half of blue meal";
+      case AmountConsumed.moreThanHalf:
+        return "More than half of blue meal";
+      case AmountConsumed.all:
+        return "All of blue meal";
+    }
+  }
+}
+
+const Map<String, AmountConsumed> parseMap = {
+  "Less than half of blue meal": AmountConsumed.halfOrLess,
+  "Half of blue meal": AmountConsumed.half,
+  "More than half of blue meal": AmountConsumed.moreThanHalf,
+  "All of blue meal": AmountConsumed.all
+};
+
+AmountConsumed? parseAmountConsumed(String? value) {
+  if (value == null) return null;
+  return parseMap[value];
 }
 
 enum TestState {

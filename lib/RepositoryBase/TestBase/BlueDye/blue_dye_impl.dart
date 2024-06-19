@@ -66,12 +66,18 @@ class BlueDyeObj extends TestObj {
           {DateTime? startTime,
           Duration? finishedEating,
           DateTime? finishedEatingTime,
+          DateTime? pauseTime,
+          DateTime? timerStart,
+          AmountConsumed? amountConsumed,
           List<BMTestLog>? logs}) =>
       BlueDyeObj(
           id: id,
           startTime: startTime ?? this.startTime,
           finishedEating: finishedEating ?? this.finishedEating,
           finishedEatingTime: finishedEatingTime ?? this.finishedEatingTime,
+          amountConsumed: amountConsumed ?? this.amountConsumed,
+          pauseTime: pauseTime ?? this.pauseTime,
+          timerStart: timerStart ?? this.timerStart,
           logs: logs ?? this.logs);
 
   @override

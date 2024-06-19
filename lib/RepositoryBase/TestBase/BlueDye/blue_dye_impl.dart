@@ -101,6 +101,7 @@ Map<String, dynamic> serializeLogs(List<BMTestLog> logs) {
 }
 
 enum AmountConsumed {
+  undetermined,
   halfOrLess,
   half,
   moreThanHalf,
@@ -109,6 +110,8 @@ enum AmountConsumed {
   @override
   String toString() {
     switch (this) {
+      case AmountConsumed.undetermined:
+        return "Unable to determine amount consumed";
       case AmountConsumed.halfOrLess:
         return "Less than half of blue meal";
       case AmountConsumed.half:
@@ -122,6 +125,7 @@ enum AmountConsumed {
 }
 
 const Map<String, AmountConsumed> parseMap = {
+  "Unable to determine amount consumed": AmountConsumed.undetermined,
   "Less than half of blue meal": AmountConsumed.halfOrLess,
   "Half of blue meal": AmountConsumed.half,
   "More than half of blue meal": AmountConsumed.moreThanHalf,

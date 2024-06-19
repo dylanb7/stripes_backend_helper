@@ -3,6 +3,7 @@
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/QuestionModel/response.dart';
 import 'package:stripes_backend_helper/RepositoryBase/TestBase/BlueDye/blue_dye_impl.dart';
+import 'package:stripes_backend_helper/RepositoryBase/TestBase/BlueDye/bm_test_log.dart';
 import 'package:stripes_backend_helper/date_format.dart';
 import 'package:stripes_backend_helper/db_keys.dart';
 
@@ -17,6 +18,8 @@ class BlueDyeResp extends Response {
   final Duration eatingDuration;
   final int normalBowelMovements;
   final int blueBowelMovements;
+  final AmountConsumed amountConsumed;
+  final List<BMTestLog> logs;
   final DateTime firstBlue;
   final DateTime lastBlue;
   BlueDyeResp(
@@ -24,6 +27,8 @@ class BlueDyeResp extends Response {
       required this.eatingDuration,
       required this.normalBowelMovements,
       required this.blueBowelMovements,
+      required this.logs,
+      required this.amountConsumed,
       required this.firstBlue,
       required this.lastBlue,
       super.id})
@@ -43,16 +48,22 @@ class BlueDyeResp extends Response {
         blueBowelMovements: obj.logs.where((element) => element.isBlue).length,
         normalBowelMovements:
             obj.logs.where((element) => !element.isBlue).length,
+        logs: obj.logs,
         firstBlue: dateFromStamp(
             obj.logs.firstWhere((element) => element.isBlue).stamp),
+        amountConsumed: obj.amountConsumed ?? AmountConsumed.undetermined,
         lastBlue: dateFromStamp(
             obj.logs.lastWhere((element) => element.isBlue).stamp));
   }
 
+  //TODO: add serialization for logs
   factory BlueDyeResp.fromJson(Map<String, dynamic> json) => BlueDyeResp(
       startEating: dateFromStamp(json[STAMP_FIELD]),
       eatingDuration: Duration(milliseconds: json[EATING_DURATION]),
       normalBowelMovements: json[NORMAL_BOWEL_MOVEMENTS],
+      amountConsumed: parseAmountConsumed(json[AMOUNT_CONSUMED]) ??
+          AmountConsumed.undetermined,
+      logs: [],
       blueBowelMovements: json[BLUE_BOWEL_MOVEMENTS],
       firstBlue: dateFromStamp(json[FIRST_BLUE]),
       lastBlue: dateFromStamp(json[LAST_BLUE]));

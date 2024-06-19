@@ -1,20 +1,25 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
 import 'package:stripes_backend_helper/RepositoryBase/TestBase/test_obj.dart';
 import 'package:stripes_backend_helper/date_format.dart';
 
 import 'bm_test_log.dart';
 
-// ignore: constant_identifier_names
 const String FINISHED_KEY = 'finished_eating';
-// ignore: constant_identifier_names
 const String FINISHED_TIME_KEY = 'finished_time';
-
 const String AMOUNT_CONSUMED = 'amount_consumed';
+const String TIMER_START = 'timer_start';
+const String PAUSE_TIME = 'pause_time';
 
 class BlueDyeObj extends TestObj {
   Duration? finishedEating;
 
   DateTime? finishedEatingTime;
+
+  DateTime? timerStart;
+
+  DateTime? pauseTime;
 
   AmountConsumed? amountConsumed;
 
@@ -24,6 +29,8 @@ class BlueDyeObj extends TestObj {
       {DateTime? startTime,
       this.finishedEating,
       this.finishedEatingTime,
+      this.timerStart,
+      this.pauseTime,
       this.amountConsumed,
       required this.logs,
       super.id})
@@ -49,6 +56,8 @@ class BlueDyeObj extends TestObj {
           FINISHED_KEY: finishedEating!.inMilliseconds,
         if (finishedEatingTime != null)
           FINISHED_TIME_KEY: dateToStamp(finishedEatingTime!),
+        if (timerStart != null) TIMER_START: dateToStamp(timerStart!),
+        if (pauseTime != null) PAUSE_TIME: dateToStamp(pauseTime!),
         if (amountConsumed != null) AMOUNT_CONSUMED: amountConsumed.toString(),
         ...serializeLogs(logs),
       };

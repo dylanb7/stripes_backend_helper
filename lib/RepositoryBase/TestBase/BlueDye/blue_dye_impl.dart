@@ -13,7 +13,7 @@ const String AMOUNT_CONSUMED = 'amount_consumed';
 const String TIMER_START = 'timer_start';
 const String PAUSE_TIME = 'pause_time';
 
-class BlueDyeObj extends TestState {
+class BlueDyeState extends TestState {
   Duration? finishedEating;
 
   DateTime? finishedEatingTime;
@@ -26,7 +26,7 @@ class BlueDyeObj extends TestState {
 
   List<BMTestLog> logs;
 
-  BlueDyeObj(
+  BlueDyeState(
       {DateTime? startTime,
       this.finishedEating,
       this.finishedEatingTime,
@@ -37,7 +37,7 @@ class BlueDyeObj extends TestState {
       super.id})
       : super(startTime: startTime);
 
-  BlueDyeObj.fromJson(Map<String, dynamic> json, QuestionHome home)
+  BlueDyeState.fromJson(Map<String, dynamic> json, QuestionHome home)
       : finishedEating = toDuration(json[FINISHED_KEY]),
         finishedEatingTime = json.containsKey(FINISHED_TIME_KEY)
             ? dateFromStamp(json[FINISHED_TIME_KEY])
@@ -46,7 +46,7 @@ class BlueDyeObj extends TestState {
         logs = deserializeLogs(json, home),
         super.fromJson(json);
 
-  BlueDyeObj.empty()
+  BlueDyeState.empty()
       : logs = [],
         super(startTime: null);
 
@@ -63,7 +63,7 @@ class BlueDyeObj extends TestState {
         ...serializeLogs(logs),
       };
 
-  BlueDyeObj copyWith(
+  BlueDyeState copyWith(
           {DateTime? startTime,
           Duration? finishedEating,
           DateTime? finishedEatingTime,
@@ -71,7 +71,7 @@ class BlueDyeObj extends TestState {
           DateTime? timerStart,
           AmountConsumed? amountConsumed,
           List<BMTestLog>? logs}) =>
-      BlueDyeObj(
+      BlueDyeState(
           id: id,
           startTime: startTime ?? this.startTime,
           finishedEating: finishedEating ?? this.finishedEating,
@@ -163,7 +163,7 @@ enum BlueDyeTestStage {
   bool get testInProgress => this != BlueDyeTestStage.initial;
 }
 
-BlueDyeTestStage stateFromTestOBJ(BlueDyeObj? obj) {
+BlueDyeTestStage stageFromTestState(BlueDyeState? obj) {
   if (obj == null || obj.startTime == null) return BlueDyeTestStage.initial;
   if (obj.finishedEating == null) return BlueDyeTestStage.started;
   if (obj.amountConsumed == null) return BlueDyeTestStage.amountConsumed;

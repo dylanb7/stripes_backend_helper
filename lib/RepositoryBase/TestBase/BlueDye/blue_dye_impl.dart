@@ -155,6 +155,7 @@ AmountConsumed? parseAmountConsumed(String? value) {
 enum TestState {
   initial,
   started,
+  amountConsumed,
   logs,
   logsSubmit;
 
@@ -164,6 +165,7 @@ enum TestState {
 TestState stateFromTestOBJ(BlueDyeObj? obj) {
   if (obj == null || obj.startTime == null) return TestState.initial;
   if (obj.finishedEating == null) return TestState.started;
+  if (obj.amountConsumed == null) return TestState.amountConsumed;
   bool startsBlue = false;
   bool endsNormal = false;
   for (BMTestLog log in obj.logs) {

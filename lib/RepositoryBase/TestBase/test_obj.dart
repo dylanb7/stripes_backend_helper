@@ -8,7 +8,6 @@ abstract class TestObj {
 
   TestObj({required this.startTime, this.id});
 
-  @mustCallSuper
   TestObj.fromJson(Map<String, dynamic> json)
       : startTime = json[STAMP_FIELD],
         id = json[STAMP_ID];

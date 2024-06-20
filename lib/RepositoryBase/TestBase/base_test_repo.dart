@@ -73,15 +73,17 @@ abstract class Test<T extends TestObj> {
   final AuthUser authUser;
   final QuestionRepo questionRepo;
 
+  final String testName;
+
   final Set<String> listensTo;
 
-  Test({
-    required this.stampRepo,
-    required this.authUser,
-    required this.subUser,
-    required this.questionRepo,
-    required this.listensTo,
-  });
+  Test(
+      {required this.stampRepo,
+      required this.authUser,
+      required this.subUser,
+      required this.questionRepo,
+      required this.listensTo,
+      required this.testName});
 
   BehaviorSubject<T> get obj;
 

@@ -94,7 +94,7 @@ abstract class Test<T extends TestState> {
   Future<void> onEdit(Response stamp, String type);
   Future<void> onDelete(Response stamp, String type);
   Future<void> submit(DateTime submitTime);
-  Future<void> setValue(T obj);
+  Future<void> setTestState(T state);
   Future<void> cancel();
   Widget? displayState(BuildContext context);
 }

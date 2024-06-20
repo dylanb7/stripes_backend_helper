@@ -15,7 +15,7 @@ class TestsRepo {
   late final Stream<List<TestState>> objects;
 
   TestsRepo({required this.tests}) {
-    objects = StreamZip(tests.map((e) => e.obj)).asBroadcastStream();
+    objects = StreamZip(tests.map((e) => e.state)).asBroadcastStream();
   }
 
   List<Test> _getApplicable(String type) {
@@ -85,7 +85,7 @@ abstract class Test<T extends TestState> {
       required this.listensTo,
       required this.testName});
 
-  BehaviorSubject<T> get obj;
+  BehaviorSubject<T> get state;
 
   String getName(BuildContext context);
   List<Question> recordAdditions(BuildContext context, String type);

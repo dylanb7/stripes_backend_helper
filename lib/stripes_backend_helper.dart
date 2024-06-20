@@ -17,7 +17,7 @@ export 'RepositoryBase/SubBase/base_sub_repo.dart';
 export 'RepositoryBase/SubBase/sub_user.dart';
 
 export 'RepositoryBase/TestBase/base_test_repo.dart';
-export 'RepositoryBase/TestBase/test_obj.dart';
+export 'RepositoryBase/TestBase/test_state.dart';
 export 'RepositoryBase/TestBase/BlueDye/blue_dye_impl.dart';
 export 'RepositoryBase/TestBase/BlueDye/blue_dye_response.dart';
 export 'RepositoryBase/TestBase/BlueDye/bm_test_log.dart';

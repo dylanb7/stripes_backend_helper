@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:stripes_backend_helper/stripes_backend_helper.dart';
 
-abstract class TestObj {
+abstract class TestState {
   DateTime? startTime;
 
   final String? id;
 
-  TestObj({required this.startTime, this.id});
+  TestState({required this.startTime, this.id});
 
-  TestObj.fromJson(Map<String, dynamic> json)
+  TestState.fromJson(Map<String, dynamic> json)
       : startTime = json[STAMP_FIELD],
         id = json[STAMP_ID];
 

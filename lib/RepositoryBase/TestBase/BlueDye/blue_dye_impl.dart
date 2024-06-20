@@ -1,7 +1,8 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
-import 'package:stripes_backend_helper/RepositoryBase/TestBase/test_obj.dart';
+import 'package:stripes_backend_helper/RepositoryBase/TestBase/test_state.dart';
+
 import 'package:stripes_backend_helper/date_format.dart';
 
 import 'bm_test_log.dart';
@@ -12,7 +13,7 @@ const String AMOUNT_CONSUMED = 'amount_consumed';
 const String TIMER_START = 'timer_start';
 const String PAUSE_TIME = 'pause_time';
 
-class BlueDyeObj extends TestObj {
+class BlueDyeObj extends TestState {
   Duration? finishedEating;
 
   DateTime? finishedEatingTime;
@@ -152,20 +153,20 @@ AmountConsumed? parseAmountConsumed(String? value) {
   return parseMap[value];
 }
 
-enum TestState {
+enum BlueDyeTestStage {
   initial,
   started,
   amountConsumed,
   logs,
   logsSubmit;
 
-  bool get testInProgress => this != TestState.initial;
+  bool get testInProgress => this != BlueDyeTestStage.initial;
 }
 
-TestState stateFromTestOBJ(BlueDyeObj? obj) {
-  if (obj == null || obj.startTime == null) return TestState.initial;
-  if (obj.finishedEating == null) return TestState.started;
-  if (obj.amountConsumed == null) return TestState.amountConsumed;
+BlueDyeTestStage stateFromTestOBJ(BlueDyeObj? obj) {
+  if (obj == null || obj.startTime == null) return BlueDyeTestStage.initial;
+  if (obj.finishedEating == null) return BlueDyeTestStage.started;
+  if (obj.amountConsumed == null) return BlueDyeTestStage.amountConsumed;
   bool startsBlue = false;
   bool endsNormal = false;
   for (BMTestLog log in obj.logs) {
@@ -175,6 +176,6 @@ TestState stateFromTestOBJ(BlueDyeObj? obj) {
       endsNormal = true;
     }
   }
-  if (endsNormal) return TestState.logsSubmit;
-  return TestState.logs;
+  if (endsNormal) return BlueDyeTestStage.logsSubmit;
+  return BlueDyeTestStage.logs;
 }

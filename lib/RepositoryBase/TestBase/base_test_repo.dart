@@ -8,11 +8,11 @@ import 'package:stripes_backend_helper/RepositoryBase/StampBase/base_stamp_repo.
 import 'package:stripes_backend_helper/RepositoryBase/SubBase/sub_user.dart';
 
 import '../AuthBase/auth_user.dart';
-import 'test_obj.dart';
+import 'test_state.dart';
 
 class TestsRepo {
   final List<Test> tests;
-  late final Stream<List<TestObj>> objects;
+  late final Stream<List<TestState>> objects;
 
   TestsRepo({required this.tests}) {
     objects = StreamZip(tests.map((e) => e.obj)).asBroadcastStream();
@@ -67,7 +67,7 @@ class TestsRepo {
   }
 }
 
-abstract class Test<T extends TestObj> {
+abstract class Test<T extends TestState> {
   final StampRepo stampRepo;
   final SubUser subUser;
   final AuthUser authUser;

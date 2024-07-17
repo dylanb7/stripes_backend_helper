@@ -59,7 +59,7 @@ const Map<String, String> questions = {
   q21: 'Difficulty falling asleep',
   q22: 'Difficulty staying asleep',
   q23: 'Tossed and turned during sleep',
-  q24: 'Increased irritability/grumpiness',
+  q24: 'Increased irritability or grumpiness',
   q25: 'Aggressive behaviour towards others',
   q26: 'Showed Self-injury (e.g. head-banging, self-biting)',
   q27: 'Gritted teeth, winced, or grimaced as if in pain',
@@ -179,7 +179,7 @@ class Symptoms {
   static const String BM = 'Bowel Movement';
   static const String PAIN = 'Pain';
   static const String REFLUX = 'GI Symptoms';
-  static const String NB = 'Sleep/Mood';
+  static const String NB = 'Sleep & Mood';
 
   static List<String> ordered() => [BM, PAIN, REFLUX, NB];
 }

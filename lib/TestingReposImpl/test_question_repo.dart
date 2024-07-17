@@ -36,47 +36,48 @@ const String q27 = '27';
 const String q28 = '28';
 const String q29 = '29';
 const String q30 = '30';
+const String q31 = '31';
 
 const Map<String, String> questions = {
-  q1: 'Pointing to stomach/tummy as if in pain',
-  q2: 'Nausea',
-  q3: 'Become more active after passing a stool?',
+  q1: 'Pointed to stomach/tummy as if in pain',
+  q2: 'Unable to sleep for an entire night',
+  q3: 'Increased activity after BM',
   q4: 'Average BM type(1-7)',
   q6: 'Pain with BM',
-  q7: 'Rush to the bathroom for BM',
-  q8: 'Straining with BM',
-  q9: 'Black tarry BM',
-  q10: 'Spit up',
-  q11: 'Regurgitated',
-  q12: 'Experienced retching',
-  q13: 'Vomiting',
+  q7: 'Rushed to the bathroom',
+  q8: 'Struggled or strained during BM',
+  q9: 'Passed black or very dark, tar-like stool',
+  q10: 'Rechewed, reswallowed, or spat out liquid or food from mouth or throat',
+  q11: 'Vomited liquid or food from their stomach',
+  q12: 'Attempted to vomit without producing any vomit',
+  q13: 'Woke up too early and could not go back to sleep',
   q14: 'Tilted head to side and arched back',
   q18: 'Applied pressure to abdomen with hands or furniture',
   q19:
-      'Choked, gagged coughed or made sound (gurgling) with throat during or after swallowing or meals',
-  q20: 'Refused foods they once ate',
-  q21: 'Insomnia (difficulty falling asleep at beginning of night)',
-  q22: 'Awakenings',
-  q23: 'Restless sleep',
-  q24: 'Irritability',
-  q25: 'Aggressive/violent behaviors towards others',
-  q26: 'Self injurious behaviors',
-  q27: 'Gritting teeth, wincing, or grimacing for no obvious reason',
-  q28: 'Moaning or groaning for no apparent reason',
-  q29: 'Incontinence / Lack of voluntary control over urination or defecation',
-  q30: 'Flatulence or Gas',
+      'Choked, gagged, coughed or made sound (gurgling) with throat during or after swallowing meals',
+  q20: 'Refused foods they once ate or had difficulty eating/swallowing',
+  q21: 'Difficulty falling asleep',
+  q22: 'Difficulty staying asleep',
+  q23: 'Tossed and turned during sleep',
+  q24: 'Increased irritability/grumpiness',
+  q25: 'Aggressive behaviour towards others',
+  q26: 'Showed Self-injury (e.g. head-banging, self-biting)',
+  q27: 'Gritted teeth, winced, or grimaced as if in pain',
+  q28: 'Moaned or groaned as if in pain',
+  q29: 'Lost control of urine or stool',
+  q30: 'Experienced more gas or flatulence than usual',
+  q31: "Swollen or bloated stomach"
 };
 
 class QuestionHomeInst extends QuestionHome {
   QuestionHomeInst() {
     all.addAll({
       q1: Check(id: q1, prompt: questions[q1]!, type: Symptoms.PAIN),
-      q2: Numeric(
-          id: q2,
-          prompt: questions[q2]!,
-          type: Symptoms.REFLUX,
-          min: 1,
-          max: 5),
+      q2: Check(
+        id: q2,
+        prompt: questions[q2]!,
+        type: Symptoms.NB,
+      ),
       q3: Check(id: q3, prompt: questions[q3]!, type: Symptoms.BM),
       q4: Numeric(
           id: q4, prompt: questions[q4]!, type: Symptoms.BM, min: 1, max: 7),
@@ -95,23 +96,17 @@ class QuestionHomeInst extends QuestionHome {
         prompt: questions[q10]!,
         type: Symptoms.REFLUX,
       ),
-      q11: Numeric(
-          id: q11,
-          prompt: questions[q11]!,
-          type: Symptoms.REFLUX,
-          min: 1,
-          max: 5),
+      q11: Check(
+        id: q11,
+        prompt: questions[q11]!,
+        type: Symptoms.REFLUX,
+      ),
       q12: Check(
         id: q12,
         prompt: questions[q12]!,
         type: Symptoms.REFLUX,
       ),
-      q13: Numeric(
-          id: q13,
-          prompt: questions[q13]!,
-          type: Symptoms.REFLUX,
-          min: 1,
-          max: 5),
+      q13: Check(id: q13, prompt: questions[q13]!, type: Symptoms.NB),
       q14: Check(id: q14, prompt: questions[q14]!, type: Symptoms.PAIN),
       q18: Check(id: q18, prompt: questions[q18]!, type: Symptoms.PAIN),
       q19: Check(id: q19, prompt: questions[q19]!, type: Symptoms.REFLUX),
@@ -119,16 +114,14 @@ class QuestionHomeInst extends QuestionHome {
       q21: Check(id: q21, prompt: questions[q21]!, type: Symptoms.NB),
       q22: Check(id: q22, prompt: questions[q22]!, type: Symptoms.NB),
       q23: Check(id: q23, prompt: questions[q23]!, type: Symptoms.NB),
-      q24: Numeric(
-          id: q24, prompt: questions[q24]!, type: Symptoms.NB, min: 1, max: 5),
-      q25: Numeric(
-          id: q25, prompt: questions[q25]!, type: Symptoms.NB, min: 1, max: 5),
-      q26: Numeric(
-          id: q26, prompt: questions[q26]!, type: Symptoms.NB, min: 1, max: 5),
+      q24: Check(id: q24, prompt: questions[q24]!, type: Symptoms.NB),
+      q25: Check(id: q25, prompt: questions[q25]!, type: Symptoms.NB),
+      q26: Check(id: q26, prompt: questions[q26]!, type: Symptoms.NB),
       q27: Check(id: q27, prompt: questions[q27]!, type: Symptoms.PAIN),
       q28: Check(id: q28, prompt: questions[q28]!, type: Symptoms.PAIN),
       q29: Check(id: q29, prompt: questions[q29]!, type: Symptoms.BM),
       q30: Check(id: q30, prompt: questions[q30]!, type: Symptoms.BM),
+      q31: Check(id: q31, prompt: questions[q31]!, type: Symptoms.BM),
     });
   }
 
@@ -185,8 +178,8 @@ class QuestionHomeInst extends QuestionHome {
 class Symptoms {
   static const String BM = 'Bowel Movement';
   static const String PAIN = 'Pain';
-  static const String REFLUX = 'Reflux';
-  static const String NB = 'Neurological Behavior';
+  static const String REFLUX = 'GI Symptoms';
+  static const String NB = 'Sleep/Mood';
 
   static List<String> ordered() => [BM, PAIN, REFLUX, NB];
 }

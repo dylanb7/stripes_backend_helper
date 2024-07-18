@@ -44,20 +44,35 @@ class TestResponseRepo extends StampRepo<Response> {
           hours: random.nextInt(23),
           minutes: random.nextInt(59),
           seconds: random.nextInt(59));
+      final DateTime submitTime = now.subtract(sub);
+      final int stamp = dateToStamp(submitTime);
       final Question question = choices[random.nextInt(choices.length)];
       Response? res;
       if (question is Numeric) {
         res = NumericResponse(
             question: question,
-            stamp: dateToStamp(now.subtract(sub)),
+            stamp: stamp,
             response: random.nextInt(((question.max ?? 5) - 1).toInt()) +
                 (question.min ?? 1));
       } else if (question is Check) {
-        res =
-            Selected(question: question, stamp: dateToStamp(now.subtract(sub)));
+        res = Selected(question: question, stamp: stamp);
+      } else if (question is AllThatApply) {
+        final int selections = random.nextInt(question.choices.length);
+        res = AllResponse(
+            stamp: stamp,
+            question: question,
+            responses: List.generate(
+                    selections, (_) => random.nextInt(question.choices.length))
+                .toSet()
+                .toList());
+      } else if (question is MultipleChoice) {
+        final int selection = random.nextInt(question.choices.length);
+        res = MultiResponse(stamp: stamp, question: question, index: selection);
       }
+
       if (res != null) {
-        _responses[currentUser]!.add(res);
+        _responses[currentUser]!.add(DetailResponse(
+            description: "", responses: [res], stamp: res.stamp));
       }
     }
     _responses[currentUser]!.sort(

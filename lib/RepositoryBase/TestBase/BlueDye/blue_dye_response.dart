@@ -33,8 +33,8 @@ class BlueDyeResp extends Response {
       required this.lastBlue,
       super.id})
       : super(
-            question:
-                const Check(type: 'Test', id: '', prompt: 'Blue Dye Test'),
+            question: const Check(
+                type: 'Blue Transit Time', id: '', prompt: 'Blue Dye Test'),
             stamp: dateToStamp(startEating));
 
   //test obj must have atleast one log

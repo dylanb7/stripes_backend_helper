@@ -18,8 +18,6 @@ abstract class QuestionRepo<T extends QuestionHome> {
 
   Map<String, DisplayBuilder>? displayOverrides;
 
-  Map<String, String>? displayTitleOverrides;
-
   Map<String, QuestionEntry>? entryOverrides;
 
   Map<String, RecordPath> getLayouts(

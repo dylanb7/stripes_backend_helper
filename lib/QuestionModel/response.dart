@@ -10,7 +10,8 @@ import '../RepositoryBase/StampBase/stamp.dart';
 abstract class Response<E extends Question> extends Stamp with EquatableMixin {
   final E question;
 
-  Response({required this.question, required super.stamp, super.id})
+  Response(
+      {required this.question, required super.stamp, super.id, super.group})
       : super(type: question.type);
 
   Response.fromJson(Map<String, dynamic> json, QuestionHome home)
@@ -30,6 +31,7 @@ class OpenResponse extends Response<FreeResponse> {
       {required FreeResponse question,
       required super.stamp,
       required this.response,
+      super.group,
       super.id})
       : super(question: question);
 
@@ -55,6 +57,7 @@ class NumericResponse extends Response<Numeric> {
       {required Numeric question,
       required int stamp,
       required this.response,
+      super.group,
       super.id})
       : super(question: question, stamp: stamp);
 
@@ -78,7 +81,7 @@ class NumericResponse extends Response<Numeric> {
 }
 
 class Selected extends Response<Check> {
-  Selected({required Check question, required int stamp, super.id})
+  Selected({required Check question, required int stamp, super.id, super.group})
       : super(question: question, stamp: stamp);
 
   Selected.fromJson(Map<String, dynamic> json, QuestionHome home)
@@ -104,6 +107,7 @@ class MultiResponse extends Response<MultipleChoice> {
       {required MultipleChoice question,
       required int stamp,
       required this.index,
+      super.group,
       super.id})
       : super(question: question, stamp: stamp);
 
@@ -128,6 +132,7 @@ class AllResponse extends Response<AllThatApply> {
       {required AllThatApply question,
       required int stamp,
       required this.responses,
+      super.group,
       super.id})
       : super(question: question, stamp: stamp);
 
@@ -158,6 +163,7 @@ class DetailResponse extends Response {
       required this.responses,
       required int stamp,
       this.detailType,
+      super.group,
       super.id})
       : super(
             question: Question.ofType(

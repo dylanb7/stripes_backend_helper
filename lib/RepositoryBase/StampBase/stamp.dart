@@ -27,5 +27,5 @@ class Stamp with EquatableMixin {
 
   @override
   @mustCallSuper
-  List<Object?> get props => [stamp, type, id];
+  List<Object?> get props => [stamp, type, group, id];
 }

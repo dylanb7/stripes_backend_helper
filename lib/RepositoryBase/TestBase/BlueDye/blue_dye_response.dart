@@ -31,6 +31,7 @@ class BlueDyeResp extends Response {
       required this.amountConsumed,
       required this.firstBlue,
       required this.lastBlue,
+      super.group,
       super.id})
       : super(
             question: const Check(

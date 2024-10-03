@@ -16,6 +16,7 @@ const String LAST_BLUE = 'lastBlueKey';
 class BlueDyeResp extends Response {
   final DateTime startEating;
   final Duration eatingDuration;
+  final DateTime? finishedEatingTime;
   final int normalBowelMovements;
   final int blueBowelMovements;
   final AmountConsumed amountConsumed;
@@ -27,6 +28,7 @@ class BlueDyeResp extends Response {
       required this.eatingDuration,
       required this.normalBowelMovements,
       required this.blueBowelMovements,
+      this.finishedEatingTime,
       required this.logs,
       required this.amountConsumed,
       required this.firstBlue,
@@ -54,7 +56,8 @@ class BlueDyeResp extends Response {
             obj.logs.firstWhere((element) => element.isBlue).stamp),
         amountConsumed: obj.amountConsumed ?? AmountConsumed.undetermined,
         lastBlue: dateFromStamp(
-            obj.logs.lastWhere((element) => element.isBlue).stamp));
+            obj.logs.lastWhere((element) => element.isBlue).stamp),
+        finishedEatingTime: obj.finishedEatingTime);
   }
 
   //TODO: add serialization for logs

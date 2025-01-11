@@ -37,6 +37,7 @@ const String q28 = '28';
 const String q29 = '29';
 const String q30 = '30';
 const String q31 = '31';
+const String q32 = '32';
 
 const Map<String, String> questions = {
   q1: 'Pointed to stomach/tummy as if in pain',
@@ -44,7 +45,7 @@ const Map<String, String> questions = {
   q3: 'Increased activity after BM',
   q4: 'Average BM type(1-7)',
   q6: 'Pain with BM',
-  q7: 'Rushed to the bathroom',
+  q7: 'Unable to reach the toilet in time',
   q8: 'Struggled or strained during BM',
   q9: 'Passed black or very dark, tar-like stool',
   q10: 'Rechewed, reswallowed, or spat out liquid or food from mouth or throat',
@@ -63,10 +64,11 @@ const Map<String, String> questions = {
   q25: 'Aggressive behaviour towards others',
   q26: 'Showed Self-injury (e.g. head-banging, self-biting)',
   q27: 'Gritted teeth, winced, or grimaced as if in pain',
-  q28: 'Moaned or groaned as if in pain',
+  q28: 'Moaned or made other noises as if in pain',
   q29: 'Lost control of urine or stool',
   q30: 'Experienced more gas or flatulence than usual',
-  q31: "Swollen or bloated stomach"
+  q31: "Swollen or bloated stomach",
+  q32: "Verbilized that they're in pain"
 };
 
 class QuestionHomeInst extends QuestionHome {
@@ -122,6 +124,7 @@ class QuestionHomeInst extends QuestionHome {
       q29: Check(id: q29, prompt: questions[q29]!, type: Symptoms.BM),
       q30: Check(id: q30, prompt: questions[q30]!, type: Symptoms.BM),
       q31: Check(id: q31, prompt: questions[q31]!, type: Symptoms.BM),
+      q32: Check(id: q32, prompt: questions[q32]!, type: Symptoms.PAIN)
     });
   }
 

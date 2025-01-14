@@ -68,7 +68,7 @@ const Map<String, String> questions = {
   q29: 'Lost control of urine or stool',
   q30: 'Experienced more gas or flatulence than usual',
   q31: "Swollen or bloated stomach",
-  q32: "Verbilized that they're in pain"
+  q32: "Verbalized that they're in pain"
 };
 
 class QuestionHomeInst extends QuestionHome {

@@ -27,6 +27,7 @@ abstract class StripesRepoPackage {
   StampRepo<Response> stamp(
       {required AuthUser user,
       required SubUser subUser,
+      required TestsRepo testsRepo,
       required QuestionRepo questionRepo});
 
   TestsRepo test(
@@ -53,6 +54,7 @@ class LocalRepoPackage extends StripesRepoPackage {
   StampRepo<Response<Question>> stamp(
       {required AuthUser user,
       required SubUser subUser,
+      required TestsRepo testsRepo,
       required QuestionRepo questionRepo}) {
     return TestResponseRepo(subUser);
   }
@@ -97,6 +99,7 @@ class LocalStockedRepoPackage extends StripesRepoPackage {
   StampRepo<Response<Question>> stamp(
       {required AuthUser user,
       required SubUser subUser,
+      required TestsRepo testsRepo,
       required QuestionRepo questionRepo}) {
     return TestResponseRepo.filled(subUser, 200);
   }

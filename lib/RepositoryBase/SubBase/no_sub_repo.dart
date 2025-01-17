@@ -5,20 +5,26 @@ class NoSubRepo extends SubUserRepo {
   NoSubRepo({required super.authUser});
 
   @override
-  Future<void> addSubUser(SubUser user) {
+  Future<bool> addSubUser(SubUser user) {
     throw UnimplementedError();
   }
 
   @override
-  Future<void> deleteSubUser(SubUser user) {
+  Future<bool> deleteSubUser(SubUser user) {
     throw UnimplementedError();
   }
 
   @override
-  Future<void> updateSubUser(SubUser user) {
+  Future<bool> updateSubUser(SubUser user) {
     throw UnimplementedError();
   }
 
   @override
   Stream<List<SubUser>> get users => Stream.value([SubUser.marker()]);
+
+  @override
+  Future<void> refresh() {
+    // TODO: implement refresh
+    throw UnimplementedError();
+  }
 }

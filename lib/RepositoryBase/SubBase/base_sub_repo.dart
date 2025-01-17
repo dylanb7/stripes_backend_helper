@@ -5,7 +5,8 @@ abstract class SubUserRepo {
   final AuthUser authUser;
   SubUserRepo({required this.authUser});
   Stream<List<SubUser>> get users;
-  Future<void> addSubUser(SubUser user);
-  Future<void> deleteSubUser(SubUser user);
-  Future<void> updateSubUser(SubUser user);
+  Future<bool> addSubUser(SubUser user);
+  Future<bool> deleteSubUser(SubUser user);
+  Future<bool> updateSubUser(SubUser user);
+  Future<void> refresh();
 }

@@ -17,4 +17,5 @@ abstract class AccessCodeRepo {
   Future<String?> codeValid(String code);
   bool validState() => _isValid;
   Future<void> removeCode();
+  Future<void> refresh();
 }

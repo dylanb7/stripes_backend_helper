@@ -111,30 +111,36 @@ class TestResponseRepo extends StampRepo<Response> {
   }
 
   @override
-  Future<void> addStamp(Response stamp) async {
+  Future<bool> addStamp(Response stamp) async {
     _responses[currentUser]!.add(stamp);
     _responses[currentUser]!.sort(
       (a, b) => b.stamp.compareTo(a.stamp),
     );
     _stream.add(_responses[currentUser]!);
+    return true;
   }
 
   @override
-  Future<void> removeStamp(Response stamp) async {
+  Future<bool> removeStamp(Response stamp) async {
     _responses[currentUser]!
         .removeWhere((element) => element.stamp == stamp.stamp);
     _stream.add(_responses[currentUser]!);
+    return true;
   }
 
   @override
   Stream<List<Response>> get stamps => _stream.stream;
 
   @override
-  Future<void> updateStamp(Response stamp) async {
+  Future<bool> updateStamp(Response stamp) async {
     final int index = _responses[currentUser]!
         .indexWhere((element) => element.stamp == stamp.stamp);
-    if (index < 0) return;
+    if (index < 0) return false;
     _responses[currentUser]![index] = stamp;
     _stream.add(_responses[currentUser]!);
+    return true;
   }
+
+  @override
+  Future<void> refresh() async {}
 }

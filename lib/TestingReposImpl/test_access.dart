@@ -13,4 +13,7 @@ class TestAccessRepo extends AccessCodeRepo {
   Future<void> removeCode() async {
     print('$currentCode removed');
   }
+
+  @override
+  Future<void> refresh() async {}
 }

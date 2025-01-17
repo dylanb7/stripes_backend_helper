@@ -15,23 +15,29 @@ class TestSubRepo extends SubUserRepo {
   }
 
   @override
-  Future<void> addSubUser(SubUser user) async {
+  Future<bool> addSubUser(SubUser user) async {
     subUsers.add(user);
     curr.add(subUsers);
+    return true;
   }
 
   @override
-  Future<void> deleteSubUser(SubUser user) async {
+  Future<bool> deleteSubUser(SubUser user) async {
     subUsers.removeWhere((element) => element.uid == user.uid);
     curr.add(subUsers);
+    return true;
   }
 
   @override
-  Future<void> updateSubUser(SubUser user) async {
+  Future<bool> updateSubUser(SubUser user) async {
     subUsers[subUsers.indexWhere((element) => element.uid == user.uid)] = user;
     curr.add(subUsers);
+    return true;
   }
 
   @override
   Stream<List<SubUser>> get users => curr.stream;
+
+  @override
+  Future<void> refresh() async {}
 }

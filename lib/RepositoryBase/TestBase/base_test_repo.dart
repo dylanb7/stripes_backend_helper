@@ -93,8 +93,9 @@ abstract class Test<T extends TestState> {
   Future<void> onSubmit(Response stamp, String type);
   Future<void> onEdit(Response stamp, String type);
   Future<void> onDelete(Response stamp, String type);
-  Future<void> submit(DateTime submitTime);
-  Future<void> setTestState(T state);
-  Future<void> cancel();
+  Future<bool> submit(DateTime submitTime);
+  Future<bool> setTestState(T state);
+  Future<bool> cancel();
+  Future<void> refresh();
   Widget? displayState(BuildContext context);
 }

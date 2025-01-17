@@ -15,8 +15,9 @@ abstract class StampRepo<T extends Stamp> {
       required this.questionRepo,
       this.earliest});
   Stream<List<T>> get stamps;
-  Future<void> addStamp(T stamp);
-  Future<void> removeStamp(T stamp);
-  Future<void> updateStamp(T stamp);
+  Future<bool> addStamp(T stamp);
+  Future<bool> removeStamp(T stamp);
+  Future<bool> updateStamp(T stamp);
+  Future<void> refresh();
   set earliestDate(DateTime time) => earliest = time;
 }

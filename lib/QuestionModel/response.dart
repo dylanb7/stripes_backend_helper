@@ -158,10 +158,13 @@ class DetailResponse extends Response {
 
   final String? detailType;
 
+  final String? linkingId;
+
   DetailResponse(
       {required this.description,
       required this.responses,
       required int stamp,
+      this.linkingId,
       this.detailType,
       super.group,
       super.id})
@@ -175,6 +178,7 @@ class DetailResponse extends Response {
       : description = json[DESCRIPTION_FIELD],
         responses = responsesFromJson(json, home),
         detailType = json[TYPE_FIELD],
+        linkingId = json["link"],
         super.fromJson(json, home);
 
   @override

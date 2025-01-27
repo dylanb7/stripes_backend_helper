@@ -83,7 +83,7 @@ class BlueDyeState extends TestState {
 
   @override
   String toString() {
-    return 'start: $startTime, duration: $finishedEating, finish time: $finishedEatingTime, logs: $logs';
+    return 'start: $startTime, duration: $finishedEating, pause time: $pauseTime, timer start: $timerStart, finish time: $finishedEatingTime, logs: $logs';
   }
 }
 

@@ -36,4 +36,9 @@ class TestAuth extends AuthRepo {
 
   @override
   Stream<AuthUser> get user => _authUser.stream;
+
+  @override
+  Future<bool> deleteAccount() async {
+    return false;
+  }
 }

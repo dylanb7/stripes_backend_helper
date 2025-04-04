@@ -25,6 +25,14 @@ abstract class QuestionRepo<T extends QuestionHome> {
           QuestionsListener? questionListener}) =>
       {};
 
+  Future<bool> addRecordPath(String category, RecordPath path);
+
+  Future<bool> removeRecordPath(String category);
+
+  Future<bool> addQuestion(Question question);
+
+  Future<bool> removeQuestion(Question question);
+
   T get questions;
 }
 
@@ -56,7 +64,10 @@ class PageLayout {
 
   final String? header;
 
-  const PageLayout({required this.questionIds, this.header});
+  final bool userCreated;
+
+  const PageLayout(
+      {required this.questionIds, this.header, this.userCreated = false});
 }
 
 abstract class QuestionHome {

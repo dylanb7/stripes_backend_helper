@@ -8,6 +8,27 @@ class TestQuestionRepo extends QuestionRepo {
 
   @override
   QuestionHome get questions => QuestionHomeInst();
+
+  @override
+  Future<bool> addQuestion(Question question) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> removeQuestion(Question question) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> addRecordPath(String id, RecordPath path) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> removeRecordPath(String category) {
+    // TODO: implement removeRecordPath
+    throw UnimplementedError();
+  }
 }
 
 const String q1 = '1';

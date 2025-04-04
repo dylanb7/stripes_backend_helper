@@ -9,13 +9,14 @@ abstract class Question with EquatableMixin {
 
   final String type;
 
-  final bool isRequired;
+  final bool isRequired, userCreated;
 
   const Question(
       {required this.id,
       required this.prompt,
       required this.type,
-      required this.isRequired});
+      required this.isRequired,
+      this.userCreated = false});
 
   factory Question.ofType({required String type}) =>
       Check(id: '', prompt: '', type: type);

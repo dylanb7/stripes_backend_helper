@@ -55,7 +55,9 @@ class QuestionEntry {
 class RecordPath {
   final List<PageLayout> pages;
   final Period? period;
-  const RecordPath({required this.pages, this.period});
+  final bool userCreated;
+  const RecordPath(
+      {required this.pages, this.period, this.userCreated = false});
 }
 
 @immutable
@@ -64,10 +66,7 @@ class PageLayout {
 
   final String? header;
 
-  final bool userCreated;
-
-  const PageLayout(
-      {required this.questionIds, this.header, this.userCreated = false});
+  const PageLayout({required this.questionIds, this.header});
 }
 
 abstract class QuestionHome {

@@ -29,6 +29,7 @@ class FreeResponse extends Question {
       {required String id,
       required String prompt,
       required String type,
+      super.userCreated,
       bool? isRequired})
       : super(
             id: id,
@@ -46,6 +47,7 @@ class Numeric extends Question {
       {required String id,
       required String prompt,
       required String type,
+      super.userCreated,
       bool? isRequired,
       this.min,
       this.max})
@@ -64,6 +66,7 @@ class Check extends Question {
       {required String id,
       required String prompt,
       required String type,
+      super.userCreated,
       bool? isRequired})
       : super(
             id: id,
@@ -83,6 +86,7 @@ class MultipleChoice extends Question {
       required String prompt,
       required String type,
       required this.choices,
+      super.userCreated,
       bool? isRequired})
       : super(
             id: id,
@@ -102,6 +106,7 @@ class AllThatApply extends Question {
       required String prompt,
       required String type,
       required this.choices,
+      super.userCreated,
       bool? isRequired})
       : super(
             id: id,

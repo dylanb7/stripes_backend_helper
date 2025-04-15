@@ -9,14 +9,15 @@ abstract class Question with EquatableMixin {
 
   final String type;
 
-  final bool isRequired, userCreated;
+  final bool isRequired, userCreated, isAddition;
 
   const Question(
       {required this.id,
       required this.prompt,
       required this.type,
       required this.isRequired,
-      this.userCreated = false});
+      this.userCreated = false,
+      this.isAddition = false});
 
   factory Question.ofType({required String type}) =>
       Check(id: '', prompt: '', type: type);
@@ -48,6 +49,7 @@ class Numeric extends Question {
       required String prompt,
       required String type,
       super.userCreated,
+      super.isAddition,
       bool? isRequired,
       this.min,
       this.max})
@@ -66,6 +68,7 @@ class Check extends Question {
       {required String id,
       required String prompt,
       required String type,
+      super.isAddition,
       super.userCreated,
       bool? isRequired})
       : super(
@@ -86,6 +89,7 @@ class MultipleChoice extends Question {
       required String prompt,
       required String type,
       required this.choices,
+      super.isAddition,
       super.userCreated,
       bool? isRequired})
       : super(
@@ -106,6 +110,7 @@ class AllThatApply extends Question {
       required String prompt,
       required String type,
       required this.choices,
+      super.isAddition,
       super.userCreated,
       bool? isRequired})
       : super(

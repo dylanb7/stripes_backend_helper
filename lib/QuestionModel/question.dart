@@ -31,6 +31,7 @@ class FreeResponse extends Question {
       required String prompt,
       required String type,
       super.userCreated,
+      super.isAddition,
       bool? isRequired})
       : super(
             id: id,

@@ -73,9 +73,9 @@ class PageLayout {
 abstract class QuestionHome {
   Map<String, Question> all = {};
 
-  Map<String, Question> additons = {};
+  Map<String, Question> additions = {};
 
-  Question fromBank(String id) => all[id] ?? additons[id] ?? Question.empty();
+  Question fromBank(String id) => all[id] ?? additions[id] ?? Question.empty();
 
   Question fromID(String id) => all[id] ?? Question.empty();
 }

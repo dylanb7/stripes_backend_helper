@@ -1,4 +1,5 @@
 // ignore_for_file: constant_identifier_names
+import 'package:rxdart/subjects.dart';
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/RepositoryBase/AuthBase/auth_user.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
@@ -7,7 +8,8 @@ class TestQuestionRepo extends QuestionRepo {
   TestQuestionRepo({super.authUser = const AuthUser.empty()});
 
   @override
-  Stream<QuestionHome> get questions => Stream.value(QuestionHomeInst());
+  BehaviorSubject<QuestionHome> get questions =>
+      BehaviorSubject.seeded(QuestionHomeInst());
 
   @override
   Future<bool> addQuestion(Question question) {

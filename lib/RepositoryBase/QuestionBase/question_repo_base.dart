@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/QuestionModel/response.dart';
 import 'package:stripes_backend_helper/RepositoryBase/AuthBase/auth_user.dart';
@@ -33,7 +34,7 @@ abstract class QuestionRepo<T extends QuestionHome> {
 
   Future<bool> removeQuestion(Question question);
 
-  Stream<T> get questions;
+  BehaviorSubject<T> get questions;
 }
 
 typedef DisplayBuilder<T extends Response<Question>> = Widget Function(

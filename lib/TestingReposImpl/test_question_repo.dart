@@ -7,7 +7,7 @@ class TestQuestionRepo extends QuestionRepo {
   TestQuestionRepo({super.authUser = const AuthUser.empty()});
 
   @override
-  QuestionHome get questions => QuestionHomeInst();
+  Stream<QuestionHome> get questions => Stream.value(QuestionHomeInst());
 
   @override
   Future<bool> addQuestion(Question question) {

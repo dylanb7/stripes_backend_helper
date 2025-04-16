@@ -33,7 +33,7 @@ abstract class QuestionRepo<T extends QuestionHome> {
 
   Future<bool> removeQuestion(Question question);
 
-  T get questions;
+  Stream<T> get questions;
 }
 
 typedef DisplayBuilder<T extends Response<Question>> = Widget Function(

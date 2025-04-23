@@ -75,6 +75,8 @@ abstract class QuestionHome {
 
   Map<String, Question> additions = {};
 
+  Map<String, List<Question>> byType();
+
   Question fromBank(String id) => all[id] ?? additions[id] ?? Question.empty();
 
   Question fromID(String id) => all[id] ?? Question.empty();

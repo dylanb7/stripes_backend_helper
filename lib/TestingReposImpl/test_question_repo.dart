@@ -95,6 +95,7 @@ const Map<String, String> questions = {
 };
 
 class QuestionHomeInst extends QuestionHome {
+  Map<String, List<Question>> types = {};
   QuestionHomeInst() {
     all.addAll({
       q1: Check(id: q1, prompt: questions[q1]!, type: Symptoms.PAIN),
@@ -149,6 +150,13 @@ class QuestionHomeInst extends QuestionHome {
       q31: Check(id: q31, prompt: questions[q31]!, type: Symptoms.BM),
       q32: Check(id: q32, prompt: questions[q32]!, type: Symptoms.PAIN)
     });
+    for (final Question question in all.values) {
+      if (types.containsKey(question.type)) {
+        types[question.type]!.add(question);
+      } else {
+        types[question.type] = [question];
+      }
+    }
   }
 
   List<Question> get severityQuestions => [
@@ -199,6 +207,9 @@ class QuestionHomeInst extends QuestionHome {
         fromID(q25),
         fromID(q26),
       ];
+
+  @override
+  Map<String, List<Question>> byType() => types;
 }
 
 class Symptoms {

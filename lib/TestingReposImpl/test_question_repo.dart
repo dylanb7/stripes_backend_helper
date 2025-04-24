@@ -22,13 +22,25 @@ class TestQuestionRepo extends QuestionRepo {
   }
 
   @override
-  Future<bool> addRecordPath(String id, RecordPath path) {
+  Future<bool> addRecordPath(RecordPath path) {
     throw UnimplementedError();
   }
 
   @override
-  Future<bool> removeRecordPath(String category) {
+  Future<bool> removeRecordPath(RecordPath category) {
     // TODO: implement removeRecordPath
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> setEnabled(RecordPath recordPath, bool enabled) {
+    // TODO: implement setEnabled
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> setQuestionEnabled(Question recordPath, bool enabled) {
+    // TODO: implement setQuestionEnabled
     throw UnimplementedError();
   }
 }

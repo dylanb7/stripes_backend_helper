@@ -26,11 +26,15 @@ abstract class QuestionRepo<T extends QuestionHome> {
           QuestionsListener? questionListener}) =>
       {};
 
-  Future<bool> addRecordPath(String category, RecordPath path);
+  Future<bool> addRecordPath(RecordPath path);
 
-  Future<bool> removeRecordPath(String category);
+  Future<bool> setEnabled(RecordPath recordPath, bool enabled);
+
+  Future<bool> removeRecordPath(RecordPath category);
 
   Future<bool> addQuestion(Question question);
+
+  Future<bool> setQuestionEnabled(Question recordPath, bool enabled);
 
   Future<bool> removeQuestion(Question question);
 

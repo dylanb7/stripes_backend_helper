@@ -54,11 +54,36 @@ class QuestionEntry {
 
 @immutable
 class RecordPath {
+  final String name;
   final List<PageLayout> pages;
   final Period? period;
   final bool userCreated;
   const RecordPath(
-      {required this.pages, this.period, this.userCreated = false});
+      {required this.name,
+      required this.pages,
+      this.period,
+      this.userCreated = false});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'period': period?.toId(),
+      'pages': pages.map((page) => page.toJson()).toList(),
+      'userCreated': userCreated
+    };
+  }
+
+  static RecordPath fromJson(Map<String, dynamic> json) {
+    return RecordPath(
+        name: json['name'],
+        pages: json['pages'] is List
+            ? (json['pages'] as List)
+                .map((pageJson) => PageLayout.fromJson(pageJson))
+                .toList()
+            : [],
+        period: json['period'] is String ? Period.fromId(json['period']) : null,
+        userCreated: json['userCreated']);
+  }
 }
 
 @immutable
@@ -68,6 +93,15 @@ class PageLayout {
   final String? header;
 
   const PageLayout({required this.questionIds, this.header});
+
+  Map<String, dynamic> toJson() {
+    return {'header': header, 'ids': questionIds.join("|")};
+  }
+
+  static PageLayout fromJson(Map<String, dynamic> json) => PageLayout(
+      questionIds:
+          json['ids'] is String ? (json['ids'] as String).split("|") : [],
+      header: json['header']);
 }
 
 abstract class QuestionHome {

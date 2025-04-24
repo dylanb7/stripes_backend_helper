@@ -7,6 +7,26 @@ enum Period {
   month,
   year;
 
+  String toId() {
+    switch (this) {
+      case Period.day:
+        return "d";
+      case Period.week:
+        return "w";
+      case Period.month:
+        return "m";
+      case Period.year:
+        return "y";
+    }
+  }
+
+  static Period fromId(String id) {
+    if (id == "d") return Period.day;
+    if (id == "w") return Period.week;
+    if (id == "m") return Period.month;
+    return Period.year;
+  }
+
   DateTime getValue(DateTime entry) {
     switch (this) {
       case Period.day:

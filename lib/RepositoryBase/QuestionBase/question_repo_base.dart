@@ -21,10 +21,10 @@ abstract class QuestionRepo<T extends QuestionHome> {
 
   Map<String, QuestionEntry>? entryOverrides;
 
-  Map<String, RecordPath> getLayouts(
+  List<RecordPath> getLayouts(
           {required BuildContext context,
           QuestionsListener? questionListener}) =>
-      {};
+      [];
 
   Future<bool> addRecordPath(RecordPath path);
 

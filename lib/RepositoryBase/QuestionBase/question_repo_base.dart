@@ -88,8 +88,8 @@ class RecordPath {
                 .toList()
             : [],
         period: json['period'] is String ? Period.fromId(json['period']) : null,
-        userCreated: json['userCreated'],
-        enabled: json['enabled']);
+        userCreated: json['userCreated'] == 1,
+        enabled: json['enabled'] == 1);
   }
 }
 

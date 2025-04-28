@@ -241,15 +241,63 @@ class Relation {
   }
 }
 
+enum Op {
+  all("all"),
+  one("one");
+
+  final String value;
+
+  const Op(this.value);
+
+  static Op? fromValue(String value) {
+    if (value == "all") return Op.all;
+    if (value == "one") return Op.one;
+    return null;
+  }
+}
+
+@immutable
+class RelationOp {
+  final List<Relation> relations;
+  final Op op;
+
+  const RelationOp({required this.relations, required this.op});
+
+  @override
+  String toString() {
+    return [relations.join("&"), op.value].join("}");
+  }
+
+  static RelationOp? fromString(String val) {
+    final List<String> values = val.split("}");
+    final Op? op = Op.fromValue(values[1]);
+    List<Relation> relations = values[0]
+        .split("&")
+        .map((value) => Relation.fromString(value))
+        .whereType<Relation>()
+        .toList();
+    if (values.length != 2 || op == null) return null;
+    return RelationOp(relations: relations, op: op);
+  }
+}
+
 @immutable
 class DependsOn {
-  final List<Relation> relation;
-  const DependsOn(this.relation);
+  final List<RelationOp> relations;
+  const DependsOn(this.relations);
 
-  const DependsOn.nothing() : relation = const [];
+  factory DependsOn.init() => const DependsOn([]);
+
+  const DependsOn.nothing() : relations = const [];
+
+  DependsOn allOf(List<Relation> rels) =>
+      DependsOn([...relations, RelationOp(relations: rels, op: Op.all)]);
+
+  DependsOn oneOf(List<Relation> rels) =>
+      DependsOn([...relations, RelationOp(relations: rels, op: Op.one)]);
 
   bool eval(QuestionsListener questionListener) {
-    if (relation.isEmpty) return true;
+    if (relations.isEmpty) return true;
 
     Question? from(String id) {
       final List<Question> withId = questionListener.questions.keys
@@ -258,57 +306,54 @@ class DependsOn {
       return withId.isEmpty ? null : withId[0];
     }
 
-    for (final Relation rel in relation) {
-      final Question? withId = from(rel.qid);
-      if (withId == null) return false;
-      if (rel.type == CheckType.exists) continue;
+    bool getEquals(Relation rel, Response? res) {
+      if (res == null) return false;
       switch (rel.questionType) {
         case QuestionType.check:
-          continue;
+          return true;
         case QuestionType.freeResponse:
-          if ((questionListener.fromQuestion(withId) as OpenResponse)
-                  .response !=
-              rel.response) {
-            return false;
-          }
-          break;
+          return (res as OpenResponse).response == rel.response;
         case QuestionType.slider:
-          if ((questionListener.fromQuestion(withId) as NumericResponse)
-                  .response !=
-              rel.response) {
-            return false;
-          }
-          break;
+          return (res as NumericResponse).response == rel.response;
         case QuestionType.multipleChoice:
-          if ((questionListener.fromQuestion(withId) as MultiResponse).index !=
-              rel.response) {
-            return false;
-          }
-          break;
+          return (res as MultiResponse).index == rel.response;
         case QuestionType.allThatApply:
-          if ((questionListener.fromQuestion(withId) as AllResponse)
-                  .responses !=
-              rel.response) {
-            return false;
-          }
-          break;
+          return (res as AllResponse).responses == rel.response;
       }
+    }
+
+    for (final RelationOp relationOp in relations) {
+      bool passed = false;
+      for (final Relation rel in relationOp.relations) {
+        final Question? withId = from(rel.qid);
+        final bool relationEval = withId == null
+            ? false
+            : rel.type == CheckType.exists
+                ? true
+                : getEquals(rel, questionListener.fromQuestion(withId));
+        if (relationOp.op == Op.all && !relationEval) return false;
+        if (relationOp.op == Op.one && relationEval) {
+          passed = true;
+          break;
+        }
+      }
+      if (!passed) return false;
     }
     return true;
   }
 
   @override
   String toString() {
-    return relation.join("~");
+    return relations.join("~");
   }
 
   static DependsOn fromString(String val) {
-    List<Relation> relations = val
+    List<RelationOp> ops = val
         .split("~")
-        .map((value) => Relation.fromString(value))
-        .whereType<Relation>()
+        .map((rel) => RelationOp.fromString(rel))
+        .whereType<RelationOp>()
         .toList();
-    return DependsOn(relations);
+    return DependsOn(ops);
   }
 }
 

@@ -21,11 +21,6 @@ abstract class QuestionRepo<T extends QuestionHome> {
 
   Map<String, QuestionEntry>? entryOverrides;
 
-  List<RecordPath> getLayouts(
-          {required BuildContext context,
-          QuestionsListener? questionListener}) =>
-      [];
-
   Future<bool> addRecordPath(RecordPath path);
 
   Future<bool> setEnabled(RecordPath recordPath, bool enabled);
@@ -37,6 +32,8 @@ abstract class QuestionRepo<T extends QuestionHome> {
   Future<bool> setQuestionEnabled(Question recordPath, bool enabled);
 
   Future<bool> removeQuestion(Question question);
+
+  BehaviorSubject<List<RecordPath>> get layouts;
 
   BehaviorSubject<T> get questions;
 }

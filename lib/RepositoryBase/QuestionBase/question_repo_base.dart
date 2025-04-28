@@ -250,7 +250,6 @@ class DependsOn {
 
   bool eval(QuestionsListener questionListener) {
     if (relation.isEmpty) return true;
-    bool passes = true;
 
     Question? from(String id) {
       final List<Question> withId = questionListener.questions.keys
@@ -263,9 +262,39 @@ class DependsOn {
       final Question? withId = from(rel.qid);
       if (withId == null) return false;
       if (rel.type == CheckType.exists) continue;
+      switch (rel.questionType) {
+        case QuestionType.check:
+          continue;
+        case QuestionType.freeResponse:
+          if ((questionListener.fromQuestion(withId) as OpenResponse)
+                  .response !=
+              rel.response) {
+            return false;
+          }
+          break;
+        case QuestionType.slider:
+          if ((questionListener.fromQuestion(withId) as NumericResponse)
+                  .response !=
+              rel.response) {
+            return false;
+          }
+          break;
+        case QuestionType.multipleChoice:
+          if ((questionListener.fromQuestion(withId) as MultiResponse).index !=
+              rel.response) {
+            return false;
+          }
+          break;
+        case QuestionType.allThatApply:
+          if ((questionListener.fromQuestion(withId) as AllResponse)
+                  .responses !=
+              rel.response) {
+            return false;
+          }
+          break;
+      }
     }
-
-    return passes;
+    return true;
   }
 
   @override

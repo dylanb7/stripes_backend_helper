@@ -270,13 +270,14 @@ class RelationOp {
 
   static RelationOp? fromString(String val) {
     final List<String> values = val.split("}");
+    if (values.length != 2) return null;
     final Op? op = Op.fromValue(values[1]);
-    List<Relation> relations = values[0]
+    final List<Relation> relations = values[0]
         .split("&")
         .map((value) => Relation.fromString(value))
         .whereType<Relation>()
         .toList();
-    if (values.length != 2 || op == null) return null;
+    if (op == null) return null;
     return RelationOp(relations: relations, op: op);
   }
 }
@@ -348,6 +349,7 @@ class DependsOn {
   }
 
   static DependsOn fromString(String val) {
+    print(val);
     List<RelationOp> ops = val
         .split("~")
         .map((rel) => RelationOp.fromString(rel))

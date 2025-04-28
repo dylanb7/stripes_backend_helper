@@ -43,6 +43,10 @@ class TestQuestionRepo extends QuestionRepo {
     // TODO: implement setQuestionEnabled
     throw UnimplementedError();
   }
+
+  @override
+  // TODO: implement layouts
+  BehaviorSubject<List<RecordPath>> get layouts => BehaviorSubject.seeded([]);
 }
 
 const String q1 = '1';

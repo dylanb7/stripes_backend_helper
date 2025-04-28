@@ -97,18 +97,190 @@ class RecordPath {
 class PageLayout {
   final List<String> questionIds;
 
+  final DependsOn dependsOn;
+
   final String? header;
 
-  const PageLayout({required this.questionIds, this.header});
+  const PageLayout(
+      {required this.questionIds,
+      this.dependsOn = const DependsOn.nothing(),
+      this.header});
 
   Map<String, dynamic> toJson() {
-    return {'header': header, 'ids': questionIds.join("|")};
+    return {
+      'header': header,
+      'ids': questionIds.join("|"),
+      'dependsOn': dependsOn.toString()
+    };
   }
 
   static PageLayout fromJson(Map<String, dynamic> json) => PageLayout(
       questionIds:
           json['ids'] is String ? (json['ids'] as String).split("|") : [],
-      header: json['header']);
+      header: json['header'],
+      dependsOn: DependsOn.fromString(json['dependsOn']));
+}
+
+enum CheckType {
+  exists("exists"),
+  equals("equals");
+
+  final String value;
+  const CheckType(this.value);
+
+  static CheckType? fromValue(String value) {
+    if (value == "exists") return CheckType.exists;
+    if (value == "equals") return CheckType.equals;
+    return null;
+  }
+}
+
+@immutable
+class Relation {
+  final String qid;
+  final dynamic response;
+  final QuestionType questionType;
+  final CheckType type;
+  const Relation(
+      {required this.qid,
+      required this.questionType,
+      this.response,
+      this.type = CheckType.exists});
+
+  const Relation.exists({required this.qid})
+      : questionType = QuestionType.check,
+        type = CheckType.exists,
+        response = null;
+
+  static Relation from<E extends Response>(
+      {required String qid,
+      required dynamic response,
+      CheckType type = CheckType.exists}) {
+    if (E is OpenResponse) {
+      return Relation(
+          qid: qid,
+          response: response,
+          questionType: QuestionType.freeResponse,
+          type: type);
+    }
+    if (E is NumericResponse) {
+      return Relation(
+          qid: qid,
+          response: response,
+          questionType: QuestionType.slider,
+          type: type);
+    }
+    if (E is MultiResponse) {
+      return Relation(
+          qid: qid,
+          response: response,
+          questionType: QuestionType.multipleChoice,
+          type: type);
+    }
+    if (E is AllResponse) {
+      return Relation(
+          qid: qid,
+          response: response,
+          questionType: QuestionType.allThatApply,
+          type: type);
+    }
+    return Relation(
+        qid: qid,
+        response: response,
+        questionType: QuestionType.check,
+        type: type);
+  }
+
+  @override
+  String toString() {
+    if (questionType == QuestionType.allThatApply) {
+      return [
+        questionType.id,
+        qid,
+        response is List<int> ? (response as List<int>).join("|") : null,
+        type.value
+      ].join("^");
+    }
+    return [questionType.id, qid, "$response", type.value].join("^");
+  }
+
+  static Relation? fromString(String value) {
+    final List<String> values = value.split("^");
+    if (values.length != 4) return null;
+    final CheckType? checkType = CheckType.fromValue(values[3]);
+    final QuestionType questionType = QuestionType.fromId(values[0]);
+    if (checkType == null) return null;
+    if (questionType == QuestionType.check || checkType == CheckType.exists) {
+      return Relation.exists(qid: values[1]);
+    }
+    final String response = values[2];
+    if (questionType == QuestionType.multipleChoice ||
+        questionType == QuestionType.slider) {
+      return Relation(
+          qid: values[1],
+          questionType: questionType,
+          response: int.tryParse(response),
+          type: checkType);
+    }
+    if (questionType == QuestionType.allThatApply) {
+      return Relation(
+          qid: values[1],
+          questionType: questionType,
+          response: response
+              .split("|")
+              .map((val) => int.tryParse(val))
+              .whereType<int>()
+              .toList(),
+          type: checkType);
+    }
+    return Relation(
+        qid: values[1],
+        response: response,
+        questionType: questionType,
+        type: checkType);
+  }
+}
+
+@immutable
+class DependsOn {
+  final List<Relation> relation;
+  const DependsOn(this.relation);
+
+  const DependsOn.nothing() : relation = const [];
+
+  bool eval(QuestionsListener questionListener) {
+    if (relation.isEmpty) return true;
+    bool passes = true;
+
+    Question? from(String id) {
+      final List<Question> withId = questionListener.questions.keys
+          .where(((key) => key.id == id))
+          .toList();
+      return withId.isEmpty ? null : withId[0];
+    }
+
+    for (final Relation rel in relation) {
+      final Question? withId = from(rel.qid);
+      if (withId == null) return false;
+      if (rel.type == CheckType.exists) continue;
+    }
+
+    return passes;
+  }
+
+  @override
+  String toString() {
+    return relation.join("~");
+  }
+
+  static DependsOn fromString(String val) {
+    List<Relation> relations = val
+        .split("~")
+        .map((value) => Relation.fromString(value))
+        .whereType<Relation>()
+        .toList();
+    return DependsOn(relations);
+  }
 }
 
 abstract class QuestionHome {

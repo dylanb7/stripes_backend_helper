@@ -58,13 +58,14 @@ class RecordPath {
   final String name;
   final List<PageLayout> pages;
   final Period? period;
-  final bool userCreated, enabled;
+  final bool userCreated, enabled, isRequired;
   const RecordPath(
       {required this.name,
       required this.pages,
       this.period,
       this.userCreated = false,
-      this.enabled = true});
+      this.enabled = true,
+      this.isRequired = false});
 
   Map<String, dynamic> toJson() {
     return {
@@ -72,7 +73,8 @@ class RecordPath {
       'period': period?.toId(),
       'pages': pages.map((page) => page.toJson()).toList(),
       'userCreated': userCreated ? 1 : 0,
-      'enabled': enabled ? 1 : 0
+      'enabled': enabled ? 1 : 0,
+      'isRequired': isRequired ? 1 : 0
     };
   }
 
@@ -86,7 +88,8 @@ class RecordPath {
             : [],
         period: json['period'] is String ? Period.fromId(json['period']) : null,
         userCreated: json['userCreated'] == 1,
-        enabled: json['enabled'] == 1);
+        enabled: json['enabled'] == 1,
+        isRequired: json['isRequired'] == 1);
   }
 }
 

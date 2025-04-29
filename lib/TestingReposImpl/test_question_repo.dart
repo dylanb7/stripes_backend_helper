@@ -175,7 +175,7 @@ class QuestionHomeInst extends QuestionHome {
     }
   }
 
-  List<Question> get severityQuestions => [
+  List<Question?> get severityQuestions => [
         fromID(q1),
         fromID(q2),
         fromID(q6),
@@ -190,16 +190,16 @@ class QuestionHomeInst extends QuestionHome {
         fromID(q26),
       ];
 
-  List<Question> get bm1 => [fromID(q4)];
+  List<Question?> get bm1 => [fromID(q4)];
 
-  List<Question> get bm2 => [
+  List<Question?> get bm2 => [
         fromID(q6),
         fromID(q7),
         fromID(q8),
         fromID(q9),
       ];
 
-  List<Question> get reflux => [
+  List<Question?> get reflux => [
         fromID(q2),
         fromID(q10),
         fromID(q11),
@@ -209,13 +209,13 @@ class QuestionHomeInst extends QuestionHome {
         fromID(q20)
       ];
 
-  List<Question> get pain => [
+  List<Question?> get pain => [
         fromID(q1),
         fromID(q14),
         fromID(q18),
       ];
 
-  List<Question> get nb => [
+  List<Question?> get nb => [
         fromID(q21),
         fromID(q22),
         fromID(q23),

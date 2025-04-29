@@ -364,9 +364,13 @@ abstract class QuestionHome {
 
   Map<String, Question> additions = {};
 
+  Map<String, Question> deleted = {};
+
   Map<String, List<Question>> byType();
 
-  Question fromBank(String id) => all[id] ?? additions[id] ?? Question.empty();
+  Question? fromBank(String id) => all[id] ?? additions[id];
 
-  Question fromID(String id) => all[id] ?? Question.empty();
+  Question? fromID(String id) => all[id];
+
+  Question? forDisplay(String id) => fromBank(id) ?? deleted[id];
 }

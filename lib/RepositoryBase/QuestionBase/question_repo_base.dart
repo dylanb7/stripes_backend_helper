@@ -89,7 +89,6 @@ class RecordPath {
       'pages': pages.map((page) => page.toJson()).toList(),
       'userCreated': userCreated ? 1 : 0,
       'enabled': enabled ? 1 : 0,
-      'locked': locked ? 1 : 0
     };
   }
 

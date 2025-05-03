@@ -67,6 +67,21 @@ class RecordPath {
       this.enabled = true,
       this.locked = false});
 
+  RecordPath copyWith(
+          {String? name,
+          List<PageLayout>? pages,
+          Period? period,
+          bool? userCreated,
+          bool? enabled,
+          bool? locked}) =>
+      RecordPath(
+          name: name ?? this.name,
+          pages: pages ?? this.pages,
+          period: period ?? this.period,
+          userCreated: userCreated ?? this.userCreated,
+          enabled: enabled ?? this.enabled,
+          locked: locked ?? this.locked);
+
   Map<String, dynamic> toJson() {
     return {
       'name': name,
@@ -105,6 +120,13 @@ class PageLayout {
       {required this.questionIds,
       this.dependsOn = const DependsOn.nothing(),
       this.header});
+
+  PageLayout copyWith(
+          {List<String>? questionIds, DependsOn? dependsOn, String? header}) =>
+      PageLayout(
+          questionIds: questionIds ?? this.questionIds,
+          dependsOn: dependsOn ?? this.dependsOn,
+          header: header ?? this.header);
 
   Map<String, dynamic> toJson() {
     return {

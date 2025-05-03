@@ -55,6 +55,7 @@ class QuestionEntry {
 
 @immutable
 class RecordPath {
+  final String? id;
   final String name;
   final List<PageLayout> pages;
   final Period? period;
@@ -62,6 +63,7 @@ class RecordPath {
   const RecordPath(
       {required this.name,
       required this.pages,
+      this.id,
       this.period,
       this.userCreated = false,
       this.enabled = true,
@@ -89,6 +91,7 @@ class RecordPath {
       'pages': pages.map((page) => page.toJson()).toList(),
       'userCreated': userCreated ? 1 : 0,
       'enabled': enabled ? 1 : 0,
+      'id': id
     };
   }
 
@@ -103,12 +106,15 @@ class RecordPath {
         period: json['period'] is String ? Period.fromId(json['period']) : null,
         userCreated: json['userCreated'] == 1,
         enabled: json['enabled'] == 1,
-        locked: json['locked'] == 1);
+        locked: json['locked'] == 1,
+        id: json['id']);
   }
 }
 
 @immutable
 class PageLayout {
+  final String? id;
+
   final List<String> questionIds;
 
   final DependsOn dependsOn;
@@ -117,6 +123,7 @@ class PageLayout {
 
   const PageLayout(
       {required this.questionIds,
+      this.id,
       this.dependsOn = const DependsOn.nothing(),
       this.header});
 
@@ -129,6 +136,7 @@ class PageLayout {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'header': header,
       'ids': questionIds.join("|"),
       'dependsOn': dependsOn.toString()
@@ -136,6 +144,7 @@ class PageLayout {
   }
 
   static PageLayout fromJson(Map<String, dynamic> json) => PageLayout(
+      id: json['id'],
       questionIds:
           json['ids'] is String ? (json['ids'] as String).split("|") : [],
       header: json['header'],

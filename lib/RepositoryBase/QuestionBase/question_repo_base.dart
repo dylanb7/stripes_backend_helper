@@ -91,7 +91,7 @@ class RecordPath {
       'pages': pages.map((page) => page.toJson()).toList(),
       'userCreated': userCreated ? 1 : 0,
       'enabled': enabled ? 1 : 0,
-      'id': id
+      if (id != null) 'id': id
     };
   }
 
@@ -136,7 +136,7 @@ class PageLayout {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id != null) 'id': id,
       'header': header,
       'ids': questionIds.join("|"),
       'dependsOn': dependsOn.toString()

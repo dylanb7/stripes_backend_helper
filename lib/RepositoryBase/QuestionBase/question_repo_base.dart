@@ -121,6 +121,30 @@ class PageLayout {
       dependsOn: DependsOn.fromString(json['dependsOn']));
 }
 
+@immutable
+class LoadedPageLayout {
+  final List<Question> questions;
+
+  final DependsOn dependsOn;
+
+  final String? header;
+
+  const LoadedPageLayout(
+      {required this.questions, this.header, required this.dependsOn});
+
+  LoadedPageLayout.from(
+      {required PageLayout layout,
+      required QuestionHome home,
+      bool forDisplay = true})
+      : dependsOn = layout.dependsOn,
+        header = layout.header,
+        questions = layout.questionIds
+            .map(
+                (qid) => forDisplay ? home.forDisplay(qid) : home.fromBank(qid))
+            .whereType<Question>()
+            .toList();
+}
+
 enum CheckType {
   exists("exists"),
   equals("equals");
@@ -349,7 +373,6 @@ class DependsOn {
   }
 
   static DependsOn fromString(String val) {
-    print(val);
     List<RelationOp> ops = val
         .split("~")
         .map((rel) => RelationOp.fromString(rel))

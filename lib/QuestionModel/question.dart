@@ -9,7 +9,7 @@ abstract class Question with EquatableMixin {
 
   final String type;
 
-  final bool isRequired, userCreated, isAddition, deleted, enabled;
+  final bool isRequired, userCreated, isAddition, deleted, enabled, locked;
 
   const Question(
       {required this.id,
@@ -17,6 +17,7 @@ abstract class Question with EquatableMixin {
       required this.type,
       required this.isRequired,
       this.enabled = true,
+      this.locked = false,
       this.userCreated = false,
       this.isAddition = false,
       this.deleted = false});
@@ -33,6 +34,7 @@ class FreeResponse extends Question {
       required String prompt,
       required String type,
       super.userCreated,
+      super.locked,
       super.isAddition,
       super.deleted,
       super.enabled,
@@ -54,6 +56,7 @@ class Numeric extends Question {
       required String prompt,
       required String type,
       super.userCreated,
+      super.locked,
       super.isAddition,
       super.deleted,
       super.enabled,
@@ -76,6 +79,7 @@ class Check extends Question {
       required String prompt,
       required String type,
       super.isAddition,
+      super.locked,
       super.userCreated,
       super.deleted,
       super.enabled,
@@ -99,6 +103,7 @@ class MultipleChoice extends Question {
       required String type,
       required this.choices,
       super.deleted,
+      super.locked,
       super.isAddition,
       super.userCreated,
       super.enabled,
@@ -122,6 +127,7 @@ class AllThatApply extends Question {
       required String type,
       required this.choices,
       super.isAddition,
+      super.locked,
       super.deleted,
       super.userCreated,
       super.enabled,

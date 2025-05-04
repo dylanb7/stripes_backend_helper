@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
@@ -54,7 +55,7 @@ class QuestionEntry {
 }
 
 @immutable
-class RecordPath {
+class RecordPath extends Equatable {
   final String? id;
   final String name;
   final List<PageLayout> pages;
@@ -109,10 +110,14 @@ class RecordPath {
         locked: json['locked'] == 1,
         id: json['id']);
   }
+
+  @override
+  List<Object?> get props =>
+      [name, period?.toId(), ...pages, id, userCreated, enabled, locked];
 }
 
 @immutable
-class PageLayout {
+class PageLayout extends Equatable {
   final String? id;
 
   final List<String> questionIds;
@@ -149,10 +154,13 @@ class PageLayout {
           json['ids'] is String ? (json['ids'] as String).split("|") : [],
       header: json['header'],
       dependsOn: DependsOn.fromString(json['dependsOn']));
+
+  @override
+  List<Object?> get props => [id, ...questionIds, dependsOn, header];
 }
 
 @immutable
-class LoadedPageLayout {
+class LoadedPageLayout extends Equatable {
   final List<Question> questions;
 
   final DependsOn dependsOn;
@@ -173,6 +181,9 @@ class LoadedPageLayout {
                 (qid) => forDisplay ? home.forDisplay(qid) : home.fromBank(qid))
             .whereType<Question>()
             .toList();
+
+  @override
+  List<Object?> get props => [questions, dependsOn, header];
 }
 
 enum CheckType {
@@ -190,7 +201,7 @@ enum CheckType {
 }
 
 @immutable
-class Relation {
+class Relation extends Equatable {
   final String qid;
   final dynamic response;
   final QuestionType questionType;
@@ -293,6 +304,9 @@ class Relation {
         questionType: questionType,
         type: checkType);
   }
+
+  @override
+  List<Object?> get props => [qid, response, questionType.id, type.value];
 }
 
 enum Op {
@@ -311,7 +325,7 @@ enum Op {
 }
 
 @immutable
-class RelationOp {
+class RelationOp extends Equatable {
   final List<Relation> relations;
   final Op op;
 
@@ -334,10 +348,13 @@ class RelationOp {
     if (op == null) return null;
     return RelationOp(relations: relations, op: op);
   }
+
+  @override
+  List<Object?> get props => [...relations, op.value];
 }
 
 @immutable
-class DependsOn {
+class DependsOn extends Equatable {
   final List<RelationOp> relations;
   const DependsOn(this.relations);
 
@@ -410,6 +427,9 @@ class DependsOn {
         .toList();
     return DependsOn(ops);
   }
+
+  @override
+  List<Object?> get props => relations;
 }
 
 abstract class QuestionHome {

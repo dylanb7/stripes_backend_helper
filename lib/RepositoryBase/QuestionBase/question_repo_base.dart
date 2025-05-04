@@ -24,9 +24,11 @@ abstract class QuestionRepo<T extends QuestionHome> {
 
   Future<bool> addRecordPath(RecordPath path);
 
-  Future<bool> setEnabled(RecordPath recordPath, bool enabled);
+  Future<bool> setPathEnabled(RecordPath recordPath, bool enabled);
 
   Future<bool> removeRecordPath(RecordPath category);
+
+  Future<bool> updateRecordPath(RecordPath path);
 
   Future<bool> addQuestion(Question question);
 

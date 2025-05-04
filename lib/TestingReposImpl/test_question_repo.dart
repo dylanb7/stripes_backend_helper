@@ -33,12 +33,6 @@ class TestQuestionRepo extends QuestionRepo {
   }
 
   @override
-  Future<bool> setEnabled(RecordPath recordPath, bool enabled) {
-    // TODO: implement setEnabled
-    throw UnimplementedError();
-  }
-
-  @override
   Future<bool> setQuestionEnabled(Question recordPath, bool enabled) {
     // TODO: implement setQuestionEnabled
     throw UnimplementedError();
@@ -47,6 +41,18 @@ class TestQuestionRepo extends QuestionRepo {
   @override
   // TODO: implement layouts
   BehaviorSubject<List<RecordPath>> get layouts => BehaviorSubject.seeded([]);
+
+  @override
+  Future<bool> setPathEnabled(RecordPath recordPath, bool enabled) {
+    // TODO: implement setPathEnabled
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> updateRecordPath(RecordPath path) {
+    // TODO: implement updateRecordPath
+    throw UnimplementedError();
+  }
 }
 
 const String q1 = '1';

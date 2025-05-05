@@ -175,7 +175,7 @@ class LoadedPageLayout extends Equatable {
       {required this.questions, this.header, required this.dependsOn, this.id});
 
   LoadedPageLayout copyWith(
-          List<Question>? questions, DependsOn? dependsOn, String? header) =>
+          {List<Question>? questions, DependsOn? dependsOn, String? header}) =>
       LoadedPageLayout(
           questions: questions ?? this.questions,
           dependsOn: dependsOn ?? this.dependsOn,

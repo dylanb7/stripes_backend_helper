@@ -163,6 +163,8 @@ class PageLayout extends Equatable {
 
 @immutable
 class LoadedPageLayout extends Equatable {
+  final String? id;
+
   final List<Question> questions;
 
   final DependsOn dependsOn;
@@ -170,7 +172,20 @@ class LoadedPageLayout extends Equatable {
   final String? header;
 
   const LoadedPageLayout(
-      {required this.questions, this.header, required this.dependsOn});
+      {required this.questions, this.header, required this.dependsOn, this.id});
+
+  LoadedPageLayout copyWith(
+          List<Question>? questions, DependsOn? dependsOn, String? header) =>
+      LoadedPageLayout(
+          questions: questions ?? this.questions,
+          dependsOn: dependsOn ?? this.dependsOn,
+          header: header ?? this.header);
+
+  PageLayout toPageLayout() => PageLayout(
+      id: id,
+      questionIds: questions.map((question) => question.id).toList(),
+      dependsOn: dependsOn,
+      header: header);
 
   LoadedPageLayout.from(
       {required PageLayout layout,
@@ -182,7 +197,8 @@ class LoadedPageLayout extends Equatable {
             .map(
                 (qid) => forDisplay ? home.forDisplay(qid) : home.fromBank(qid))
             .whereType<Question>()
-            .toList();
+            .toList(),
+        id = layout.id;
 
   @override
   List<Object?> get props => [questions, dependsOn, header];

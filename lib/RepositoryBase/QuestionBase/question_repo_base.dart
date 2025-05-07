@@ -437,6 +437,22 @@ class DependsOn extends Equatable {
     return operations.join("~");
   }
 
+  String toReadableString({required String? Function(String) promptProvider}) {
+    String message = "";
+    for (final RelationOp op in operations) {
+      if (op.relations.length > 1) message += "${op.op.value}: \n";
+      for (int i = 0; i < op.relations.length; i++) {
+        final Relation relation = op.relations[i];
+        final String? questionText = promptProvider(relation.qid);
+        if (questionText == null) continue;
+        message +=
+            "  - ${relation.type == CheckType.exists ? questionText : "$questionText = ${relation.response}}"}${i < op.relations.length - 1 ? "\n" : ""}";
+      }
+      message += "\n";
+    }
+    return message;
+  }
+
   static DependsOn fromString(String val) {
     List<RelationOp> ops = val
         .split("~")

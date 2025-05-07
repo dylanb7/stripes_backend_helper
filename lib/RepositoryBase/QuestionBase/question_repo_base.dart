@@ -373,21 +373,21 @@ class RelationOp extends Equatable {
 
 @immutable
 class DependsOn extends Equatable {
-  final List<RelationOp> relations;
-  const DependsOn(this.relations);
+  final List<RelationOp> operations;
+  const DependsOn(this.operations);
 
   factory DependsOn.init() => const DependsOn([]);
 
-  const DependsOn.nothing() : relations = const [];
+  const DependsOn.nothing() : operations = const [];
 
   DependsOn allOf(List<Relation> rels) =>
-      DependsOn([...relations, RelationOp(relations: rels, op: Op.all)]);
+      DependsOn([...operations, RelationOp(relations: rels, op: Op.all)]);
 
   DependsOn oneOf(List<Relation> rels) =>
-      DependsOn([...relations, RelationOp(relations: rels, op: Op.one)]);
+      DependsOn([...operations, RelationOp(relations: rels, op: Op.one)]);
 
   bool eval(QuestionsListener questionListener) {
-    if (relations.isEmpty) return true;
+    if (operations.isEmpty) return true;
 
     Question? from(String id) {
       final List<Question> withId = questionListener.questions.keys
@@ -412,7 +412,7 @@ class DependsOn extends Equatable {
       }
     }
 
-    for (final RelationOp relationOp in relations) {
+    for (final RelationOp relationOp in operations) {
       bool passed = false;
       for (final Relation rel in relationOp.relations) {
         final Question? withId = from(rel.qid);
@@ -434,7 +434,7 @@ class DependsOn extends Equatable {
 
   @override
   String toString() {
-    return relations.join("~");
+    return operations.join("~");
   }
 
   static DependsOn fromString(String val) {
@@ -447,7 +447,7 @@ class DependsOn extends Equatable {
   }
 
   @override
-  List<Object?> get props => relations;
+  List<Object?> get props => operations;
 }
 
 abstract class QuestionHome {

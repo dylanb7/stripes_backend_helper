@@ -35,7 +35,7 @@ abstract class StripesRepoPackage {
       required StampRepo stampRepo,
       required QuestionRepo questionRepo});
 
-  QuestionRepo questions({required AuthUser user});
+  QuestionRepo questions({required AuthUser user, required SubUser subUser});
 }
 
 class LocalRepoPackage extends StripesRepoPackage {
@@ -72,8 +72,9 @@ class LocalRepoPackage extends StripesRepoPackage {
   }
 
   @override
-  QuestionRepo<QuestionHome> questions({required AuthUser user}) {
-    return TestQuestionRepo();
+  QuestionRepo<QuestionHome> questions(
+      {required AuthUser user, required SubUser subUser}) {
+    return TestQuestionRepo(subUser: subUser);
   }
 }
 
@@ -89,8 +90,9 @@ class LocalStockedRepoPackage extends StripesRepoPackage {
   }
 
   @override
-  QuestionRepo<QuestionHome> questions({required AuthUser user}) {
-    return TestQuestionRepo();
+  QuestionRepo<QuestionHome> questions(
+      {required AuthUser user, required SubUser subUser}) {
+    return TestQuestionRepo(subUser: subUser);
   }
 
   @override

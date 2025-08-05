@@ -6,6 +6,7 @@ import 'package:stripes_backend_helper/QuestionModel/response.dart';
 import 'package:stripes_backend_helper/RepositoryBase/AuthBase/auth_user.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_listener.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/record_period.dart';
+import 'package:stripes_backend_helper/RepositoryBase/SubBase/sub_user.dart';
 
 /*
 Default question behavior groups questions by type and adds them to a record path. Displays and entries are preset.
@@ -16,7 +17,9 @@ Default question behavior groups questions by type and adds them to a record pat
 abstract class QuestionRepo<T extends QuestionHome> {
   final AuthUser authUser;
 
-  QuestionRepo({required this.authUser});
+  final SubUser subUser;
+
+  QuestionRepo({required this.authUser, required this.subUser});
 
   Map<String, DisplayBuilder>? displayOverrides;
 

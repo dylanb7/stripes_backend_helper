@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
@@ -6,6 +8,9 @@ import 'package:stripes_backend_helper/QuestionModel/response.dart';
 import 'package:stripes_backend_helper/RepositoryBase/AuthBase/auth_user.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_listener.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/record_period.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:yaml/yaml.dart';
+import 'package:flutter/widgets.dart';
 
 /*
 Default question behavior groups questions by type and adds them to a record path. Displays and entries are preset.
@@ -480,4 +485,272 @@ abstract class QuestionHome {
   Question? fromID(String id) => all[id];
 
   Question? forDisplay(String id) => fromBank(id) ?? deleted[id];
+}
+
+@immutable
+class Baseline {
+  const Baseline();
+}
+
+@immutable
+class RelativeEntry {
+  const RelativeEntry();
+}
+
+typedef Translator = String? Function(String key, String locale);
+
+extension QuestionYamlLoading on Question {
+  static Future<List<Question>> fromYamlAsset(
+    BuildContext context,
+    String assetPath, {
+    Map<String, Map<String, String>>? localizations,
+    Translator? translator,
+  }) async {
+    final yamlString = await rootBundle.loadString(assetPath);
+    if (context.mounted) {
+      return fromYamlStringInternal(yamlString, context,
+          localizations: localizations, translator: translator);
+    } else {
+      return [];
+    }
+  }
+
+  static Future<List<Question>> fromYamlFileSystem(
+    BuildContext context,
+    String filePath, {
+    Map<String, Map<String, String>>? localizations,
+    Translator? translator,
+  }) async {
+    final file = File(filePath);
+    final yamlString = await file.readAsString();
+    if (context.mounted) {
+      return fromYamlStringInternal(yamlString, context,
+          localizations: localizations, translator: translator);
+    } else {
+      return [];
+    }
+  }
+
+  static Future<List<Question>> fromYamlStringInternal(
+    String yamlString,
+    BuildContext context, {
+    Map<String, Map<String, String>>? localizations,
+    Translator? translator,
+  }) async {
+    final doc = loadYaml(yamlString);
+
+    if (doc is! YamlMap) {
+      throw ArgumentError('Top level YAML document must be a mapping');
+    }
+
+    Map<String, Map<String, String>>? locs = localizations;
+    if (locs == null && doc.containsKey('localizations')) {
+      locs = <String, Map<String, String>>{};
+      final rawLocs = doc['localizations'] as YamlMap;
+      rawLocs.forEach((lang, map) {
+        locs![lang.toString()] = Map<String, String>.from(map);
+      });
+    }
+
+    final questionsRaw = doc['questions'];
+    if (questionsRaw == null || questionsRaw is! YamlList) {
+      throw ArgumentError('YAML must contain a "questions" list');
+    }
+
+    final List<Question> questions = [];
+
+    for (final qRaw in questionsRaw) {
+      if (qRaw is YamlMap) {
+        final map = Map<String, dynamic>.from(qRaw);
+        final q = QuestionYamlParsing.fromYamlMap(
+          map,
+          context,
+          localizations: locs,
+          translator: translator,
+        );
+        questions.add(q);
+      } else {
+        throw ArgumentError('Each question must be a map/object');
+      }
+    }
+
+    return questions;
+  }
+}
+
+extension QuestionYamlParsing on Question {
+  static Question fromYamlMap(
+    Map<String, dynamic> map,
+    BuildContext context, {
+    Map<String, Map<String, String>>? localizations,
+    Translator? translator,
+  }) {
+    final locale = Localizations.localeOf(context).languageCode;
+
+    String resolveKey(String? key) {
+      if (key == null || key.isEmpty) return '';
+
+      if (translator != null) {
+        final t = translator(key, locale);
+        if (t != null && t.isNotEmpty) return t;
+      }
+      if (localizations != null) {
+        final langMap = localizations[locale];
+        if (langMap != null && langMap.containsKey(key)) {
+          final val = langMap[key];
+          if (val != null && val.isNotEmpty) return val;
+        }
+      }
+
+      final pretty = key.split('.').last.replaceAll('_', ' ');
+      if (pretty.isEmpty) return key;
+      return pretty[0].toUpperCase() + pretty.substring(1);
+    }
+
+    String stringVal(String k) {
+      final v = map[k];
+      if (v == null) return '';
+      return v.toString();
+    }
+
+    bool boolVal(String k, {bool defaultValue = false}) {
+      final v = map[k];
+      if (v == null) return defaultValue;
+      if (v is bool) return v;
+      final s = v.toString().toLowerCase();
+      return s == 'true' || s == '1';
+    }
+
+    num? numVal(String k) {
+      final v = map[k];
+      if (v == null) return null;
+      if (v is num) return v;
+      return num.tryParse(v.toString());
+    }
+
+    List<String> listOfStrings(dynamic maybeList) {
+      if (maybeList == null) return <String>[];
+      if (maybeList is List) {
+        return maybeList.map((e) => e.toString()).toList();
+      }
+      return [maybeList.toString()];
+    }
+
+    final id = stringVal('id');
+    final domainType = stringVal('type');
+    final kindRaw = stringVal('kind').isNotEmpty
+        ? stringVal('kind')
+        : stringVal('questionType');
+
+    final promptKey =
+        map.containsKey('promptKey') ? stringVal('promptKey') : '';
+    final rawPrompt = map.containsKey('prompt') ? stringVal('prompt') : '';
+    final prompt = promptKey.isNotEmpty ? resolveKey(promptKey) : rawPrompt;
+
+    final isRequired = boolVal('isRequired', defaultValue: false);
+    final enabled = boolVal('enabled', defaultValue: true);
+    final locked = boolVal('locked', defaultValue: false);
+    final userCreated = boolVal('userCreated', defaultValue: false);
+    final isAddition = boolVal('isAddition', defaultValue: false);
+    final deleted = boolVal('deleted', defaultValue: false);
+
+    final kind = kindRaw.trim().toLowerCase();
+
+    if (kind == 'm') {
+      final choiceKeys = listOfStrings(map['choices']);
+      final localizedChoices = choiceKeys.map((k) {
+        return resolveKey(k);
+      }).toList();
+
+      return MultipleChoice(
+        id: id,
+        prompt: prompt,
+        type: domainType,
+        choices: localizedChoices,
+        isRequired: isRequired,
+        enabled: enabled,
+        locked: locked,
+        userCreated: userCreated,
+        isAddition: isAddition,
+        deleted: deleted,
+      );
+    } else if (kind == 'a') {
+      final choiceKeys = listOfStrings(map['choices']);
+      final localizedChoices = choiceKeys.map((k) => resolveKey(k)).toList();
+
+      return AllThatApply(
+        id: id,
+        prompt: prompt,
+        type: domainType,
+        choices: localizedChoices,
+        isRequired: isRequired,
+        enabled: enabled,
+        locked: locked,
+        userCreated: userCreated,
+        isAddition: isAddition,
+        deleted: deleted,
+      );
+    } else if (kind == 'f') {
+      return FreeResponse(
+        id: id,
+        prompt: prompt,
+        type: domainType,
+        isRequired: isRequired,
+        enabled: enabled,
+        locked: locked,
+        userCreated: userCreated,
+        isAddition: isAddition,
+        deleted: deleted,
+      );
+    } else if (kind == 's') {
+      final min = numVal('min');
+      final max = numVal('max');
+
+      return Numeric(
+        id: id,
+        prompt: prompt,
+        type: domainType,
+        min: min,
+        max: max,
+        isRequired: isRequired,
+        enabled: enabled,
+        locked: locked,
+        userCreated: userCreated,
+        isAddition: isAddition,
+        deleted: deleted,
+      );
+    } else {
+      // Default -> Check
+      return Check(
+        id: id,
+        prompt: prompt,
+        type: domainType,
+        isRequired: isRequired,
+        enabled: enabled,
+        locked: locked,
+        userCreated: userCreated,
+        isAddition: isAddition,
+        deleted: deleted,
+      );
+    }
+  }
+
+  static Question fromYamlString(
+    String yamlString,
+    BuildContext context, {
+    Map<String, Map<String, String>>? localizations,
+    Translator? translator,
+  }) {
+    final parsed = loadYaml(yamlString);
+    if (parsed is! YamlMap) {
+      throw ArgumentError(
+          'Provided YAML string must be a mapping at top level');
+    }
+    final map = <String, dynamic>{};
+    for (final key in parsed.keys) {
+      map[key.toString()] = parsed[key];
+    }
+    return fromYamlMap(map, context,
+        localizations: localizations, translator: translator);
+  }
 }

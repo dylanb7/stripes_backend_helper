@@ -5,7 +5,8 @@ import 'package:stripes_backend_helper/RepositoryBase/AuthBase/auth_user.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
 
 class TestQuestionRepo extends QuestionRepo {
-  TestQuestionRepo({super.authUser = const AuthUser.empty()});
+  TestQuestionRepo(
+      {super.authUser = const AuthUser.empty(), required super.subUser});
 
   @override
   BehaviorSubject<QuestionHome> get questions =>

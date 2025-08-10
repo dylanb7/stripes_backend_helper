@@ -8,6 +8,8 @@ import 'package:stripes_backend_helper/QuestionModel/response.dart';
 import 'package:stripes_backend_helper/RepositoryBase/AuthBase/auth_user.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_listener.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/record_period.dart';
+import 'package:stripes_backend_helper/RepositoryBase/SubBase/sub_user.dart';
+import 'package:uuid/uuid.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:yaml/yaml.dart';
 import 'package:flutter/widgets.dart';
@@ -21,7 +23,9 @@ Default question behavior groups questions by type and adds them to a record pat
 abstract class QuestionRepo<T extends QuestionHome> {
   final AuthUser authUser;
 
-  QuestionRepo({required this.authUser});
+  final SubUser subUser;
+
+  QuestionRepo({required this.authUser, required this.subUser});
 
   Map<String, DisplayBuilder>? displayOverrides;
 
@@ -68,14 +72,15 @@ class RecordPath extends Equatable {
   final List<PageLayout> pages;
   final Period? period;
   final bool userCreated, enabled, locked;
-  const RecordPath(
+  RecordPath(
       {required this.name,
       required this.pages,
-      this.id,
+      String? uid,
       this.period,
       this.userCreated = false,
       this.enabled = true,
-      this.locked = false});
+      this.locked = false})
+      : id = uid ?? const Uuid().v4();
 
   RecordPath copyWith(
           {String? name,
@@ -85,6 +90,7 @@ class RecordPath extends Equatable {
           bool? enabled,
           bool? locked}) =>
       RecordPath(
+          uid: id,
           name: name ?? this.name,
           pages: pages ?? this.pages,
           period: period ?? this.period,
@@ -115,7 +121,7 @@ class RecordPath extends Equatable {
         userCreated: json['userCreated'] == 1,
         enabled: json['enabled'] == 1,
         locked: json['locked'] == 1,
-        id: json['id']);
+        uid: json['id']);
   }
 
   @override
@@ -133,15 +139,17 @@ class PageLayout extends Equatable {
 
   final String? header;
 
-  const PageLayout(
+  PageLayout(
       {required this.questionIds,
-      this.id,
       this.dependsOn = const DependsOn.nothing(),
-      this.header});
+      this.header,
+      String? uid})
+      : id = uid ?? const Uuid().v4();
 
   PageLayout copyWith(
           {List<String>? questionIds, DependsOn? dependsOn, String? header}) =>
       PageLayout(
+          uid: id,
           questionIds: questionIds ?? this.questionIds,
           dependsOn: dependsOn ?? this.dependsOn,
           header: header ?? this.header);
@@ -156,7 +164,7 @@ class PageLayout extends Equatable {
   }
 
   static PageLayout fromJson(Map<String, dynamic> json) => PageLayout(
-      id: json['id'],
+      uid: json['id'],
       questionIds:
           json['ids'] is String ? (json['ids'] as String).split("|") : [],
       header: json['header'],
@@ -187,7 +195,7 @@ class LoadedPageLayout extends Equatable {
           header: header ?? this.header);
 
   PageLayout toPageLayout() => PageLayout(
-      id: id,
+      uid: id,
       questionIds: questions.map((question) => question.id).toList(),
       dependsOn: dependsOn,
       header: header);

@@ -20,7 +20,7 @@ class TestResponseRepo extends StampRepo<Response> {
       : super(
             authUser: const AuthUser.empty(),
             currentUser: subUser,
-            questionRepo: TestQuestionRepo()) {
+            questionRepo: TestQuestionRepo(subUser: subUser)) {
     if (!_responses.containsKey(currentUser)) {
       _responses[currentUser] = [];
     }
@@ -31,7 +31,7 @@ class TestResponseRepo extends StampRepo<Response> {
       : super(
             authUser: const AuthUser.empty(),
             currentUser: current,
-            questionRepo: TestQuestionRepo()) {
+            questionRepo: TestQuestionRepo(subUser: current)) {
     if (!_responses.containsKey(currentUser)) {
       _responses[currentUser] = [];
     }
@@ -87,7 +87,7 @@ class TestResponseRepo extends StampRepo<Response> {
       : super(
             authUser: const AuthUser.empty(),
             currentUser: current,
-            questionRepo: TestQuestionRepo()) {
+            questionRepo: TestQuestionRepo(subUser: current)) {
     if (!_responses.containsKey(currentUser)) {
       _responses[currentUser] = [];
     }

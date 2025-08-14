@@ -728,7 +728,6 @@ extension QuestionYamlParsing on Question {
         deleted: deleted,
       );
     } else {
-      // Default -> Check
       return Check(
         id: id,
         prompt: prompt,

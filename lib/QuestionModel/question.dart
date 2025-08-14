@@ -9,7 +9,17 @@ abstract class Question with EquatableMixin {
 
   final String type;
 
-  final bool isRequired, userCreated, isAddition, deleted, enabled, locked;
+  final bool isRequired,
+      userCreated,
+      isAddition,
+      deleted,
+      enabled,
+      locked,
+      isBaseline;
+
+  final String? fromBaseline;
+
+  final String? transform;
 
   const Question(
       {required this.id,
@@ -20,7 +30,10 @@ abstract class Question with EquatableMixin {
       this.locked = false,
       this.userCreated = false,
       this.isAddition = false,
-      this.deleted = false});
+      this.deleted = false,
+      this.isBaseline = false,
+      this.fromBaseline,
+      this.transform});
 
   factory Question.ofType({required String type}) =>
       Check(id: '', prompt: '', type: type);
@@ -38,6 +51,9 @@ class FreeResponse extends Question {
       super.isAddition,
       super.deleted,
       super.enabled,
+      super.isBaseline,
+      super.fromBaseline,
+      super.transform,
       bool? isRequired})
       : super(
             id: id,
@@ -60,6 +76,9 @@ class Numeric extends Question {
       super.isAddition,
       super.deleted,
       super.enabled,
+      super.isBaseline,
+      super.fromBaseline,
+      super.transform,
       bool? isRequired,
       this.min,
       this.max})
@@ -83,6 +102,9 @@ class Check extends Question {
       super.userCreated,
       super.deleted,
       super.enabled,
+      super.isBaseline,
+      super.fromBaseline,
+      super.transform,
       bool? isRequired})
       : super(
             id: id,
@@ -107,6 +129,9 @@ class MultipleChoice extends Question {
       super.isAddition,
       super.userCreated,
       super.enabled,
+      super.isBaseline,
+      super.fromBaseline,
+      super.transform,
       bool? isRequired})
       : super(
             id: id,
@@ -131,6 +156,9 @@ class AllThatApply extends Question {
       super.deleted,
       super.userCreated,
       super.enabled,
+      super.isBaseline,
+      super.fromBaseline,
+      super.transform,
       bool? isRequired})
       : super(
             id: id,

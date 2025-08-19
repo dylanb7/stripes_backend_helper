@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
 
 @immutable
 abstract class Question with EquatableMixin {
@@ -17,6 +18,8 @@ abstract class Question with EquatableMixin {
       locked,
       isBaseline;
 
+  final DependsOn? dependsOn;
+
   final String? fromBaseline;
 
   final String? transform;
@@ -32,6 +35,7 @@ abstract class Question with EquatableMixin {
       this.isAddition = false,
       this.deleted = false,
       this.isBaseline = false,
+      this.dependsOn,
       this.fromBaseline,
       this.transform});
 
@@ -54,6 +58,7 @@ class FreeResponse extends Question {
       super.isBaseline,
       super.fromBaseline,
       super.transform,
+      super.dependsOn,
       bool? isRequired})
       : super(
             id: id,
@@ -79,6 +84,7 @@ class Numeric extends Question {
       super.isBaseline,
       super.fromBaseline,
       super.transform,
+      super.dependsOn,
       bool? isRequired,
       this.min,
       this.max})
@@ -105,6 +111,7 @@ class Check extends Question {
       super.isBaseline,
       super.fromBaseline,
       super.transform,
+      super.dependsOn,
       bool? isRequired})
       : super(
             id: id,
@@ -132,6 +139,7 @@ class MultipleChoice extends Question {
       super.isBaseline,
       super.fromBaseline,
       super.transform,
+      super.dependsOn,
       bool? isRequired})
       : super(
             id: id,
@@ -159,6 +167,7 @@ class AllThatApply extends Question {
       super.isBaseline,
       super.fromBaseline,
       super.transform,
+      super.dependsOn,
       bool? isRequired})
       : super(
             id: id,

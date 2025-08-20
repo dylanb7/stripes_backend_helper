@@ -248,10 +248,10 @@ class Relation extends Equatable {
         type = CheckType.exists,
         response = null;
 
-  static Relation from<E extends Response>(
+  static Relation equals<E extends Response>(
       {required String qid,
       required dynamic response,
-      CheckType type = CheckType.exists}) {
+      CheckType type = CheckType.equals}) {
     if (E is OpenResponse) {
       return Relation(
           qid: qid,
@@ -280,11 +280,7 @@ class Relation extends Equatable {
           questionType: QuestionType.allThatApply,
           type: type);
     }
-    return Relation(
-        qid: qid,
-        response: response,
-        questionType: QuestionType.check,
-        type: type);
+    return Relation.exists(qid: qid);
   }
 
   @override
@@ -392,6 +388,82 @@ class DependsOn extends Equatable {
   factory DependsOn.init() => const DependsOn([]);
 
   const DependsOn.nothing() : operations = const [];
+
+  factory DependsOn.fromYaml(Map<String, dynamic> yamlData) {
+    DependsOn dependsOn = const DependsOn.nothing();
+
+    Relation? parseRelation(Map<String, dynamic> item) {
+      const existsKey = 'exists';
+
+      if (item.containsKey(existsKey)) {
+        return Relation.exists(qid: item[existsKey]);
+      }
+      const questionIdKey = 'questionId';
+      const equalsKey = 'equals';
+      if (!item.containsKey(questionIdKey)) {
+        return null;
+      }
+      final String questionIdSlug = item[questionIdKey];
+
+      if (item.containsKey(equalsKey)) {
+        final dynamic equalsSlug = item[equalsKey];
+
+        int? equalsValue = int.tryParse(equalsSlug);
+        if (equalsValue != null) {
+          return Relation.equals(qid: questionIdSlug, response: equalsValue);
+        }
+      }
+
+      const textKey = "text";
+
+      if (item.containsKey(textKey)) {
+        final dynamic textSlug = item[textKey];
+
+        if (textSlug is! String) return null;
+        return Relation.equals(qid: questionIdSlug, response: textSlug);
+      }
+
+      const responsesKey = "responses";
+
+      if (item.containsKey(responsesKey)) {
+        final dynamic responsesSlug = item[responsesKey];
+        if (responsesSlug is! String) return null;
+        final List<int> parsedResponse = responsesSlug
+            .split(',')
+            .map(int.tryParse)
+            .whereType<int>()
+            .toList();
+        return Relation.equals(qid: questionIdSlug, response: parsedResponse);
+      }
+      return null;
+    }
+
+    if (yamlData.containsKey('oneOf')) {
+      final List<dynamic> conditions = yamlData['oneOf'] as List<dynamic>;
+      final relations = conditions
+          .map((cond) {
+            final Map<String, dynamic> item = cond as Map<String, dynamic>;
+            return parseRelation(item);
+          })
+          .whereType<Relation>()
+          .toList();
+      dependsOn = dependsOn.oneOf(relations);
+    }
+
+    if (yamlData.containsKey('allOf')) {
+      final List<dynamic> conditions = yamlData['allOf'] as List<dynamic>;
+      final relations = conditions
+          .map((cond) {
+            final Map<String, dynamic> item = cond as Map<String, dynamic>;
+            return parseRelation(item);
+          })
+          .whereType<Relation>()
+          .toList();
+      dependsOn = dependsOn.allOf(relations);
+    }
+
+    return dependsOn;
+  }
 
   DependsOn allOf(List<Relation> rels) =>
       DependsOn([...operations, RelationOp(relations: rels, op: Op.all)]);

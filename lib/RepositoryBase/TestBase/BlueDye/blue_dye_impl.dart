@@ -104,7 +104,7 @@ List<BMTestLog> deserializeLogs(Map<String, dynamic> json, QuestionHome home) {
     if (!json.containsKey(key)) {
       return res;
     }
-    res.add(BMTestLog.fromJson(json[key], home));
+    //res.add(BMTestLog.fromJson(json[key], home));
   }
 }
 

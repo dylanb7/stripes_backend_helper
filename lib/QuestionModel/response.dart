@@ -7,7 +7,7 @@ import 'package:stripes_backend_helper/db_keys.dart';
 import '../RepositoryBase/StampBase/stamp.dart';
 
 @immutable
-abstract class Response<E extends Question> extends Stamp with EquatableMixin {
+sealed class Response<E extends Question> extends Stamp with EquatableMixin {
   final E question;
 
   Response(
@@ -151,6 +151,36 @@ class AllResponse extends Response<AllThatApply> {
   List<Object?> get props => [...super.props, responses, question];
 }
 
+abstract class ResponseWrap extends Response {
+  final List<Response> responses;
+
+  ResponseWrap({
+    required this.responses,
+    required super.group,
+    required super.stamp,
+    required String type,
+    super.id,
+  }) : super(question: Question.ofType(type: type));
+}
+
+class DetailResponse extends ResponseWrap {
+  final String? description;
+
+  final String? linkingId;
+  DetailResponse(
+      {this.description,
+      this.linkingId,
+      required super.responses,
+      super.group,
+      super.id,
+      required super.stamp,
+      String? detailType})
+      : super(
+            type: detailType ??
+                (responses.isEmpty ? 'Description' : responses.first.type));
+}
+
+/*
 class DetailResponse extends Response {
   final String? description;
 
@@ -192,7 +222,7 @@ class DetailResponse extends Response {
   @override
   List<Object?> get props => [...super.props, description, responses];
 }
-
+*/
 Map<String, dynamic> responesToJson(List<Response> responses) {
   Map<String, dynamic> res = {};
   for (int i = 0; i < responses.length; i++) {
@@ -214,9 +244,7 @@ Response responseFromJson(Map<String, dynamic> json, QuestionHome home) {
   if (json.containsKey(RESPONSE_FIELD)) {
     return OpenResponse.fromJson(json, home);
   }
-  if (json.containsKey(DESCRIPTION_FIELD)) {
-    DetailResponse.fromJson(json, home);
-  }
+
   return Selected.fromJson(json, home);
 }
 

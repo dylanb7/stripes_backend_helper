@@ -1,6 +1,5 @@
 // ignore_for_file: constant_identifier_names
 
-import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/QuestionModel/response.dart';
 import 'package:stripes_backend_helper/RepositoryBase/TestBase/BlueDye/blue_dye_impl.dart';
 import 'package:stripes_backend_helper/RepositoryBase/TestBase/BlueDye/bm_test_log.dart';
@@ -13,7 +12,7 @@ const String BLUE_BOWEL_MOVEMENTS = 'blueBowelMovementsKey';
 const String FIRST_BLUE = 'firstBlueKey';
 const String LAST_BLUE = 'lastBlueKey';
 
-class BlueDyeResp extends Response {
+class BlueDyeResp extends ResponseWrap {
   final DateTime startEating;
   final Duration eatingDuration;
   final DateTime? finishedEatingTime;
@@ -36,8 +35,8 @@ class BlueDyeResp extends Response {
       super.group,
       super.id})
       : super(
-            question: const Check(
-                type: 'Blue Transit Time', id: '', prompt: 'Blue Dye Test'),
+            responses: logs,
+            type: logs.isEmpty ? 'Blue Dye Response' : logs.first.type,
             stamp: dateToStamp(startEating));
 
   //test obj must have atleast one log
@@ -67,7 +66,7 @@ class BlueDyeResp extends Response {
       normalBowelMovements: json[NORMAL_BOWEL_MOVEMENTS],
       amountConsumed: parseAmountConsumed(json[AMOUNT_CONSUMED]) ??
           AmountConsumed.undetermined,
-      logs: [],
+      logs: const [],
       blueBowelMovements: json[BLUE_BOWEL_MOVEMENTS],
       firstBlue: dateFromStamp(json[FIRST_BLUE]),
       lastBlue: dateFromStamp(json[LAST_BLUE]));

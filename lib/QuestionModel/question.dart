@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
 
 @immutable
-abstract class Question with EquatableMixin {
+sealed class Question with EquatableMixin {
   final String id;
 
   final String prompt;
@@ -191,11 +191,18 @@ enum QuestionType {
   const QuestionType(this.id, this.value);
 
   static QuestionType from(Question question) {
-    if (question is MultipleChoice) return multipleChoice;
-    if (question is FreeResponse) return freeResponse;
-    if (question is Numeric) return slider;
-    if (question is AllThatApply) return allThatApply;
-    return check;
+    switch (question) {
+      case FreeResponse():
+        return freeResponse;
+      case Numeric():
+        return slider;
+      case Check():
+        return check;
+      case MultipleChoice():
+        return multipleChoice;
+      case AllThatApply():
+        return allThatApply;
+    }
   }
 
   static QuestionType fromId(String id) {

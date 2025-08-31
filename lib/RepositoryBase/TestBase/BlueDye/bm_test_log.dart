@@ -6,15 +6,15 @@ import 'package:stripes_backend_helper/stripes_backend_helper.dart';
 const String DETAIL_RES_KEY = 'detail_res';
 const String IS_BLUE_KEY = 'is_blue';
 
-class BMTestLog extends ResponseWrap with EquatableMixin {
-  final DetailResponse response;
-
+class BMTestLog extends SingleResponseWrap with EquatableMixin {
   final bool isBlue;
 
   BMTestLog(
-      {required this.response, required this.isBlue, super.group, super.id})
-      : super(
-            stamp: response.stamp, responses: [response], type: response.type);
+      {required DetailResponse response,
+      required this.isBlue,
+      super.group,
+      super.id})
+      : super(response: response);
 
   @override
   Map<String, dynamic> toJson() {

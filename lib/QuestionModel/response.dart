@@ -156,11 +156,18 @@ abstract class ResponseWrap extends Response {
 
   ResponseWrap({
     required this.responses,
-    required super.group,
     required super.stamp,
     required String type,
+    super.group,
     super.id,
   }) : super(question: Question.ofType(type: type));
+}
+
+abstract class SingleResponseWrap extends Response {
+  final Response response;
+
+  SingleResponseWrap({required this.response, super.group, super.id})
+      : super(question: response.question, stamp: response.stamp);
 }
 
 class DetailResponse extends ResponseWrap {

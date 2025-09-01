@@ -6,7 +6,7 @@ import 'package:stripes_backend_helper/stripes_backend_helper.dart';
 const String DETAIL_RES_KEY = 'detail_res';
 const String IS_BLUE_KEY = 'is_blue';
 
-class BMTestLog extends SingleResponseWrap with EquatableMixin {
+class BMTestLog extends SingleResponseWrap<DetailResponse> with EquatableMixin {
   final bool isBlue;
 
   BMTestLog(

@@ -68,6 +68,38 @@ class FreeResponse extends Question {
 
   @override
   List<Object?> get props => [id, prompt, type, isRequired];
+
+  FreeResponse copyWith({
+    String? id,
+    String? prompt,
+    String? type,
+    bool? userCreated,
+    bool? locked,
+    bool? isAddition,
+    bool? deleted,
+    bool? enabled,
+    bool? isBaseline,
+    String? fromBaseline,
+    String? transform,
+    DependsOn? dependsOn,
+    bool? isRequired,
+  }) {
+    return FreeResponse(
+      id: id ?? this.id,
+      prompt: prompt ?? this.prompt,
+      type: type ?? this.type,
+      userCreated: userCreated ?? this.userCreated,
+      locked: locked ?? this.locked,
+      isAddition: isAddition ?? this.isAddition,
+      deleted: deleted ?? this.deleted,
+      enabled: enabled ?? this.enabled,
+      isBaseline: isBaseline ?? this.isBaseline,
+      fromBaseline: fromBaseline ?? this.fromBaseline,
+      transform: transform ?? this.transform,
+      dependsOn: dependsOn ?? this.dependsOn,
+      isRequired: isRequired ?? this.isRequired,
+    );
+  }
 }
 
 class Numeric extends Question {
@@ -96,6 +128,42 @@ class Numeric extends Question {
 
   @override
   List<Object?> get props => [id, prompt, type, min, max, isRequired];
+
+  Numeric copyWith({
+    String? id,
+    String? prompt,
+    String? type,
+    bool? userCreated,
+    bool? locked,
+    bool? isAddition,
+    bool? deleted,
+    bool? enabled,
+    bool? isBaseline,
+    String? fromBaseline,
+    String? transform,
+    DependsOn? dependsOn,
+    bool? isRequired,
+    num? min,
+    num? max,
+  }) {
+    return Numeric(
+      id: id ?? this.id,
+      prompt: prompt ?? this.prompt,
+      type: type ?? this.type,
+      userCreated: userCreated ?? this.userCreated,
+      locked: locked ?? this.locked,
+      isAddition: isAddition ?? this.isAddition,
+      deleted: deleted ?? this.deleted,
+      enabled: enabled ?? this.enabled,
+      isBaseline: isBaseline ?? this.isBaseline,
+      fromBaseline: fromBaseline ?? this.fromBaseline,
+      transform: transform ?? this.transform,
+      dependsOn: dependsOn ?? this.dependsOn,
+      isRequired: isRequired ?? this.isRequired,
+      min: min ?? this.min,
+      max: max ?? this.max,
+    );
+  }
 }
 
 class Check extends Question {
@@ -121,6 +189,38 @@ class Check extends Question {
 
   @override
   List<Object?> get props => [id, prompt, type, isRequired];
+
+  Check copyWith({
+    String? id,
+    String? prompt,
+    String? type,
+    bool? isAddition,
+    bool? locked,
+    bool? userCreated,
+    bool? deleted,
+    bool? enabled,
+    bool? isBaseline,
+    String? fromBaseline,
+    String? transform,
+    DependsOn? dependsOn,
+    bool? isRequired,
+  }) {
+    return Check(
+      id: id ?? this.id,
+      prompt: prompt ?? this.prompt,
+      type: type ?? this.type,
+      isAddition: isAddition ?? this.isAddition,
+      locked: locked ?? this.locked,
+      userCreated: userCreated ?? this.userCreated,
+      deleted: deleted ?? this.deleted,
+      enabled: enabled ?? this.enabled,
+      isBaseline: isBaseline ?? this.isBaseline,
+      fromBaseline: fromBaseline ?? this.fromBaseline,
+      transform: transform ?? this.transform,
+      dependsOn: dependsOn ?? this.dependsOn,
+      isRequired: isRequired ?? this.isRequired,
+    );
+  }
 }
 
 class MultipleChoice extends Question {
@@ -149,6 +249,40 @@ class MultipleChoice extends Question {
 
   @override
   List<Object?> get props => [id, prompt, type, choices, isRequired];
+
+  MultipleChoice copyWith({
+    String? id,
+    String? prompt,
+    String? type,
+    List<String>? choices,
+    bool? deleted,
+    bool? locked,
+    bool? isAddition,
+    bool? userCreated,
+    bool? enabled,
+    bool? isBaseline,
+    String? fromBaseline,
+    String? transform,
+    DependsOn? dependsOn,
+    bool? isRequired,
+  }) {
+    return MultipleChoice(
+      id: id ?? this.id,
+      prompt: prompt ?? this.prompt,
+      type: type ?? this.type,
+      choices: choices ?? this.choices,
+      deleted: deleted ?? this.deleted,
+      locked: locked ?? this.locked,
+      isAddition: isAddition ?? this.isAddition,
+      userCreated: userCreated ?? this.userCreated,
+      enabled: enabled ?? this.enabled,
+      isBaseline: isBaseline ?? this.isBaseline,
+      fromBaseline: fromBaseline ?? this.fromBaseline,
+      transform: transform ?? this.transform,
+      dependsOn: dependsOn ?? this.dependsOn,
+      isRequired: isRequired ?? this.isRequired,
+    );
+  }
 }
 
 class AllThatApply extends Question {
@@ -177,6 +311,40 @@ class AllThatApply extends Question {
 
   @override
   List<Object?> get props => [id, prompt, type, choices, isRequired];
+
+  AllThatApply copyWith({
+    String? id,
+    String? prompt,
+    String? type,
+    List<String>? choices,
+    bool? isAddition,
+    bool? locked,
+    bool? deleted,
+    bool? userCreated,
+    bool? enabled,
+    bool? isBaseline,
+    String? fromBaseline,
+    String? transform,
+    DependsOn? dependsOn,
+    bool? isRequired,
+  }) {
+    return AllThatApply(
+      id: id ?? this.id,
+      prompt: prompt ?? this.prompt,
+      type: type ?? this.type,
+      choices: choices ?? this.choices,
+      isAddition: isAddition ?? this.isAddition,
+      locked: locked ?? this.locked,
+      deleted: deleted ?? this.deleted,
+      userCreated: userCreated ?? this.userCreated,
+      enabled: enabled ?? this.enabled,
+      isBaseline: isBaseline ?? this.isBaseline,
+      fromBaseline: fromBaseline ?? this.fromBaseline,
+      transform: transform ?? this.transform,
+      dependsOn: dependsOn ?? this.dependsOn,
+      isRequired: isRequired ?? this.isRequired,
+    );
+  }
 }
 
 enum QuestionType {

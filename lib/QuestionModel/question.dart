@@ -43,6 +43,38 @@ sealed class Question with EquatableMixin {
       Check(id: '', prompt: '', type: type);
 
   static Question empty() => const Check(id: 'empty', prompt: '', type: '');
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'prompt': prompt,
+        'type': type,
+        'isRequired': isRequired ? 1 : 0,
+        'userCreated': userCreated ? 1 : 0,
+        'isAddition': isAddition ? 1 : 0,
+        'deleted': deleted ? 1 : 0,
+        'enabled': enabled ? 1 : 0,
+        'isBaseline': isBaseline ? 1 : 0,
+        'fromBaseline': fromBaseline,
+        'transform': transform,
+        'questionType': QuestionType.from(this).value,
+        'dependsOn': dependsOn?.toString(),
+      };
+
+  factory Question.fromJson(Map<String, dynamic> json) {
+    final questionType = json['questionType'];
+    switch (QuestionType.fromString(questionType)) {
+      case QuestionType.freeResponse:
+        return FreeResponse.fromJson(json);
+      case QuestionType.slider:
+        return Numeric.fromJson(json);
+      case QuestionType.check:
+        return Check.fromJson(json);
+      case QuestionType.multipleChoice:
+        return MultipleChoice.fromJson(json);
+      case QuestionType.allThatApply:
+        return AllThatApply.fromJson(json);
+    }
+  }
 }
 
 class FreeResponse extends Question {
@@ -65,6 +97,27 @@ class FreeResponse extends Question {
             prompt: prompt,
             type: type,
             isRequired: isRequired ?? false);
+
+  factory FreeResponse.fromJson(Map<String, dynamic> json) {
+    return FreeResponse(
+      id: json['id'],
+      prompt: json['prompt'],
+      type: json['type'],
+      isRequired: json['isRequired'] == 1,
+      userCreated: json['userCreated'] == 1,
+      isAddition: json['isAddition'] == 1,
+      deleted: json['deleted'] == 1,
+      enabled: json['enabled'] == 1,
+      isBaseline: json['isBaseline'] == 1,
+      fromBaseline: json['fromBaseline'],
+      transform: json['transform'],
+      dependsOn: json["dependsOn"] == null
+          ? const DependsOn.nothing()
+          : DependsOn.fromString(
+              json["dependsOn"],
+            ),
+    );
+  }
 
   @override
   List<Object?> get props => [id, prompt, type, isRequired];
@@ -126,6 +179,29 @@ class Numeric extends Question {
             type: type,
             isRequired: isRequired ?? false);
 
+  factory Numeric.fromJson(Map<String, dynamic> json) {
+    return Numeric(
+      id: json['id'],
+      prompt: json['prompt'],
+      type: json['type'],
+      min: json['min'],
+      max: json['max'],
+      isRequired: json['isRequired'] == 1,
+      userCreated: json['userCreated'] == 1,
+      isAddition: json['isAddition'] == 1,
+      deleted: json['deleted'] == 1,
+      enabled: json['enabled'] == 1,
+      isBaseline: json['isBaseline'] == 1,
+      fromBaseline: json['fromBaseline'],
+      transform: json['transform'],
+      dependsOn: json["dependsOn"] == null
+          ? const DependsOn.nothing()
+          : DependsOn.fromString(
+              json["dependsOn"],
+            ),
+    );
+  }
+
   @override
   List<Object?> get props => [id, prompt, type, min, max, isRequired];
 
@@ -164,6 +240,14 @@ class Numeric extends Question {
       max: max ?? this.max,
     );
   }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['min'] = min;
+    json['max'] = max;
+    return json;
+  }
 }
 
 class Check extends Question {
@@ -186,6 +270,27 @@ class Check extends Question {
             prompt: prompt,
             type: type,
             isRequired: isRequired ?? false);
+
+  factory Check.fromJson(Map<String, dynamic> json) {
+    return Check(
+      id: json['id'],
+      prompt: json['prompt'],
+      type: json['type'],
+      isRequired: json['isRequired'] == 1,
+      userCreated: json['userCreated'] == 1,
+      isAddition: json['isAddition'] == 1,
+      deleted: json['deleted'] == 1,
+      enabled: json['enabled'] == 1,
+      isBaseline: json['isBaseline'] == 1,
+      fromBaseline: json['fromBaseline'],
+      transform: json['transform'],
+      dependsOn: json["dependsOn"] == null
+          ? const DependsOn.nothing()
+          : DependsOn.fromString(
+              json["dependsOn"],
+            ),
+    );
+  }
 
   @override
   List<Object?> get props => [id, prompt, type, isRequired];
@@ -247,6 +352,30 @@ class MultipleChoice extends Question {
             type: type,
             isRequired: isRequired ?? false);
 
+  factory MultipleChoice.fromJson(Map<String, dynamic> json) {
+    return MultipleChoice(
+      id: json['id'],
+      prompt: json['prompt'],
+      type: json['type'],
+      choices: json['choices'] is String
+          ? (json['choices'] as String).split(',')
+          : [],
+      isRequired: json['isRequired'] == 1,
+      userCreated: json['userCreated'] == 1,
+      isAddition: json['isAddition'] == 1,
+      deleted: json['deleted'] == 1,
+      enabled: json['enabled'] == 1,
+      isBaseline: json['isBaseline'] == 1,
+      fromBaseline: json['fromBaseline'],
+      transform: json['transform'],
+      dependsOn: json["dependsOn"] == null
+          ? const DependsOn.nothing()
+          : DependsOn.fromString(
+              json["dependsOn"],
+            ),
+    );
+  }
+
   @override
   List<Object?> get props => [id, prompt, type, choices, isRequired];
 
@@ -283,6 +412,13 @@ class MultipleChoice extends Question {
       isRequired: isRequired ?? this.isRequired,
     );
   }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['choices'] = choices.join(',');
+    return json;
+  }
 }
 
 class AllThatApply extends Question {
@@ -308,6 +444,30 @@ class AllThatApply extends Question {
             prompt: prompt,
             type: type,
             isRequired: isRequired ?? false);
+
+  factory AllThatApply.fromJson(Map<String, dynamic> json) {
+    return AllThatApply(
+      id: json['id'],
+      prompt: json['prompt'],
+      type: json['type'],
+      choices: json['choices'] is String
+          ? (json['choices'] as String).split(',')
+          : [],
+      isRequired: json['isRequired'] == 1,
+      userCreated: json['userCreated'] == 1,
+      isAddition: json['isAddition'] == 1,
+      deleted: json['deleted'] == 1,
+      enabled: json['enabled'] == 1,
+      isBaseline: json['isBaseline'] == 1,
+      fromBaseline: json['fromBaseline'],
+      transform: json['transform'],
+      dependsOn: json["dependsOn"] == null
+          ? const DependsOn.nothing()
+          : DependsOn.fromString(
+              json["dependsOn"],
+            ),
+    );
+  }
 
   @override
   List<Object?> get props => [id, prompt, type, choices, isRequired];
@@ -344,6 +504,13 @@ class AllThatApply extends Question {
       dependsOn: dependsOn ?? this.dependsOn,
       isRequired: isRequired ?? this.isRequired,
     );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['choices'] = choices.join(',');
+    return json;
   }
 }
 

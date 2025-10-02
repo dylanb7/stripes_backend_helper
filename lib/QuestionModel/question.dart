@@ -549,10 +549,18 @@ enum QuestionType {
   }
 
   static QuestionType fromString(String value) {
-    if (value == "MultipleChoice") return multipleChoice;
-    if (value == "FreeResponse") return freeResponse;
-    if (value == "Numeric") return slider;
-    if (value == "AllThatApply") return allThatApply;
+    if (value == "MultipleChoice" || value == "Multiple Choice") {
+      return multipleChoice;
+    }
+    if (value == "FreeResponse" || value == "Free Response") {
+      return freeResponse;
+    }
+    if (value == "Slider" || value == "Numeric") {
+      return slider;
+    }
+    if (value == "AllThatApply" || value == "All That Apply") {
+      return allThatApply;
+    }
     return check;
   }
 

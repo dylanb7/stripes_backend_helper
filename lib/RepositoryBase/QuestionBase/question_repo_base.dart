@@ -474,12 +474,6 @@ class DependsOn extends Equatable {
   bool eval(QuestionsListener questionListener) {
     if (operations.isEmpty) return true;
 
-    Map<String, Question> byId = Map.fromEntries(
-      questionListener.questions.keys.map(
-        (question) => MapEntry(question.id, question),
-      ),
-    );
-
     bool getEquals(Relation rel, Response? res) {
       if (res == null) return false;
       switch (rel.questionType) {
@@ -499,12 +493,12 @@ class DependsOn extends Equatable {
     for (final RelationOp relationOp in operations) {
       bool passed = false;
       for (final Relation rel in relationOp.relations) {
-        final Question? withId = byId[rel.qid];
+        final Response? withId = questionListener.questions[rel.qid];
         final bool relationEval = withId == null
             ? false
             : rel.type == CheckType.exists
                 ? true
-                : getEquals(rel, questionListener.fromQuestion(withId));
+                : getEquals(rel, withId);
         if (relationOp.op == Op.all && !relationEval) return false;
         if (relationOp.op == Op.one && relationEval) {
           passed = true;

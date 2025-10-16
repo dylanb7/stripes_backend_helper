@@ -12,7 +12,7 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
     _submitTime = submitTime;
     _description = desc;
     responses?.forEach((res) {
-      questions[res.question] = res;
+      questions[res.question.id] = res;
     });
   }
 
@@ -33,7 +33,7 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
 
   final String? editId;
 
-  Map<Question, Response> questions = {};
+  Map<String, Response> questions = {};
 
   Set<Question> pending = {};
 
@@ -64,7 +64,7 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
         pending.add(question);
       }
     } else {
-      questions[question] = response;
+      questions[question.id] = response;
       pending.remove(question);
     }
     notifyListeners();
@@ -81,14 +81,14 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
   }
 
   addResponse(Response response) {
-    questions[response.question] = response;
+    questions[response.question.id] = response;
     notifyListeners();
   }
 
-  Response? fromQuestion(Question question) => questions[question];
+  Response? fromQuestion(Question question) => questions[question.id];
 
   removeResponse(Question question) {
-    questions.remove(question);
+    questions.remove(question.id);
     notifyListeners();
   }
 

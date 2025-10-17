@@ -97,6 +97,5 @@ abstract class Test<T extends TestState> {
   Future<bool> setTestState(T state);
   Future<bool> cancel();
   Future<void> refresh();
-  Future<bool> load();
   Widget? displayState(BuildContext context);
 }

@@ -47,8 +47,6 @@ abstract class QuestionRepo<T extends QuestionHome> {
 
   BehaviorSubject<List<RecordPath>> get layouts;
 
-  Future<bool> load();
-
   BehaviorSubject<T> get questions;
 }
 

@@ -9,5 +9,4 @@ abstract class SubUserRepo {
   Future<bool> deleteSubUser(SubUser user);
   Future<bool> updateSubUser(SubUser user);
   Future<void> refresh();
-  Future<bool> load();
 }

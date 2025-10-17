@@ -143,4 +143,10 @@ class TestResponseRepo extends StampRepo<Response> {
 
   @override
   Future<void> refresh() async {}
+
+  @override
+  Future<bool> load() {
+    // TODO: implement load
+    throw UnimplementedError();
+  }
 }

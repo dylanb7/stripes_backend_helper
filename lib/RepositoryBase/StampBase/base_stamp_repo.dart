@@ -19,5 +19,7 @@ abstract class StampRepo<T extends Stamp> {
   Future<bool> removeStamp(T stamp);
   Future<bool> updateStamp(T stamp);
   Future<void> refresh();
+  Future<bool> load();
+
   set earliestDate(DateTime time) => earliest = time;
 }

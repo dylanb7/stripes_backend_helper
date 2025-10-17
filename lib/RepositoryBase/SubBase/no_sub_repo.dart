@@ -27,4 +27,9 @@ class NoSubRepo extends SubUserRepo {
     // TODO: implement refresh
     throw UnimplementedError();
   }
+
+  @override
+  Future<bool> load() async {
+    return true;
+  }
 }

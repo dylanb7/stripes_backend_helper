@@ -10,10 +10,7 @@ class TestSubRepo extends SubUserRepo {
 
   StreamController<List<SubUser>> curr = StreamController();
 
-  TestSubRepo(AuthUser user) : super(authUser: user) {
-    curr.add(subUsers);
-  }
-
+  TestSubRepo(AuthUser user) : super(authUser: user);
   @override
   Future<bool> addSubUser(SubUser user) async {
     subUsers.add(user);
@@ -40,4 +37,10 @@ class TestSubRepo extends SubUserRepo {
 
   @override
   Future<void> refresh() async {}
+
+  @override
+  Future<bool> load() async {
+    curr.add(subUsers);
+    return true;
+  }
 }

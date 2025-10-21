@@ -56,13 +56,13 @@ sealed class Question with EquatableMixin {
         'isBaseline': isBaseline ? 1 : 0,
         'fromBaseline': fromBaseline,
         'transform': transform,
-        'questionType': QuestionType.from(this).value,
+        'questionType': QuestionType.from(this).id,
         'dependsOn': dependsOn?.toString(),
       };
 
   factory Question.fromJson(Map<String, dynamic> json) {
     final questionType = json['questionType'];
-    switch (QuestionType.fromString(questionType)) {
+    switch (QuestionType.fromId(questionType)) {
       case QuestionType.freeResponse:
         return FreeResponse.fromJson(json);
       case QuestionType.slider:

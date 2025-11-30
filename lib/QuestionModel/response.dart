@@ -230,36 +230,4 @@ class DetailResponse extends Response {
   List<Object?> get props => [...super.props, description, responses];
 }
 */
-Map<String, dynamic> responesToJson(List<Response> responses) {
-  Map<String, dynamic> res = {};
-  for (int i = 0; i < responses.length; i++) {
-    res['$i'] = responses[i].toJson();
-  }
-  return res;
-}
 
-Response responseFromJson(Map<String, dynamic> json, QuestionHome home) {
-  if (json.containsKey(SELECTED_FIELDS)) {
-    return AllResponse.fromJson(json, home);
-  }
-  if (json.containsKey(SELECTED_FIELD)) {
-    return MultiResponse.fromJson(json, home);
-  }
-  if (json.containsKey(NUMERIC_RESPONSE_FIELD)) {
-    return NumericResponse.fromJson(json, home);
-  }
-  if (json.containsKey(RESPONSE_FIELD)) {
-    return OpenResponse.fromJson(json, home);
-  }
-
-  return Selected.fromJson(json, home);
-}
-
-List<Response> responsesFromJson(Map<String, dynamic> json, QuestionHome home) {
-  List<Response> res = [];
-  for (int i = 0; true; i++) {
-    final String key = '$i';
-    if (!json.containsKey(key)) return res;
-    res.add(responseFromJson(json[key], home));
-  }
-}

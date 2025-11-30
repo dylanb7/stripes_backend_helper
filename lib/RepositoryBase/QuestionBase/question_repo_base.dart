@@ -248,39 +248,16 @@ class Relation extends Equatable {
         type = CheckType.exists,
         response = null;
 
-  static Relation equals<E extends Response>(
+  static Relation equals(
       {required String qid,
       required dynamic response,
+      required QuestionType questionType,
       CheckType type = CheckType.equals}) {
-    if (E is OpenResponse) {
       return Relation(
           qid: qid,
           response: response,
-          questionType: QuestionType.freeResponse,
+          questionType: questionType,
           type: type);
-    }
-    if (E is NumericResponse) {
-      return Relation(
-          qid: qid,
-          response: response,
-          questionType: QuestionType.slider,
-          type: type);
-    }
-    if (E is MultiResponse) {
-      return Relation(
-          qid: qid,
-          response: response,
-          questionType: QuestionType.multipleChoice,
-          type: type);
-    }
-    if (E is AllResponse) {
-      return Relation(
-          qid: qid,
-          response: response,
-          questionType: QuestionType.allThatApply,
-          type: type);
-    }
-    return Relation.exists(qid: qid);
   }
 
   @override
@@ -389,7 +366,8 @@ class DependsOn extends Equatable {
 
   const DependsOn.nothing() : operations = const [];
 
-  factory DependsOn.fromYaml(Map<String, dynamic> yamlData) {
+  factory DependsOn.fromYaml(YamlMap yamlMap) {
+    final Map<String, dynamic> yamlData = Map<String, dynamic>.from(yamlMap);
     DependsOn dependsOn = const DependsOn.nothing();
 
     Relation? parseRelation(Map<String, dynamic> item) {
@@ -399,18 +377,19 @@ class DependsOn extends Equatable {
         return Relation.exists(qid: item[existsKey]);
       }
       const questionIdKey = 'questionId';
-      const equalsKey = 'equals';
       if (!item.containsKey(questionIdKey)) {
         return null;
       }
       final String questionIdSlug = item[questionIdKey];
+
+      const equalsKey = 'equals';
 
       if (item.containsKey(equalsKey)) {
         final dynamic equalsSlug = item[equalsKey];
 
         int? equalsValue = int.tryParse(equalsSlug);
         if (equalsValue != null) {
-          return Relation.equals(qid: questionIdSlug, response: equalsValue);
+          return Relation.equals(qid: questionIdSlug, questionType: QuestionType.slider, response: equalsValue);
         }
       }
 
@@ -420,7 +399,7 @@ class DependsOn extends Equatable {
         final dynamic textSlug = item[textKey];
 
         if (textSlug is! String) return null;
-        return Relation.equals(qid: questionIdSlug, response: textSlug);
+        return Relation.equals(qid: questionIdSlug, questionType: QuestionType.freeResponse, response: textSlug);
       }
 
       const responsesKey = "responses";
@@ -433,7 +412,7 @@ class DependsOn extends Equatable {
             .map(int.tryParse)
             .whereType<int>()
             .toList();
-        return Relation.equals(qid: questionIdSlug, response: parsedResponse);
+        return Relation.equals(qid: questionIdSlug, questionType: QuestionType.allThatApply, response: parsedResponse);
       }
       return null;
     }
@@ -447,7 +426,9 @@ class DependsOn extends Equatable {
           })
           .whereType<Relation>()
           .toList();
-      dependsOn = dependsOn.oneOf(relations);
+      if(relations.isNotEmpty) {
+        dependsOn = dependsOn.oneOf(relations);
+      }
     }
 
     if (yamlData.containsKey('allOf')) {
@@ -459,7 +440,9 @@ class DependsOn extends Equatable {
           })
           .whereType<Relation>()
           .toList();
-      dependsOn = dependsOn.allOf(relations);
+      if(relations.isNotEmpty) {
+        dependsOn = dependsOn.allOf(relations);
+      }
     }
 
     return dependsOn;
@@ -560,269 +543,4 @@ abstract class QuestionHome {
   Question? forDisplay(String id) => fromBank(id) ?? deleted[id];
 }
 
-@immutable
-class Baseline {
-  const Baseline();
-}
 
-@immutable
-class RelativeEntry {
-  const RelativeEntry();
-}
-
-typedef Translator = String? Function(String key, String locale);
-
-extension QuestionYamlLoading on Question {
-  static Future<List<Question>> fromYamlAsset(
-    BuildContext context,
-    String assetPath, {
-    Map<String, Map<String, String>>? localizations,
-    Translator? translator,
-  }) async {
-    final yamlString = await rootBundle.loadString(assetPath);
-    if (context.mounted) {
-      return fromYamlStringInternal(yamlString, context,
-          localizations: localizations, translator: translator);
-    } else {
-      return [];
-    }
-  }
-
-  static Future<List<Question>> fromYamlFileSystem(
-    BuildContext context,
-    String filePath, {
-    Map<String, Map<String, String>>? localizations,
-    Translator? translator,
-  }) async {
-    final file = File(filePath);
-    final yamlString = await file.readAsString();
-    if (context.mounted) {
-      return fromYamlStringInternal(yamlString, context,
-          localizations: localizations, translator: translator);
-    } else {
-      return [];
-    }
-  }
-
-  static Future<List<Question>> fromYamlStringInternal(
-    String yamlString,
-    BuildContext context, {
-    Map<String, Map<String, String>>? localizations,
-    Translator? translator,
-  }) async {
-    final doc = loadYaml(yamlString);
-
-    if (doc is! YamlMap) {
-      throw ArgumentError('Top level YAML document must be a mapping');
-    }
-
-    Map<String, Map<String, String>>? locs = localizations;
-    if (locs == null && doc.containsKey('localizations')) {
-      locs = <String, Map<String, String>>{};
-      final rawLocs = doc['localizations'] as YamlMap;
-      rawLocs.forEach((lang, map) {
-        locs![lang.toString()] = Map<String, String>.from(map);
-      });
-    }
-
-    final questionsRaw = doc['questions'];
-    if (questionsRaw == null || questionsRaw is! YamlList) {
-      throw ArgumentError('YAML must contain a "questions" list');
-    }
-
-    final List<Question> questions = [];
-
-    for (final qRaw in questionsRaw) {
-      if (qRaw is YamlMap) {
-        final map = Map<String, dynamic>.from(qRaw);
-        final q = QuestionYamlParsing.fromYamlMap(
-          map,
-          context,
-          localizations: locs,
-          translator: translator,
-        );
-        questions.add(q);
-      } else {
-        throw ArgumentError('Each question must be a map/object');
-      }
-    }
-
-    return questions;
-  }
-}
-
-extension QuestionYamlParsing on Question {
-  static Question fromYamlMap(
-    Map<String, dynamic> map,
-    BuildContext context, {
-    Map<String, Map<String, String>>? localizations,
-    Translator? translator,
-  }) {
-    final locale = Localizations.localeOf(context).languageCode;
-
-    String resolveKey(String? key) {
-      if (key == null || key.isEmpty) return '';
-
-      if (translator != null) {
-        final t = translator(key, locale);
-        if (t != null && t.isNotEmpty) return t;
-      }
-      if (localizations != null) {
-        final langMap = localizations[locale];
-        if (langMap != null && langMap.containsKey(key)) {
-          final val = langMap[key];
-          if (val != null && val.isNotEmpty) return val;
-        }
-      }
-
-      final pretty = key.split('.').last.replaceAll('_', ' ');
-      if (pretty.isEmpty) return key;
-      return pretty[0].toUpperCase() + pretty.substring(1);
-    }
-
-    String stringVal(String k) {
-      final v = map[k];
-      if (v == null) return '';
-      return v.toString();
-    }
-
-    bool boolVal(String k, {bool defaultValue = false}) {
-      final v = map[k];
-      if (v == null) return defaultValue;
-      if (v is bool) return v;
-      final s = v.toString().toLowerCase();
-      return s == 'true' || s == '1';
-    }
-
-    num? numVal(String k) {
-      final v = map[k];
-      if (v == null) return null;
-      if (v is num) return v;
-      return num.tryParse(v.toString());
-    }
-
-    List<String> listOfStrings(dynamic maybeList) {
-      if (maybeList == null) return <String>[];
-      if (maybeList is List) {
-        return maybeList.map((e) => e.toString()).toList();
-      }
-      return [maybeList.toString()];
-    }
-
-    final id = stringVal('id');
-    final domainType = stringVal('type');
-    final kindRaw = stringVal('kind').isNotEmpty
-        ? stringVal('kind')
-        : stringVal('questionType');
-
-    final promptKey =
-        map.containsKey('promptKey') ? stringVal('promptKey') : '';
-    final rawPrompt = map.containsKey('prompt') ? stringVal('prompt') : '';
-    final prompt = promptKey.isNotEmpty ? resolveKey(promptKey) : rawPrompt;
-
-    final isRequired = boolVal('isRequired', defaultValue: false);
-    final enabled = boolVal('enabled', defaultValue: true);
-    final locked = boolVal('locked', defaultValue: false);
-    final userCreated = boolVal('userCreated', defaultValue: false);
-    final isAddition = boolVal('isAddition', defaultValue: false);
-    final deleted = boolVal('deleted', defaultValue: false);
-
-    final kind = kindRaw.trim().toLowerCase();
-
-    if (kind == 'm') {
-      final choiceKeys = listOfStrings(map['choices']);
-      final localizedChoices = choiceKeys.map((k) {
-        return resolveKey(k);
-      }).toList();
-
-      return MultipleChoice(
-        id: id,
-        prompt: prompt,
-        type: domainType,
-        choices: localizedChoices,
-        isRequired: isRequired,
-        enabled: enabled,
-        locked: locked,
-        userCreated: userCreated,
-        isAddition: isAddition,
-        deleted: deleted,
-      );
-    } else if (kind == 'a') {
-      final choiceKeys = listOfStrings(map['choices']);
-      final localizedChoices = choiceKeys.map((k) => resolveKey(k)).toList();
-
-      return AllThatApply(
-        id: id,
-        prompt: prompt,
-        type: domainType,
-        choices: localizedChoices,
-        isRequired: isRequired,
-        enabled: enabled,
-        locked: locked,
-        userCreated: userCreated,
-        isAddition: isAddition,
-        deleted: deleted,
-      );
-    } else if (kind == 'f') {
-      return FreeResponse(
-        id: id,
-        prompt: prompt,
-        type: domainType,
-        isRequired: isRequired,
-        enabled: enabled,
-        locked: locked,
-        userCreated: userCreated,
-        isAddition: isAddition,
-        deleted: deleted,
-      );
-    } else if (kind == 's') {
-      final min = numVal('min');
-      final max = numVal('max');
-
-      return Numeric(
-        id: id,
-        prompt: prompt,
-        type: domainType,
-        min: min,
-        max: max,
-        isRequired: isRequired,
-        enabled: enabled,
-        locked: locked,
-        userCreated: userCreated,
-        isAddition: isAddition,
-        deleted: deleted,
-      );
-    } else {
-      return Check(
-        id: id,
-        prompt: prompt,
-        type: domainType,
-        isRequired: isRequired,
-        enabled: enabled,
-        locked: locked,
-        userCreated: userCreated,
-        isAddition: isAddition,
-        deleted: deleted,
-      );
-    }
-  }
-
-  static Question fromYamlString(
-    String yamlString,
-    BuildContext context, {
-    Map<String, Map<String, String>>? localizations,
-    Translator? translator,
-  }) {
-    final parsed = loadYaml(yamlString);
-    if (parsed is! YamlMap) {
-      throw ArgumentError(
-          'Provided YAML string must be a mapping at top level');
-    }
-    final map = <String, dynamic>{};
-    for (final key in parsed.keys) {
-      map[key.toString()] = parsed[key];
-    }
-    return fromYamlMap(map, context,
-        localizations: localizations, translator: translator);
-  }
-}

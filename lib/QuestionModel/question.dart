@@ -75,6 +75,23 @@ sealed class Question with EquatableMixin {
         return AllThatApply.fromJson(json);
     }
   }
+
+  @override
+  List<Object?> get props => [
+        id,
+        prompt,
+        type,
+        isRequired,
+        deleted,
+        locked,
+        isAddition,
+        userCreated,
+        enabled,
+        isBaseline,
+        fromBaseline,
+        transform,
+        dependsOn
+      ];
 }
 
 class FreeResponse extends Question {
@@ -118,9 +135,6 @@ class FreeResponse extends Question {
             ),
     );
   }
-
-  @override
-  List<Object?> get props => [id, prompt, type, isRequired];
 
   FreeResponse copyWith({
     String? id,
@@ -203,7 +217,7 @@ class Numeric extends Question {
   }
 
   @override
-  List<Object?> get props => [id, prompt, type, min, max, isRequired];
+  List<Object?> get props => [...super.props, min, max];
 
   Numeric copyWith({
     String? id,
@@ -292,9 +306,6 @@ class Check extends Question {
     );
   }
 
-  @override
-  List<Object?> get props => [id, prompt, type, isRequired];
-
   Check copyWith({
     String? id,
     String? prompt,
@@ -377,7 +388,7 @@ class MultipleChoice extends Question {
   }
 
   @override
-  List<Object?> get props => [id, prompt, type, choices, isRequired];
+  List<Object?> get props => [...super.props, choices];
 
   MultipleChoice copyWith({
     String? id,
@@ -470,7 +481,7 @@ class AllThatApply extends Question {
   }
 
   @override
-  List<Object?> get props => [id, prompt, type, choices, isRequired];
+  List<Object?> get props => [...super.props, choices];
 
   AllThatApply copyWith({
     String? id,

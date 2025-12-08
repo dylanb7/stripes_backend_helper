@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
@@ -71,7 +72,7 @@ class RecordPath extends Equatable {
   final String name;
   final List<PageLayout> pages;
   final Period? period;
-  final bool userCreated, enabled, locked;
+  final bool userCreated, enabled, locked, isBaseline;
   RecordPath(
       {required this.name,
       required this.pages,
@@ -79,7 +80,8 @@ class RecordPath extends Equatable {
       this.period,
       this.userCreated = false,
       this.enabled = true,
-      this.locked = false})
+      this.locked = false,
+      this.isBaseline = false})
       : id = uid ?? const Uuid().v4();
 
   RecordPath copyWith(
@@ -88,7 +90,8 @@ class RecordPath extends Equatable {
           Period? period,
           bool? userCreated,
           bool? enabled,
-          bool? locked}) =>
+          bool? locked,
+          bool? isBaseline}) =>
       RecordPath(
           uid: id,
           name: name ?? this.name,
@@ -96,7 +99,8 @@ class RecordPath extends Equatable {
           period: period ?? this.period,
           userCreated: userCreated ?? this.userCreated,
           enabled: enabled ?? this.enabled,
-          locked: locked ?? this.locked);
+          locked: locked ?? this.locked,
+          isBaseline: isBaseline ?? this.isBaseline);
 
   Map<String, dynamic> toJson() {
     return {
@@ -105,6 +109,7 @@ class RecordPath extends Equatable {
       'pages': pages.map((page) => page.toJson()).toList(),
       'userCreated': userCreated ? 1 : 0,
       'enabled': enabled ? 1 : 0,
+      'isBaseline': isBaseline ? 1 : 0,
       if (id != null) 'id': id
     };
   }
@@ -121,12 +126,21 @@ class RecordPath extends Equatable {
         userCreated: json['userCreated'] == 1,
         enabled: json['enabled'] == 1,
         locked: json['locked'] == 1,
+        isBaseline: json['isBaseline'] == 1,
         uid: json['id']);
   }
 
   @override
-  List<Object?> get props =>
-      [name, period?.toId(), ...pages, id, userCreated, enabled, locked];
+  List<Object?> get props => [
+        name,
+        period?.toId(),
+        ...pages,
+        id,
+        userCreated,
+        enabled,
+        locked,
+        isBaseline
+      ];
 }
 
 @immutable
@@ -253,11 +267,8 @@ class Relation extends Equatable {
       required dynamic response,
       required QuestionType questionType,
       CheckType type = CheckType.equals}) {
-      return Relation(
-          qid: qid,
-          response: response,
-          questionType: questionType,
-          type: type);
+    return Relation(
+        qid: qid, response: response, questionType: questionType, type: type);
   }
 
   @override
@@ -389,7 +400,10 @@ class DependsOn extends Equatable {
 
         int? equalsValue = int.tryParse(equalsSlug);
         if (equalsValue != null) {
-          return Relation.equals(qid: questionIdSlug, questionType: QuestionType.slider, response: equalsValue);
+          return Relation.equals(
+              qid: questionIdSlug,
+              questionType: QuestionType.slider,
+              response: equalsValue);
         }
       }
 
@@ -399,7 +413,24 @@ class DependsOn extends Equatable {
         final dynamic textSlug = item[textKey];
 
         if (textSlug is! String) return null;
-        return Relation.equals(qid: questionIdSlug, questionType: QuestionType.freeResponse, response: textSlug);
+        return Relation.equals(
+            qid: questionIdSlug,
+            questionType: QuestionType.freeResponse,
+            response: textSlug);
+      }
+
+      const indexKey = "index";
+
+      if (item.containsKey(indexKey)) {
+        final dynamic indexSlug = item[indexKey];
+        int? indexValue =
+            indexSlug is int ? indexSlug : int.tryParse(indexSlug.toString());
+        if (indexValue != null) {
+          return Relation.equals(
+              qid: questionIdSlug,
+              questionType: QuestionType.multipleChoice,
+              response: indexValue);
+        }
       }
 
       const responsesKey = "responses";
@@ -412,7 +443,10 @@ class DependsOn extends Equatable {
             .map(int.tryParse)
             .whereType<int>()
             .toList();
-        return Relation.equals(qid: questionIdSlug, questionType: QuestionType.allThatApply, response: parsedResponse);
+        return Relation.equals(
+            qid: questionIdSlug,
+            questionType: QuestionType.allThatApply,
+            response: parsedResponse);
       }
       return null;
     }
@@ -426,7 +460,7 @@ class DependsOn extends Equatable {
           })
           .whereType<Relation>()
           .toList();
-      if(relations.isNotEmpty) {
+      if (relations.isNotEmpty) {
         dependsOn = dependsOn.oneOf(relations);
       }
     }
@@ -440,7 +474,7 @@ class DependsOn extends Equatable {
           })
           .whereType<Relation>()
           .toList();
-      if(relations.isNotEmpty) {
+      if (relations.isNotEmpty) {
         dependsOn = dependsOn.allOf(relations);
       }
     }
@@ -469,7 +503,12 @@ class DependsOn extends Equatable {
         case QuestionType.multipleChoice:
           return (res as MultiResponse).index == rel.response;
         case QuestionType.allThatApply:
-          return (res as AllResponse).responses == rel.response;
+          final resResponses = (res as AllResponse).responses;
+          final relResponse = rel.response;
+          if (relResponse is List<int>) {
+            return listEquals(resResponses, relResponse);
+          }
+          return false;
       }
     }
 
@@ -542,5 +581,3 @@ abstract class QuestionHome {
 
   Question? forDisplay(String id) => fromBank(id) ?? deleted[id];
 }
-
-

@@ -22,3 +22,9 @@ abstract class StampRepo<T extends Stamp> {
 
   set earliestDate(DateTime time) => earliest = time;
 }
+
+mixin BaselineMixin<T extends Stamp> on StampRepo<T> {
+  Future<bool> addBaseline(T stamp);
+  Future<bool> removeBaseline(T stamp);
+  Stream<List<T>> get baselines;
+}

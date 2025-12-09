@@ -455,7 +455,7 @@ class DependsOn extends Equatable {
       final List<dynamic> conditions = yamlData['oneOf'] as List<dynamic>;
       final relations = conditions
           .map((cond) {
-            final Map<String, dynamic> item = cond as Map<String, dynamic>;
+            final Map<String, dynamic> item = Map<String, dynamic>.from(cond);
             return parseRelation(item);
           })
           .whereType<Relation>()
@@ -469,7 +469,7 @@ class DependsOn extends Equatable {
       final List<dynamic> conditions = yamlData['allOf'] as List<dynamic>;
       final relations = conditions
           .map((cond) {
-            final Map<String, dynamic> item = cond as Map<String, dynamic>;
+            final Map<String, dynamic> item = Map<String, dynamic>.from(cond);
             return parseRelation(item);
           })
           .whereType<Relation>()

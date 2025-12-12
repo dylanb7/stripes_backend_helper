@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Transform;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:yaml/yaml.dart';
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/transform.dart';
 
 @immutable
 class QuestionsYamlData {
@@ -49,9 +50,8 @@ List<RecordPath> loadInRecordPaths({
       final headerKey = p['headerKey'] as String?;
 
       DependsOn? dependsOn;
-      if (p['dependsOn'] != null) {
-        final dependsOnMap = p['dependsOn'] as YamlMap;
-        dependsOn = DependsOn.fromYaml(dependsOnMap);
+      if (p['dependsOn'] is YamlMap) {
+        dependsOn = DependsOn.fromYaml(p['dependsOn'] as YamlMap);
       }
 
       pages.add(PageLayout(
@@ -98,7 +98,17 @@ List<Question> loadInQuestions({
     if (q['dependsOn'] is YamlMap) {
       dependsOn = DependsOn.fromYaml(q['dependsOn'] as YamlMap);
     }
-    final String? transform = q["transform"];
+
+    // Parse transform: supports both YamlMap (native YAML) and String (JSON)
+    String? transform;
+    final transformValue = q["transform"];
+    if (transformValue is YamlMap) {
+      final parsed = Transform.fromYaml(transformValue);
+      transform = parsed?.serialize();
+    } else if (transformValue is String) {
+      transform = transformValue;
+    }
+
     final bool isBaseline = baselineIds.contains(id);
     final String? fromBaseline = q["fromBaseline"];
 

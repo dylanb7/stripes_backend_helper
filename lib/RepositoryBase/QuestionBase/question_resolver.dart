@@ -1,100 +1,45 @@
-import 'dart:convert';
-
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/QuestionModel/response.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/transform.dart';
 
-enum TransformType {
-  mapChoices('mapChoices'),
-  copyValue('copyValue');
-
-  final String id;
-  const TransformType(this.id);
-
-  static TransformType? fromId(String? id) {
-    if (id == null) return null;
-    return TransformType.values.cast<TransformType?>().firstWhere(
-          (t) => t!.id == id,
-          orElse: () => null,
-        );
-  }
-}
+export 'transform.dart';
 
 extension QuestionResolver on Question {
-  Question resolve(Response baseline) {
-    if (fromBaseline == null || transform == null) return this;
+  List<Question> resolve({required Response current}) {
+    if (transform == null) return [this];
+    return _resolveInternal(source: current, allowSelfSource: true);
+  }
 
-    try {
-      final Map<String, dynamic> transformData = jsonDecode(transform!);
-      final String? targetId = transformData['sourceId'];
-      final TransformType? type = TransformType.fromId(transformData['type']);
+  List<Question> resolveFromBaseline({
+    required Response baseline,
+    int? baselineVersion,
+  }) {
+    if (transform == null || fromBaseline == null) return [this];
+    return _resolveInternal(
+      source: baseline,
+      baselineVersion: baselineVersion,
+      allowSelfSource: false,
+    );
+  }
 
-      if (targetId == null || type == null) return this;
+  List<Question> _resolveInternal({
+    required Response source,
+    int? baselineVersion,
+    bool allowSelfSource = false,
+  }) {
+    final Transform? xform = Transform.parse(transform);
+    if (xform == null) return [this];
 
-      List<Response> targetResponses = [];
-
-      if (baseline is ResponseWrap) {
-        targetResponses =
-            baseline.responses.where((r) => r.question.id == targetId).toList();
-      } else {
-        if (baseline.question.id == targetId) {
-          targetResponses = [baseline];
-        }
-      }
-
-      if (targetResponses.isEmpty) return this;
-
-      switch (type) {
-        case TransformType.mapChoices:
-          if (this is MultipleChoice) {
-            List<String> newChoices = [];
-            for (final targetResponse in targetResponses) {
-              if (targetResponse is OpenResponse) {
-                newChoices.add(targetResponse.response);
-              } else if (targetResponse is MultiResponse) {
-                newChoices.add(targetResponse.choice);
-              } else if (targetResponse is AllResponse) {
-                newChoices.addAll(targetResponse.choices);
-              }
-            }
-            return (this as MultipleChoice).copyWith(choices: newChoices);
-          }
-          break;
-        case TransformType.copyValue:
-          final firstResponse = targetResponses.first;
-          String valueToCopy = "";
-          switch (firstResponse) {
-            case OpenResponse(response: final response):
-              valueToCopy = response;
-              break;
-            case MultiResponse(index: final index, question: final question):
-              valueToCopy = question.choices[index];
-              break;
-            case NumericResponse(response: final response):
-              valueToCopy = response.toString();
-              break;
-            default:
-              break;
-          }
-
-          final newPrompt =
-              prompt.replaceAll(RegExp(r'\[value\]'), valueToCopy);
-          switch (this) {
-            case FreeResponse():
-              return (this as FreeResponse).copyWith(prompt: newPrompt);
-            case Numeric():
-              return (this as Numeric).copyWith(prompt: newPrompt);
-            case Check():
-              return (this as Check).copyWith(prompt: newPrompt);
-            case MultipleChoice():
-              return (this as MultipleChoice).copyWith(prompt: newPrompt);
-            case AllThatApply():
-              return (this as AllThatApply).copyWith(prompt: newPrompt);
-          }
-      }
-
-      return this;
-    } catch (e) {
-      return this;
+    List<Response> sourceResponses;
+    if (xform.sourceId == null) {
+      if (!allowSelfSource) return [this];
+      sourceResponses = getSourceResponses(source, null, id);
+    } else {
+      sourceResponses = getSourceResponses(source, xform.sourceId, id);
     }
+
+    if (sourceResponses.isEmpty) return [this];
+
+    return xform.apply(this, sourceResponses, baselineVersion: baselineVersion);
   }
 }

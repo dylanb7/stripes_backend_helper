@@ -1,4 +1,5 @@
 import 'package:async/async.dart';
+import 'package:stripes_backend_helper/RepositoryBase/repo_result.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
@@ -38,6 +39,7 @@ class TestsRepo {
 
   List<Question> getRecordAdditions(BuildContext context, String type) {
     List<Test> tests = _getApplicable(type);
+
     List<Question> additions = [];
     for (final Test test in tests) {
       additions.addAll(test.recordAdditions(context, type));
@@ -93,9 +95,9 @@ abstract class Test<T extends TestState> {
   Future<void> onSubmit(Response stamp, String type);
   Future<void> onEdit(Response stamp, String type);
   Future<void> onDelete(Response stamp, String type);
-  Future<bool> submit(DateTime submitTime);
-  Future<bool> setTestState(T state);
-  Future<bool> cancel();
+  Future<RepoResult<void>> submit(DateTime submitTime);
+  Future<RepoResult<T?>> setTestState(T state);
+  Future<RepoResult<void>> cancel();
   Future<void> refresh();
   Widget? displayState(BuildContext context);
 }

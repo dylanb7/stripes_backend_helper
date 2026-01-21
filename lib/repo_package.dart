@@ -1,3 +1,4 @@
+import 'package:stripes_backend_helper/SyncOperations/manager_base.dart';
 import 'package:stripes_backend_helper/TestingReposImpl/test_question_repo.dart';
 
 import 'QuestionModel/question.dart';
@@ -36,6 +37,8 @@ abstract class StripesRepoPackage {
       required QuestionRepo questionRepo});
 
   QuestionRepo questions({required AuthUser user, required SubUser subUser});
+
+  SyncManagerBase? syncManager({required SubUser subUser});
 }
 
 class LocalRepoPackage extends StripesRepoPackage {
@@ -76,6 +79,11 @@ class LocalRepoPackage extends StripesRepoPackage {
       {required AuthUser user, required SubUser subUser}) {
     return TestQuestionRepo(subUser: subUser);
   }
+
+  @override
+  SyncManagerBase? syncManager({required SubUser subUser}) {
+    return null;
+  }
 }
 
 class LocalStockedRepoPackage extends StripesRepoPackage {
@@ -115,5 +123,10 @@ class LocalStockedRepoPackage extends StripesRepoPackage {
       required StampRepo<Stamp> stampRepo,
       required QuestionRepo questionRepo}) {
     return TestTestRepo(stampRepo, subUser);
+  }
+
+  @override
+  SyncManagerBase? syncManager({required SubUser subUser}) {
+    return null;
   }
 }

@@ -36,7 +36,7 @@ class BlueDyeResp extends ResponseWrap {
       super.id})
       : super(
             responses: logs,
-            type: 'Blue Dye Test',
+            type: 'Blue Dye Transit',
             stamp: dateToStamp(startEating));
 
   //test obj must have atleast one log

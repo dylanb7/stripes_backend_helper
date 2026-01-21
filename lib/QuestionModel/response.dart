@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_resolver.dart';
 import 'package:stripes_backend_helper/db_keys.dart';
 
 import '../RepositoryBase/StampBase/stamp.dart';
@@ -15,11 +18,85 @@ sealed class Response<E extends Question> extends Stamp with EquatableMixin {
       : super(type: question.type);
 
   Response.fromJson(Map<String, dynamic> json, QuestionHome home)
-      : question = home.fromBank(json[ID_FIELD]) as E,
+      : question = parseQuestion(json[ID_FIELD], home) as E,
         super.fromJson(json);
+
+  static Question parseQuestion(dynamic idField, QuestionHome home) {
+    if (idField is String && idField.startsWith('{')) {
+      try {
+        final questionJson = jsonDecode(idField) as Map<String, dynamic>;
+        return Question.fromJson(questionJson);
+      } catch (_) {}
+    }
+
+    return home.forDisplay(idField) ?? Question.empty();
+  }
+
+  Response encodeGeneratedQuestion() {
+    if (!_isGeneratedQuestion) return this;
+
+    final String jsonValues = jsonEncode(question.toJson());
+    Question newQ;
+
+    switch (question) {
+      case FreeResponse q:
+        newQ = q.copyWith(id: jsonValues);
+      case Numeric q:
+        newQ = q.copyWith(id: jsonValues);
+      case Check q:
+        newQ = q.copyWith(id: jsonValues);
+      case MultipleChoice q:
+        newQ = q.copyWith(id: jsonValues);
+      case AllThatApply q:
+        newQ = q.copyWith(id: jsonValues);
+    }
+
+    final Response res = this;
+    switch (res) {
+      case OpenResponse r:
+        return OpenResponse(
+            question: newQ as FreeResponse,
+            response: r.response,
+            stamp: r.stamp,
+            id: r.id);
+      case NumericResponse r:
+        return NumericResponse(
+            question: newQ as Numeric,
+            response: r.response,
+            stamp: r.stamp,
+            id: r.id);
+      case Selected r:
+        return Selected(
+            question: newQ as Check, stamp: r.stamp, id: r.id, group: r.group);
+      case AllResponse r:
+        return AllResponse(
+            question: newQ as AllThatApply,
+            responses: r.responses,
+            stamp: r.stamp,
+            id: r.id,
+            group: r.group);
+      case MultiResponse r:
+        if (newQ is MultipleChoice) {
+          return MultiResponse(
+              question: newQ,
+              index: r.index,
+              stamp: r.stamp,
+              id: r.id,
+              group: r.group);
+        }
+        return res;
+      default:
+        return res;
+    }
+  }
+
+  bool get _isGeneratedQuestion => question.id.contains(generatedIdDelimiter);
 
   @override
   Map<String, dynamic> toJson() {
+    if (_isGeneratedQuestion) {
+      return {...super.toJson(), ID_FIELD: jsonEncode(question.toJson())};
+    }
     return {...super.toJson(), ID_FIELD: question.id};
   }
 }
@@ -41,7 +118,7 @@ class OpenResponse extends Response<FreeResponse> {
 
   @override
   Map<String, dynamic> toJson() =>
-      {...super.toJson(), ID_FIELD: question.id, RESPONSE_FIELD: response};
+      {...super.toJson(), RESPONSE_FIELD: response};
 
   @override
   List<Object?> get props => [
@@ -68,7 +145,6 @@ class NumericResponse extends Response<Numeric> {
   @override
   Map<String, dynamic> toJson() => {
         ...super.toJson(),
-        ID_FIELD: question.id,
         NUMERIC_RESPONSE_FIELD: response,
       };
 
@@ -88,10 +164,7 @@ class Selected extends Response<Check> {
       : super.fromJson(json, home);
 
   @override
-  Map<String, dynamic> toJson() => {
-        ...super.toJson(),
-        ID_FIELD: question.id,
-      };
+  Map<String, dynamic> toJson() => super.toJson();
 
   @override
   List<Object?> get props => [
@@ -116,8 +189,7 @@ class MultiResponse extends Response<MultipleChoice> {
         super.fromJson(json, home);
 
   @override
-  Map<String, dynamic> toJson() =>
-      {...super.toJson(), ID_FIELD: question.id, SELECTED_FIELD: index};
+  Map<String, dynamic> toJson() => {...super.toJson(), SELECTED_FIELD: index};
 
   String get choice => question.choices[index];
 
@@ -142,7 +214,7 @@ class AllResponse extends Response<AllThatApply> {
 
   @override
   Map<String, dynamic> toJson() =>
-      {...super.toJson(), ID_FIELD: question.id, SELECTED_FIELDS: responses};
+      {...super.toJson(), SELECTED_FIELDS: responses};
 
   List<String> get choices =>
       responses.map((res) => question.choices[res]).toList();
@@ -231,3 +303,62 @@ class DetailResponse extends Response {
 }
 */
 
+extension ResponseExtensions on Response {
+  Response encodeGeneratedQuestion() {
+    if (!question.id.contains(generatedIdDelimiter)) return this;
+
+    final String jsonValues = jsonEncode(question.toJson());
+    Question newQ;
+
+    switch (question) {
+      case FreeResponse q:
+        newQ = q.copyWith(id: jsonValues);
+      case Numeric q:
+        newQ = q.copyWith(id: jsonValues);
+      case Check q:
+        newQ = q.copyWith(id: jsonValues);
+      case MultipleChoice q:
+        newQ = q.copyWith(id: jsonValues);
+      case AllThatApply q:
+        newQ = q.copyWith(id: jsonValues);
+    }
+
+    final Response res = this;
+    switch (res) {
+      case OpenResponse r:
+        return OpenResponse(
+            question: newQ as FreeResponse,
+            response: r.response,
+            stamp: r.stamp,
+            id: r.id);
+      case NumericResponse r:
+        return NumericResponse(
+            question: newQ as Numeric,
+            response: r.response,
+            stamp: r.stamp,
+            id: r.id);
+      case Selected r:
+        return Selected(
+            question: newQ as Check, stamp: r.stamp, id: r.id, group: r.group);
+      case AllResponse r:
+        return AllResponse(
+            question: newQ as AllThatApply,
+            responses: r.responses,
+            stamp: r.stamp,
+            id: r.id,
+            group: r.group);
+      case MultiResponse r:
+        if (newQ is MultipleChoice) {
+          return MultiResponse(
+              question: newQ,
+              index: r.index,
+              stamp: r.stamp,
+              id: r.id,
+              group: r.group);
+        }
+        return res;
+      default:
+        return res;
+    }
+  }
+}

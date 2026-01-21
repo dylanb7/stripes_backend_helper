@@ -5,6 +5,7 @@ import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/QuestionModel/response.dart';
 import 'package:stripes_backend_helper/RepositoryBase/AuthBase/auth_user.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/depends_on.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/requirement.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_listener.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/record_period.dart';
 import 'package:stripes_backend_helper/RepositoryBase/SubBase/sub_user.dart';
@@ -49,7 +50,7 @@ abstract class QuestionRepo<T extends QuestionHome> {
 }
 
 mixin BaselineRecordPathMixin<T extends QuestionHome> on QuestionRepo<T> {
-  Stream<List<RecordPath>> get baselineRecordPaths;
+  BehaviorSubject<List<RecordPath>> get baselineRecordPaths;
 }
 
 typedef DisplayBuilder<T extends Response<Question>> = Widget Function(
@@ -74,6 +75,7 @@ class RecordPath extends Equatable {
   final List<PageLayout> pages;
   final Period? period;
   final bool userCreated, enabled, locked, isBaseline;
+  final String? fromBaseline;
   RecordPath(
       {required this.name,
       required this.pages,
@@ -82,7 +84,8 @@ class RecordPath extends Equatable {
       this.userCreated = false,
       this.enabled = true,
       this.locked = false,
-      this.isBaseline = false})
+      this.isBaseline = false,
+      this.fromBaseline})
       : id = uid ?? const Uuid().v4();
 
   RecordPath copyWith(
@@ -92,7 +95,8 @@ class RecordPath extends Equatable {
           bool? userCreated,
           bool? enabled,
           bool? locked,
-          bool? isBaseline}) =>
+          bool? isBaseline,
+          String? fromBaseline}) =>
       RecordPath(
           uid: id,
           name: name ?? this.name,
@@ -101,7 +105,8 @@ class RecordPath extends Equatable {
           userCreated: userCreated ?? this.userCreated,
           enabled: enabled ?? this.enabled,
           locked: locked ?? this.locked,
-          isBaseline: isBaseline ?? this.isBaseline);
+          isBaseline: isBaseline ?? this.isBaseline,
+          fromBaseline: fromBaseline ?? this.fromBaseline);
 
   Map<String, dynamic> toJson() {
     return {
@@ -111,6 +116,7 @@ class RecordPath extends Equatable {
       'userCreated': userCreated ? 1 : 0,
       'enabled': enabled ? 1 : 0,
       'isBaseline': isBaseline ? 1 : 0,
+      'fromBaseline': fromBaseline,
       if (id != null) 'id': id
     };
   }
@@ -128,6 +134,7 @@ class RecordPath extends Equatable {
         enabled: json['enabled'] == 1,
         locked: json['locked'] == 1,
         isBaseline: json['isBaseline'] == 1,
+        fromBaseline: json['fromBaseline'],
         uid: json['id']);
   }
 
@@ -140,7 +147,8 @@ class RecordPath extends Equatable {
         userCreated,
         enabled,
         locked,
-        isBaseline
+        isBaseline,
+        fromBaseline
       ];
 }
 
@@ -152,21 +160,28 @@ class PageLayout extends Equatable {
 
   final DependsOn dependsOn;
 
+  final Requirement requirement;
+
   final String? header;
 
   PageLayout(
       {required this.questionIds,
       this.dependsOn = const DependsOn.nothing(),
+      this.requirement = const Requirement.nothing(),
       this.header,
       String? uid})
       : id = uid ?? const Uuid().v4();
 
   PageLayout copyWith(
-          {List<String>? questionIds, DependsOn? dependsOn, String? header}) =>
+          {List<String>? questionIds,
+          DependsOn? dependsOn,
+          Requirement? requirement,
+          String? header}) =>
       PageLayout(
           uid: id,
           questionIds: questionIds ?? this.questionIds,
           dependsOn: dependsOn ?? this.dependsOn,
+          requirement: requirement ?? this.requirement,
           header: header ?? this.header);
 
   Map<String, dynamic> toJson() {
@@ -174,7 +189,8 @@ class PageLayout extends Equatable {
       if (id != null) 'id': id,
       'header': header,
       'ids': questionIds.join("|"),
-      'dependsOn': dependsOn.toString()
+      'dependsOn': dependsOn.toString(),
+      'requirement': requirement.toString()
     };
   }
 
@@ -183,10 +199,12 @@ class PageLayout extends Equatable {
       questionIds:
           json['ids'] is String ? (json['ids'] as String).split("|") : [],
       header: json['header'],
-      dependsOn: DependsOn.fromString(json['dependsOn']));
+      dependsOn: DependsOn.fromString(json['dependsOn']),
+      requirement: Requirement.fromString(json['requirement'] ?? ''));
 
   @override
-  List<Object?> get props => [id, ...questionIds, dependsOn, header];
+  List<Object?> get props =>
+      [id, ...questionIds, dependsOn, requirement, header];
 }
 
 @immutable
@@ -197,22 +215,33 @@ class LoadedPageLayout extends Equatable {
 
   final DependsOn dependsOn;
 
+  final Requirement requirement;
+
   final String? header;
 
   const LoadedPageLayout(
-      {required this.questions, this.header, required this.dependsOn, this.id});
+      {required this.questions,
+      this.header,
+      required this.dependsOn,
+      required this.requirement,
+      this.id});
 
   LoadedPageLayout copyWith(
-          {List<Question>? questions, DependsOn? dependsOn, String? header}) =>
+          {List<Question>? questions,
+          DependsOn? dependsOn,
+          Requirement? requirement,
+          String? header}) =>
       LoadedPageLayout(
           questions: questions ?? this.questions,
           dependsOn: dependsOn ?? this.dependsOn,
+          requirement: requirement ?? this.requirement,
           header: header ?? this.header);
 
   PageLayout toPageLayout() => PageLayout(
       uid: id,
       questionIds: questions.map((question) => question.id).toList(),
       dependsOn: dependsOn,
+      requirement: requirement,
       header: header);
 
   LoadedPageLayout.from(
@@ -220,6 +249,7 @@ class LoadedPageLayout extends Equatable {
       required QuestionHome home,
       bool forDisplay = true})
       : dependsOn = layout.dependsOn,
+        requirement = layout.requirement,
         header = layout.header,
         questions = layout.questionIds
             .map(
@@ -229,7 +259,7 @@ class LoadedPageLayout extends Equatable {
         id = layout.id;
 
   @override
-  List<Object?> get props => [questions, dependsOn, header];
+  List<Object?> get props => [questions, dependsOn, requirement, header];
 }
 
 abstract class QuestionHome {

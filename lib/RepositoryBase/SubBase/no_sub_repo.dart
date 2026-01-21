@@ -1,21 +1,22 @@
 import 'package:stripes_backend_helper/RepositoryBase/SubBase/base_sub_repo.dart';
 import 'package:stripes_backend_helper/RepositoryBase/SubBase/sub_user.dart';
+import 'package:stripes_backend_helper/RepositoryBase/repo_result.dart';
 
 class NoSubRepo extends SubUserRepo {
   NoSubRepo({required super.authUser});
 
   @override
-  Future<bool> addSubUser(SubUser user) {
+  Future<RepoResult<SubUser?>> addSubUser(SubUser user) {
     throw UnimplementedError();
   }
 
   @override
-  Future<bool> deleteSubUser(SubUser user) {
+  Future<RepoResult<void>> deleteSubUser(SubUser user) {
     throw UnimplementedError();
   }
 
   @override
-  Future<bool> updateSubUser(SubUser user) {
+  Future<RepoResult<SubUser?>> updateSubUser(SubUser user) {
     throw UnimplementedError();
   }
 
@@ -26,10 +27,5 @@ class NoSubRepo extends SubUserRepo {
   Future<void> refresh() {
     // TODO: implement refresh
     throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> load() async {
-    return true;
   }
 }

@@ -3,6 +3,8 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:yaml/yaml.dart';
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/requirement.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/record_period.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/transform.dart';
 
 @immutable
@@ -54,19 +56,30 @@ List<RecordPath> loadInRecordPaths({
         dependsOn = DependsOn.fromYaml(p['dependsOn'] as YamlMap);
       }
 
+      Requirement? requirement;
+      if (p['requirement'] is YamlMap) {
+        requirement = Requirement.fromYaml(p['requirement'] as YamlMap);
+      }
+
       pages.add(PageLayout(
         questionIds: questionIds ?? [],
         header: headerKey,
         dependsOn: dependsOn ?? const DependsOn.nothing(),
+        requirement: requirement ?? const Requirement.nothing(),
       ));
     }
 
     final bool isBaseline = (rp['isBaseline'] == true);
+    final String? fromBaseline = rp['fromBaseline'];
+    final String? periodStr = rp['period'];
+    final period = periodStr != null ? Period.fromId(periodStr) : null;
 
     recordPaths.add(RecordPath(
       name: name,
       pages: pages,
       isBaseline: isBaseline,
+      fromBaseline: fromBaseline,
+      period: period,
     ));
   }
 
@@ -99,6 +112,12 @@ List<Question> loadInQuestions({
       dependsOn = DependsOn.fromYaml(q['dependsOn'] as YamlMap);
     }
 
+    Requirement requirement = const Requirement.nothing();
+    if (q['requirement'] is YamlMap) {
+      requirement = Requirement.fromYaml(q['requirement'] as YamlMap,
+          defaultQuestionId: id);
+    }
+
     // Parse transform: supports both YamlMap (native YAML) and String (JSON)
     String? transform;
     final transformValue = q["transform"];
@@ -120,6 +139,7 @@ List<Question> loadInQuestions({
             type: type,
             isRequired: isRequired,
             dependsOn: dependsOn,
+            requirement: requirement,
             transform: transform,
             isBaseline: isBaseline,
             fromBaseline: fromBaseline));
@@ -134,6 +154,7 @@ List<Question> loadInQuestions({
             max: q['max'],
             isRequired: isRequired,
             dependsOn: dependsOn,
+            requirement: requirement,
             transform: transform,
             isBaseline: isBaseline,
             fromBaseline: fromBaseline));
@@ -144,8 +165,8 @@ List<Question> loadInQuestions({
             id: id,
             prompt: promptKey,
             type: type,
-            isRequired: isRequired,
             dependsOn: dependsOn,
+            requirement: requirement,
             transform: transform,
             isBaseline: isBaseline,
             fromBaseline: fromBaseline));
@@ -165,6 +186,7 @@ List<Question> loadInQuestions({
               choices: choices,
               isRequired: isRequired,
               dependsOn: dependsOn,
+              requirement: requirement,
               transform: transform,
               isBaseline: isBaseline,
               fromBaseline: fromBaseline));
@@ -174,8 +196,8 @@ List<Question> loadInQuestions({
               prompt: promptKey,
               type: type,
               choices: choices,
-              isRequired: isRequired,
               dependsOn: dependsOn,
+              requirement: requirement,
               transform: transform,
               isBaseline: isBaseline,
               fromBaseline: fromBaseline));

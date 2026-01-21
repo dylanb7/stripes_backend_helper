@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:stripes_backend_helper/RepositoryBase/AuthBase/auth_user.dart';
+import 'package:stripes_backend_helper/RepositoryBase/repo_result.dart';
 
 import '../RepositoryBase/SubBase/base_sub_repo.dart';
 import '../RepositoryBase/SubBase/sub_user.dart';
@@ -12,24 +13,24 @@ class TestSubRepo extends SubUserRepo {
 
   TestSubRepo(AuthUser user) : super(authUser: user);
   @override
-  Future<bool> addSubUser(SubUser user) async {
+  Future<RepoResult<SubUser?>> addSubUser(SubUser user) async {
     subUsers.add(user);
     curr.add(subUsers);
-    return true;
+    return Success(user);
   }
 
   @override
-  Future<bool> deleteSubUser(SubUser user) async {
+  Future<RepoResult<void>> deleteSubUser(SubUser user) async {
     subUsers.removeWhere((element) => element.uid == user.uid);
     curr.add(subUsers);
-    return true;
+    return const Success(null);
   }
 
   @override
-  Future<bool> updateSubUser(SubUser user) async {
+  Future<RepoResult<SubUser?>> updateSubUser(SubUser user) async {
     subUsers[subUsers.indexWhere((element) => element.uid == user.uid)] = user;
     curr.add(subUsers);
-    return true;
+    return Success(user);
   }
 
   @override
@@ -37,10 +38,4 @@ class TestSubRepo extends SubUserRepo {
 
   @override
   Future<void> refresh() async {}
-
-  @override
-  Future<bool> load() async {
-    curr.add(subUsers);
-    return true;
-  }
 }

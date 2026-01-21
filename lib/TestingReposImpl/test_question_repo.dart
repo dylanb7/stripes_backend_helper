@@ -54,12 +54,6 @@ class TestQuestionRepo extends QuestionRepo {
     // TODO: implement updateRecordPath
     throw UnimplementedError();
   }
-
-  @override
-  Future<bool> load() {
-    // TODO: implement load
-    throw UnimplementedError();
-  }
 }
 
 const String q1 = '1';

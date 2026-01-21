@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/requirement.dart';
 
 @immutable
 sealed class Question with EquatableMixin {
@@ -10,15 +11,11 @@ sealed class Question with EquatableMixin {
 
   final String type;
 
-  final bool isRequired,
-      userCreated,
-      isAddition,
-      deleted,
-      enabled,
-      locked,
-      isBaseline;
+  final bool userCreated, isAddition, deleted, enabled, locked, isBaseline;
 
   final DependsOn? dependsOn;
+
+  final Requirement? requirement;
 
   final String? fromBaseline;
 
@@ -28,7 +25,6 @@ sealed class Question with EquatableMixin {
       {required this.id,
       required this.prompt,
       required this.type,
-      required this.isRequired,
       this.enabled = true,
       this.locked = false,
       this.userCreated = false,
@@ -36,6 +32,7 @@ sealed class Question with EquatableMixin {
       this.deleted = false,
       this.isBaseline = false,
       this.dependsOn,
+      this.requirement,
       this.fromBaseline,
       this.transform});
 
@@ -48,7 +45,6 @@ sealed class Question with EquatableMixin {
         'id': id,
         'prompt': prompt,
         'type': type,
-        'isRequired': isRequired ? 1 : 0,
         'userCreated': userCreated ? 1 : 0,
         'isAddition': isAddition ? 1 : 0,
         'deleted': deleted ? 1 : 0,
@@ -58,6 +54,7 @@ sealed class Question with EquatableMixin {
         'transform': transform,
         'questionType': QuestionType.from(this).id,
         'dependsOn': dependsOn?.toString(),
+        'requirement': requirement?.toString(),
       };
 
   factory Question.fromJson(Map<String, dynamic> json) {
@@ -81,13 +78,13 @@ sealed class Question with EquatableMixin {
         id,
         prompt,
         type,
-        isRequired,
         deleted,
         userCreated,
         isBaseline,
         fromBaseline,
         transform,
-        dependsOn
+        dependsOn,
+        requirement
       ];
 }
 
@@ -105,12 +102,13 @@ class FreeResponse extends Question {
       super.fromBaseline,
       super.transform,
       super.dependsOn,
+      super.requirement,
       bool? isRequired})
       : super(
-            id: id,
-            prompt: prompt,
-            type: type,
-            isRequired: isRequired ?? false);
+          id: id,
+          prompt: prompt,
+          type: type,
+        );
 
   factory FreeResponse.fromJson(Map<String, dynamic> json) {
     return FreeResponse(
@@ -130,6 +128,11 @@ class FreeResponse extends Question {
           : DependsOn.fromString(
               json["dependsOn"],
             ),
+      requirement: json["requirement"] == null
+          ? const Requirement.nothing()
+          : Requirement.fromString(
+              json["requirement"],
+            ),
     );
   }
 
@@ -146,6 +149,7 @@ class FreeResponse extends Question {
     String? fromBaseline,
     String? transform,
     DependsOn? dependsOn,
+    Requirement? requirement,
     bool? isRequired,
   }) {
     return FreeResponse(
@@ -161,7 +165,7 @@ class FreeResponse extends Question {
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
       dependsOn: dependsOn ?? this.dependsOn,
-      isRequired: isRequired ?? this.isRequired,
+      requirement: requirement ?? this.requirement,
     );
   }
 }
@@ -181,14 +185,15 @@ class Numeric extends Question {
       super.fromBaseline,
       super.transform,
       super.dependsOn,
+      super.requirement,
       bool? isRequired,
       this.min,
       this.max})
       : super(
-            id: id,
-            prompt: prompt,
-            type: type,
-            isRequired: isRequired ?? false);
+          id: id,
+          prompt: prompt,
+          type: type,
+        );
 
   factory Numeric.fromJson(Map<String, dynamic> json) {
     return Numeric(
@@ -210,6 +215,11 @@ class Numeric extends Question {
           : DependsOn.fromString(
               json["dependsOn"],
             ),
+      requirement: json["requirement"] == null
+          ? const Requirement.nothing()
+          : Requirement.fromString(
+              json["requirement"],
+            ),
     );
   }
 
@@ -229,6 +239,7 @@ class Numeric extends Question {
     String? fromBaseline,
     String? transform,
     DependsOn? dependsOn,
+    Requirement? requirement,
     bool? isRequired,
     num? min,
     num? max,
@@ -246,7 +257,7 @@ class Numeric extends Question {
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
       dependsOn: dependsOn ?? this.dependsOn,
-      isRequired: isRequired ?? this.isRequired,
+      requirement: requirement ?? this.requirement,
       min: min ?? this.min,
       max: max ?? this.max,
     );
@@ -262,32 +273,31 @@ class Numeric extends Question {
 }
 
 class Check extends Question {
-  const Check(
-      {required String id,
-      required String prompt,
-      required String type,
-      super.isAddition,
-      super.locked,
-      super.userCreated,
-      super.deleted,
-      super.enabled,
-      super.isBaseline,
-      super.fromBaseline,
-      super.transform,
-      super.dependsOn,
-      bool? isRequired})
-      : super(
-            id: id,
-            prompt: prompt,
-            type: type,
-            isRequired: isRequired ?? false);
+  const Check({
+    required String id,
+    required String prompt,
+    required String type,
+    super.isAddition,
+    super.locked,
+    super.userCreated,
+    super.deleted,
+    super.enabled,
+    super.isBaseline,
+    super.fromBaseline,
+    super.transform,
+    super.dependsOn,
+    super.requirement,
+  }) : super(
+          id: id,
+          prompt: prompt,
+          type: type,
+        );
 
   factory Check.fromJson(Map<String, dynamic> json) {
     return Check(
       id: json['id'],
       prompt: json['prompt'],
       type: json['type'],
-      isRequired: json['isRequired'] == 1,
       userCreated: json['userCreated'] == 1,
       isAddition: json['isAddition'] == 1,
       deleted: json['deleted'] == 1,
@@ -299,6 +309,11 @@ class Check extends Question {
           ? const DependsOn.nothing()
           : DependsOn.fromString(
               json["dependsOn"],
+            ),
+      requirement: json["requirement"] == null
+          ? const Requirement.nothing()
+          : Requirement.fromString(
+              json["requirement"],
             ),
     );
   }
@@ -316,6 +331,7 @@ class Check extends Question {
     String? fromBaseline,
     String? transform,
     DependsOn? dependsOn,
+    Requirement? requirement,
     bool? isRequired,
   }) {
     return Check(
@@ -331,7 +347,7 @@ class Check extends Question {
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
       dependsOn: dependsOn ?? this.dependsOn,
-      isRequired: isRequired ?? this.isRequired,
+      requirement: requirement ?? this.requirement,
     );
   }
 }
@@ -353,12 +369,13 @@ class MultipleChoice extends Question {
       super.fromBaseline,
       super.transform,
       super.dependsOn,
+      super.requirement,
       bool? isRequired})
       : super(
-            id: id,
-            prompt: prompt,
-            type: type,
-            isRequired: isRequired ?? false);
+          id: id,
+          prompt: prompt,
+          type: type,
+        );
 
   factory MultipleChoice.fromJson(Map<String, dynamic> json) {
     return MultipleChoice(
@@ -381,6 +398,11 @@ class MultipleChoice extends Question {
           : DependsOn.fromString(
               json["dependsOn"],
             ),
+      requirement: json["requirement"] == null
+          ? const Requirement.nothing()
+          : Requirement.fromString(
+              json["requirement"],
+            ),
     );
   }
 
@@ -401,6 +423,7 @@ class MultipleChoice extends Question {
     String? fromBaseline,
     String? transform,
     DependsOn? dependsOn,
+    Requirement? requirement,
     bool? isRequired,
   }) {
     return MultipleChoice(
@@ -417,7 +440,7 @@ class MultipleChoice extends Question {
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
       dependsOn: dependsOn ?? this.dependsOn,
-      isRequired: isRequired ?? this.isRequired,
+      requirement: requirement ?? this.requirement,
     );
   }
 
@@ -432,26 +455,26 @@ class MultipleChoice extends Question {
 class AllThatApply extends Question {
   final List<String> choices;
 
-  const AllThatApply(
-      {required String id,
-      required String prompt,
-      required String type,
-      required this.choices,
-      super.isAddition,
-      super.locked,
-      super.deleted,
-      super.userCreated,
-      super.enabled,
-      super.isBaseline,
-      super.fromBaseline,
-      super.transform,
-      super.dependsOn,
-      bool? isRequired})
-      : super(
-            id: id,
-            prompt: prompt,
-            type: type,
-            isRequired: isRequired ?? false);
+  const AllThatApply({
+    required String id,
+    required String prompt,
+    required String type,
+    required this.choices,
+    super.isAddition,
+    super.locked,
+    super.deleted,
+    super.userCreated,
+    super.enabled,
+    super.isBaseline,
+    super.fromBaseline,
+    super.transform,
+    super.dependsOn,
+    super.requirement,
+  }) : super(
+          id: id,
+          prompt: prompt,
+          type: type,
+        );
 
   factory AllThatApply.fromJson(Map<String, dynamic> json) {
     return AllThatApply(
@@ -461,7 +484,6 @@ class AllThatApply extends Question {
       choices: json['choices'] is String
           ? (json['choices'] as String).split(',')
           : [],
-      isRequired: json['isRequired'] == 1,
       userCreated: json['userCreated'] == 1,
       isAddition: json['isAddition'] == 1,
       deleted: json['deleted'] == 1,
@@ -473,6 +495,11 @@ class AllThatApply extends Question {
           ? const DependsOn.nothing()
           : DependsOn.fromString(
               json["dependsOn"],
+            ),
+      requirement: json["requirement"] == null
+          ? const Requirement.nothing()
+          : Requirement.fromString(
+              json["requirement"],
             ),
     );
   }
@@ -494,6 +521,7 @@ class AllThatApply extends Question {
     String? fromBaseline,
     String? transform,
     DependsOn? dependsOn,
+    Requirement? requirement,
     bool? isRequired,
   }) {
     return AllThatApply(
@@ -510,7 +538,7 @@ class AllThatApply extends Question {
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
       dependsOn: dependsOn ?? this.dependsOn,
-      isRequired: isRequired ?? this.isRequired,
+      requirement: requirement ?? this.requirement,
     );
   }
 

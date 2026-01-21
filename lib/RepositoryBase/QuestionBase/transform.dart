@@ -4,9 +4,21 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/QuestionModel/response.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/requirement.dart';
 import 'package:yaml/yaml.dart';
 
 const String generatedIdDelimiter = '::';
+
+abstract final class TransformKeys {
+  static const type = 'type';
+  static const sourceId = 'sourceId';
+  static const generated = 'generated';
+  static const prompt = 'prompt';
+  static const min = 'min';
+  static const max = 'max';
+  static const choices = 'choices';
+  static const requirement = 'requirement';
+}
 
 sealed class Transform with EquatableMixin {
   final String? sourceId;
@@ -58,7 +70,9 @@ class MapChoices extends Transform with EquatableMixin {
     List<Response> sourceResponses, {
     int? baselineVersion,
   }) {
-    if (question is! MultipleChoice) return [question];
+    if (question is! MultipleChoice && question is! AllThatApply) {
+      return [question];
+    }
 
     List<String> newChoices = [];
     for (final targetResponse in sourceResponses) {
@@ -70,7 +84,12 @@ class MapChoices extends Transform with EquatableMixin {
         newChoices.addAll(targetResponse.choices);
       }
     }
-    return [question.copyWith(choices: newChoices)];
+
+    if (question is MultipleChoice) {
+      return [question.copyWith(choices: newChoices)];
+    } else {
+      return [(question as AllThatApply).copyWith(choices: newChoices)];
+    }
   }
 
   @override
@@ -193,18 +212,18 @@ class GenerateForEach extends Transform with EquatableMixin {
 class GeneratedDefinition with EquatableMixin {
   final String? prompt;
   final String? questionType;
-  final bool isRequired;
   final num? min;
   final num? max;
   final List<String>? choices;
+  final Requirement? requirement;
 
   const GeneratedDefinition({
     this.prompt,
     this.questionType,
-    this.isRequired = false,
     this.min,
     this.max,
     this.choices,
+    this.requirement,
   });
 
   Question build(Question template, String value, String newId) {
@@ -212,20 +231,22 @@ class GeneratedDefinition with EquatableMixin {
     final newPrompt = defPrompt.replaceAll('{value}', value);
     final type = questionType ?? template.type;
 
+    final effectiveRequirement = requirement ?? template.requirement;
+
     return switch (type) {
       'FreeResponse' => FreeResponse(
           id: newId,
           prompt: newPrompt,
           type: template.type,
           userCreated: template.userCreated,
-          isRequired: isRequired,
+          requirement: effectiveRequirement,
         ),
       'Numeric' => Numeric(
           id: newId,
           prompt: newPrompt,
           type: template.type,
           userCreated: template.userCreated,
-          isRequired: isRequired,
+          requirement: effectiveRequirement,
           min: min,
           max: max,
         ),
@@ -234,14 +255,14 @@ class GeneratedDefinition with EquatableMixin {
           prompt: newPrompt,
           type: template.type,
           userCreated: template.userCreated,
-          isRequired: isRequired,
+          requirement: effectiveRequirement,
         ),
       'MultipleChoice' => MultipleChoice(
           id: newId,
           prompt: newPrompt,
           type: template.type,
           userCreated: template.userCreated,
-          isRequired: isRequired,
+          requirement: effectiveRequirement,
           choices: choices ?? [],
         ),
       'AllThatApply' => AllThatApply(
@@ -249,7 +270,7 @@ class GeneratedDefinition with EquatableMixin {
           prompt: newPrompt,
           type: template.type,
           userCreated: template.userCreated,
-          isRequired: isRequired,
+          requirement: effectiveRequirement,
           choices: choices ?? [],
         ),
       _ => _copyQuestionWithPromptAndId(template, newPrompt, newId),
@@ -259,27 +280,29 @@ class GeneratedDefinition with EquatableMixin {
   Map<String, dynamic> toJson() => {
         if (prompt != null) 'prompt': prompt,
         if (questionType != null) 'type': questionType,
-        'isRequired': isRequired,
         if (min != null) 'min': min,
         if (max != null) 'max': max,
         if (choices != null) 'choices': choices,
+        if (requirement != null) 'requirement': requirement.toString(),
       };
 
   static GeneratedDefinition fromJson(Map<String, dynamic> json) =>
       GeneratedDefinition(
         prompt: json[TransformKeys.prompt] as String?,
         questionType: json[TransformKeys.type] as String?,
-        isRequired: json[TransformKeys.isRequired] as bool? ?? false,
         min: json[TransformKeys.min] as num?,
         max: json[TransformKeys.max] as num?,
         choices: json[TransformKeys.choices] != null
             ? List<String>.from(json[TransformKeys.choices])
             : null,
+        requirement: json[TransformKeys.requirement] != null
+            ? Requirement.fromString(json[TransformKeys.requirement] as String)
+            : null,
       );
 
   @override
   List<Object?> get props =>
-      [prompt, questionType, isRequired, min, max, choices];
+      [prompt, questionType, min, max, choices, requirement];
 }
 
 // Helper functions
@@ -352,15 +375,4 @@ List<Response> getSourceResponses(
     return [source];
   }
   return [];
-}
-
-abstract final class TransformKeys {
-  static const type = 'type';
-  static const sourceId = 'sourceId';
-  static const generated = 'generated';
-  static const prompt = 'prompt';
-  static const isRequired = 'isRequired';
-  static const min = 'min';
-  static const max = 'max';
-  static const choices = 'choices';
 }

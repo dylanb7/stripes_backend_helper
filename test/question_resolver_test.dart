@@ -318,7 +318,7 @@ void main() {
       expect(generated[0].id, 'seizure-types::tonic-clonic');
       expect((generated[0] as MultipleChoice).choices,
           ['Daily', 'Weekly', 'Monthly']);
-      expect(generated[0].isRequired, true);
+      expect(generated[0].requirement, true);
 
       // Second generated question
       expect(generated[1], isA<MultipleChoice>());

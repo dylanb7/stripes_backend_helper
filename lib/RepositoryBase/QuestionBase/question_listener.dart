@@ -1,26 +1,71 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/QuestionModel/response.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
+import 'package:stripes_backend_helper/db_keys.dart';
 
-class QuestionsListener extends ChangeNotifier with EquatableMixin {
-  QuestionsListener(
-      {List<Response>? responses,
-      this.editId,
-      DateTime? submitTime,
-      String? desc}) {
+class QuestionsListener extends ChangeNotifier {
+  QuestionsListener({
+    List<Response>? responses,
+    this.editId,
+    DateTime? submitTime,
+    String? description,
+    bool tried = false,
+  }) {
+    if (responses != null) {
+      for (final res in responses) {
+        questions[res.question.id] = res;
+      }
+    }
     _submitTime = submitTime;
-    _description = desc;
-    responses?.forEach((res) {
-      questions[res.question.id] = res;
-    });
+    _description = description;
+    _tried = tried;
   }
+
+  factory QuestionsListener.fromJson(
+      Map<String, dynamic> json, QuestionHome home) {
+    final responses = (json['responses'] as List?)
+            ?.map((e) => _responseFromJson(e, home))
+            .whereType<Response>()
+            .toList() ??
+        [];
+
+    return QuestionsListener(
+      responses: responses,
+      editId: json['editId'],
+      submitTime: json['submitTime'] != null
+          ? DateTime.tryParse(json['submitTime'])
+          : null,
+      description: json['description'],
+      tried: json['tried'] ?? false,
+    );
+  }
+
+  static Response? _responseFromJson(
+      Map<String, dynamic> json, QuestionHome home) {
+    final question = Response.parseQuestion(json[ID_FIELD], home);
+    if (question is FreeResponse) return OpenResponse.fromJson(json, home);
+    if (question is Numeric) return NumericResponse.fromJson(json, home);
+    if (question is Check) return Selected.fromJson(json, home);
+    if (question is MultipleChoice) return MultiResponse.fromJson(json, home);
+    if (question is AllThatApply) return AllResponse.fromJson(json, home);
+    return null;
+  }
+
+  Map<String, dynamic> toJson() => {
+        'editId': editId,
+        'submitTime': submitTime?.toIso8601String(),
+        'description': description,
+        'tried': tried,
+        'responses': questions.values.map((e) => e.toJson()).toList(),
+      };
 
   QuestionsListener copy() => QuestionsListener(
       responses: questions.values.toList(),
       editId: editId,
       submitTime: submitTime,
-      desc: description);
+      description: description,
+      tried: tried);
 
   DateTime? _submitTime;
 
@@ -33,9 +78,9 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
 
   final String? editId;
 
-  Map<String, Response> questions = {};
+  final Map<String, Response> questions = {};
 
-  Set<Question> pending = {};
+  final Set<Question> pending = {};
 
   bool _tried = false;
 
@@ -57,37 +102,59 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
     notifyListeners();
   }
 
-  setResponse(Question question, {Response? response}) {
+  void setResponse(Question question, {Response? response}) {
     if (response == null) {
-      questions.remove(question);
-      if (question.isRequired) {
-        pending.add(question);
-      }
+      questions.remove(question.id);
     } else {
       questions[question.id] = response;
+    }
+
+    if (isQuestionValid(question)) {
       pending.remove(question);
+    } else {
+      pending.add(question);
+    }
+
+    notifyListeners();
+  }
+
+  bool isQuestionValid(Question question) {
+    if (question.requirement != null &&
+        question.requirement!.groups.isNotEmpty) {
+      return question.requirement!.eval(this, contextId: question.id);
+    }
+    return true;
+  }
+
+  void addPendingQuestions(List<Question> questionsToCheck) {
+    for (final question in questionsToCheck) {
+      if (!isQuestionValid(question)) {
+        pending.add(question);
+      } else {
+        pending.remove(question);
+      }
     }
     notifyListeners();
   }
 
-  addPending(Question question) {
+  void addPending(Question question) {
     pending.add(question);
     notifyListeners();
   }
 
-  removePending(Question question) {
+  void removePending(Question question) {
     pending.remove(question);
     notifyListeners();
   }
 
-  addResponse(Response response) {
+  void addResponse(Response response) {
     questions[response.question.id] = response;
     notifyListeners();
   }
 
   Response? fromQuestion(Question question) => questions[question.id];
 
-  removeResponse(Question question) {
+  void removeResponse(Question question) {
     questions.remove(question.id);
     notifyListeners();
   }
@@ -96,7 +163,4 @@ class QuestionsListener extends ChangeNotifier with EquatableMixin {
   String toString() {
     return "$editId | $description | $submitTime\n\n$questions ";
   }
-
-  @override
-  List<Object?> get props => [editId, questions, description, submitTime];
 }

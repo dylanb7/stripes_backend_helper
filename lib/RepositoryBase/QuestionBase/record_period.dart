@@ -45,16 +45,16 @@ enum Period {
     final DateTime start = getValue(entry);
     switch (this) {
       case Period.day:
-        final DateTime end = start.add(const Duration(days: 1));
+        final DateTime end = DateTime(start.year, start.month, start.day + 1);
         return DateTimeRange(start: start, end: end);
       case Period.week:
-        final DateTime end = start.add(const Duration(days: 7));
+        final DateTime end = DateTime(start.year, start.month, start.day + 7);
         return DateTimeRange(start: start, end: end);
       case Period.month:
-        final DateTime end = start.add(Duration(days: daysInMonth(entry)));
+        final DateTime end = DateTime(start.year, start.month + 1, start.day);
         return DateTimeRange(start: start, end: end);
       case Period.year:
-        final DateTime end = start.add(const Duration(days: 365));
+        final DateTime end = DateTime(start.year + 1, start.month, start.day);
         return DateTimeRange(start: start, end: end);
     }
   }
@@ -102,10 +102,8 @@ DateTime previous(DateTime date, int day) {
   if (day == date.weekday) {
     return date;
   } else {
-    return date.subtract(
-      Duration(
-        days: (date.weekday - day) % DateTime.daysPerWeek,
-      ),
-    );
+    // Use calendar arithmetic instead of Duration to handle DST correctly
+    final int daysToSubtract = (date.weekday - day) % DateTime.daysPerWeek;
+    return DateTime(date.year, date.month, date.day - daysToSubtract);
   }
 }

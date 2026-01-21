@@ -11,7 +11,6 @@ class Stamp with EquatableMixin {
 
   const Stamp({required this.stamp, required this.type, this.id, this.group});
 
-  @mustCallSuper
   Stamp.fromJson(Map<String, dynamic> json)
       : stamp = json[STAMP_FIELD],
         type = json[TYPE_FIELD],

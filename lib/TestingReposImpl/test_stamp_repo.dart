@@ -10,6 +10,7 @@ import 'package:stripes_backend_helper/TestingReposImpl/test_question_repo.dart'
 import 'package:stripes_backend_helper/date_format.dart';
 
 import '../RepositoryBase/StampBase/base_stamp_repo.dart';
+import '../RepositoryBase/repo_result.dart';
 
 Map<SubUser, List<Response>> _responses = {};
 
@@ -111,42 +112,41 @@ class TestResponseRepo extends StampRepo<Response> {
   }
 
   @override
-  Future<bool> addStamp(Response stamp) async {
+  Future<RepoResult<Response?>> addStamp(Response stamp) async {
     _responses[currentUser]!.add(stamp);
     _responses[currentUser]!.sort(
       (a, b) => b.stamp.compareTo(a.stamp),
     );
     _stream.add(_responses[currentUser]!);
-    return true;
+    return const Success(null);
   }
 
   @override
-  Future<bool> removeStamp(Response stamp) async {
+  Future<RepoResult<void>> removeStamp(Response stamp) async {
     _responses[currentUser]!
         .removeWhere((element) => element.stamp == stamp.stamp);
     _stream.add(_responses[currentUser]!);
-    return true;
+    return const Success(null);
   }
 
   @override
   Stream<List<Response>> get stamps => _stream.stream;
 
   @override
-  Future<bool> updateStamp(Response stamp) async {
+  Future<RepoResult<Response?>> updateStamp(Response stamp) async {
     final int index = _responses[currentUser]!
         .indexWhere((element) => element.stamp == stamp.stamp);
-    if (index < 0) return false;
+    if (index < 0) return const Failure(message: "Update failed: not found");
     _responses[currentUser]![index] = stamp;
     _stream.add(_responses[currentUser]!);
-    return true;
+    return const Success(null);
   }
 
   @override
   Future<void> refresh() async {}
 
   @override
-  Future<bool> load() {
-    // TODO: implement load
-    throw UnimplementedError();
+  Future<void> refreshCheckins({Iterable<String>? types}) {
+    return refresh();
   }
 }

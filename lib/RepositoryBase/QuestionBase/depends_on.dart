@@ -55,7 +55,6 @@ class DependsOn with EquatableMixin {
   factory DependsOn.fromYaml(YamlMap yamlMap) {
     final Map<String, dynamic> yamlData = Map<String, dynamic>.from(yamlMap);
 
-    // Use the shared parsing logic.
     final condition = Condition.fromYaml(yamlData);
 
     if (condition == null) return const DependsOn.nothing();
@@ -64,7 +63,6 @@ class DependsOn with EquatableMixin {
       return DependsOn([condition]);
     }
 
-    // Wrap single condition
     return DependsOn([
       ConditionGroup(conditions: [condition], op: GroupOp.all)
     ]);

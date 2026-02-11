@@ -42,24 +42,19 @@ sealed class Condition {
       return null;
     }
 
-    // Explicit ID takes precedence, then default.
     final String? qid =
         (yaml[YamlKeys.questionId] as String?) ?? defaultQuestionId;
 
     if (yaml.containsKey(YamlKeys.exists)) {
       final val = yaml[YamlKeys.exists];
       if (val is bool && val == true) {
-        // If qid is null, it means "self" (which is valid for Requirements)
-        return ExistsCondition(qid); // qid can be null
+        return ExistsCondition(qid);
       }
       if (val is String) {
-        // "exists: someId" format in yaml? No, usually {exists: true}
-        // But code formerly handled {exists: 'someId'} -> ExistsCondition('someId')
         return ExistsCondition(val);
       }
     }
 
-    // For regex, the pattern is the value. Question ID is separate.
     if (yaml.containsKey(YamlKeys.regex)) {
       return MatchesRegex(qid, yaml[YamlKeys.regex] as String);
     }
@@ -327,7 +322,7 @@ class ConditionGroup extends Condition with EquatableMixin {
   const ConditionGroup({
     required this.conditions,
     required this.op,
-  }) : super(null); // ConditionGroup doesn't target a single question
+  }) : super(null);
 
   @override
   bool evaluate(Response? response) {
@@ -343,8 +338,6 @@ class ConditionGroup extends Condition with EquatableMixin {
       } else {
         final targetId = condition.questionId ?? contextId;
         if (targetId == null) {
-          // Cannot evaluate condition without target ID in this context
-          // Usually means malformed config or "self" used where no "self" exists
           return false;
         }
         final response = listener.questions[targetId];
@@ -365,7 +358,6 @@ class ConditionGroup extends Condition with EquatableMixin {
   }
 
   static ConditionGroup? parse(String serialized) {
-    // Format: (cond1&cond2&...)all or (cond1&cond2&...)one
     if (!serialized.startsWith('(')) return null;
 
     final lastParen = serialized.lastIndexOf(')');

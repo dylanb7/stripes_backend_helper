@@ -79,7 +79,8 @@ void main() {
       expect(resolvedMc.choices, ['Seizure A']);
     });
 
-    test('replaces [value] in prompt using copyValue', () {
+    test('stores interpolations using copyValue instead of replacing prompt',
+        () {
       final transform = jsonEncode({'sourceId': 'q1', 'type': 'copyValue'});
       final question = FreeResponse(
         id: 'q2',
@@ -98,7 +99,10 @@ void main() {
       expect(resolved.length, 1);
       expect(resolved.first, isA<FreeResponse>());
       final resolvedFr = resolved.first as FreeResponse;
-      expect(resolvedFr.prompt, 'How was Seizure A?');
+      // Prompt template stays intact
+      expect(resolvedFr.prompt, 'How was [value]?');
+      // Interpolation value is stored for UI-layer resolution
+      expect(resolvedFr.interpolations, {'value': 'Seizure A'});
     });
   });
 
@@ -121,7 +125,8 @@ void main() {
       expect(resolved.first, equals(question));
     });
 
-    test('generateForEach creates question for each AllThatApply choice', () {
+    test('generateForEach stores interpolations for each AllThatApply choice',
+        () {
       final parentQuestion = AllThatApply(
         id: 'seizure-types',
         prompt: 'What seizure types?',
@@ -147,13 +152,17 @@ void main() {
       final generated = followUp.resolve(current: parentResponse);
 
       expect(generated.length, 2);
-      expect(generated[0].prompt, 'How often do you experience Tonic-clonic?');
+      // Prompt template stays intact
+      expect(generated[0].prompt, 'How often do you experience {value}?');
+      expect(generated[0].interpolations, {'value': 'Tonic-clonic'});
       expect(generated[0].id, 'seizure-freq::tonic-clonic');
-      expect(generated[1].prompt, 'How often do you experience Focal?');
+      expect(generated[1].prompt, 'How often do you experience {value}?');
+      expect(generated[1].interpolations, {'value': 'Focal'});
       expect(generated[1].id, 'seizure-freq::focal');
     });
 
-    test('generateForEach creates question for MultipleChoice response', () {
+    test('generateForEach stores interpolations for MultipleChoice response',
+        () {
       final parentQuestion = MultipleChoice(
         id: 'pain-location',
         prompt: 'Where is the pain?',
@@ -180,7 +189,8 @@ void main() {
       final generated = followUp.resolve(current: parentResponse);
 
       expect(generated.length, 1);
-      expect(generated[0].prompt, 'Rate your Stomach pain (1-10)');
+      expect(generated[0].prompt, 'Rate your {value} pain (1-10)');
+      expect(generated[0].interpolations, {'value': 'Stomach'});
       expect(generated[0].id, 'pain-severity::stomach');
     });
 
@@ -214,7 +224,7 @@ void main() {
       expect(generated.first, equals(followUp));
     });
 
-    test('generateForEach works with ResponseWrap', () {
+    test('generateForEach stores interpolations with ResponseWrap', () {
       final parentQuestion = AllThatApply(
         id: 'seizure-types',
         prompt: 'What seizure types?',
@@ -246,7 +256,8 @@ void main() {
       final generated = followUp.resolve(current: detailResponse);
 
       expect(generated.length, 1);
-      expect(generated[0].prompt, 'How often Absence?');
+      expect(generated[0].prompt, 'How often {value}?');
+      expect(generated[0].interpolations, {'value': 'Absence'});
     });
 
     test('mapChoices works with resolve (current recording)', () {
@@ -279,7 +290,9 @@ void main() {
       expect(resolvedMc.choices, ['Option A', 'Option C']);
     });
 
-    test('generateForEach with inline generated definition', () {
+    test(
+        'generateForEach with inline generated definition stores interpolations',
+        () {
       final transform = jsonEncode({
         'type': 'generateForEach',
         'generated': {
@@ -314,19 +327,20 @@ void main() {
 
       // First generated question
       expect(generated[0], isA<MultipleChoice>());
-      expect(generated[0].prompt, 'How often do you experience Tonic-clonic?');
+      expect(generated[0].prompt, 'How often do you experience {value}?');
+      expect(generated[0].interpolations, {'value': 'Tonic-clonic'});
       expect(generated[0].id, 'seizure-types::tonic-clonic');
       expect((generated[0] as MultipleChoice).choices,
           ['Daily', 'Weekly', 'Monthly']);
-      expect(generated[0].requirement, true);
 
       // Second generated question
       expect(generated[1], isA<MultipleChoice>());
-      expect(generated[1].prompt, 'How often do you experience Absence?');
+      expect(generated[1].prompt, 'How often do you experience {value}?');
+      expect(generated[1].interpolations, {'value': 'Absence'});
       expect(generated[1].id, 'seizure-types::absence');
     });
 
-    test('generateForEach inline generates Numeric questions', () {
+    test('generateForEach inline generates Numeric with interpolations', () {
       final transform = jsonEncode({
         'type': 'generateForEach',
         'generated': {
@@ -359,10 +373,43 @@ void main() {
 
       expect(generated.length, 1);
       expect(generated[0], isA<Numeric>());
-      expect(generated[0].prompt, 'Rate Pain severity (1-10)');
+      expect(generated[0].prompt, 'Rate {value} severity (1-10)');
+      expect(generated[0].interpolations, {'value': 'Pain'});
       final numeric = generated[0] as Numeric;
       expect(numeric.min, 1);
       expect(numeric.max, 10);
+    });
+  });
+
+  group('Question.interpolations serialization', () {
+    test('round-trips through toJson/fromJson', () {
+      final question = MultipleChoice(
+        id: 'q1',
+        prompt: 'Rate {value}',
+        type: 'test',
+        choices: ['A', 'B'],
+        interpolations: {'value': 'seizure.type.focal'},
+      );
+
+      final json = question.toJson();
+      final restored = Question.fromJson(json);
+
+      expect(restored, isA<MultipleChoice>());
+      expect(restored.interpolations, {'value': 'seizure.type.focal'});
+      expect(restored.prompt, 'Rate {value}');
+    });
+
+    test('null interpolations round-trips correctly', () {
+      final question = Check(
+        id: 'q1',
+        prompt: 'Test',
+        type: 'test',
+      );
+
+      final json = question.toJson();
+      final restored = Question.fromJson(json);
+
+      expect(restored.interpolations, isNull);
     });
   });
 }

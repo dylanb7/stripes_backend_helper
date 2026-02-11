@@ -131,9 +131,12 @@ class CopyValue extends Transform with EquatableMixin {
         break;
     }
 
-    final newPrompt =
-        question.prompt.replaceAll(RegExp(r'\[value\]'), valueToCopy);
-    return [_copyQuestionWithPrompt(question, newPrompt)];
+    return [
+      _copyQuestionWithInterpolations(
+        question,
+        {'value': valueToCopy, ...?question.interpolations},
+      )
+    ];
   }
 
   @override
@@ -170,13 +173,24 @@ class GenerateForEach extends Transform with EquatableMixin {
         if (baselineVersion != null) {
           newId = '$newId${generatedIdDelimiter}v$baselineVersion';
         }
+        final interpolations = {
+          'value': value,
+          ...?question.interpolations,
+        };
         Question newQuestion;
         if (generatedDef != null) {
-          newQuestion = generatedDef!.build(question, value, newId);
+          newQuestion = generatedDef!.build(
+            question,
+            value,
+            newId,
+            interpolations,
+          );
         } else {
-          final newPrompt = question.prompt.replaceAll('{value}', value);
-          newQuestion =
-              _copyQuestionWithPromptAndId(question, newPrompt, newId);
+          newQuestion = _copyQuestionWithIdAndInterpolations(
+            question,
+            newId,
+            interpolations,
+          );
         }
         generated.add(newQuestion);
       }
@@ -226,9 +240,14 @@ class GeneratedDefinition with EquatableMixin {
     this.requirement,
   });
 
-  Question build(Question template, String value, String newId) {
-    final defPrompt = prompt ?? '{value}';
-    final newPrompt = defPrompt.replaceAll('{value}', value);
+  Question build(
+    Question template,
+    String value,
+    String newId,
+    Map<String, String> interpolations,
+  ) {
+    final defPrompt = prompt ?? template.prompt;
+
     final type = questionType ?? template.type;
 
     final effectiveRequirement = requirement ?? template.requirement;
@@ -236,44 +255,53 @@ class GeneratedDefinition with EquatableMixin {
     return switch (type) {
       'FreeResponse' => FreeResponse(
           id: newId,
-          prompt: newPrompt,
+          prompt: defPrompt,
           type: template.type,
           userCreated: template.userCreated,
           requirement: effectiveRequirement,
+          interpolations: interpolations,
         ),
       'Numeric' => Numeric(
           id: newId,
-          prompt: newPrompt,
+          prompt: defPrompt,
           type: template.type,
           userCreated: template.userCreated,
           requirement: effectiveRequirement,
+          interpolations: interpolations,
           min: min,
           max: max,
         ),
       'Check' => Check(
           id: newId,
-          prompt: newPrompt,
+          prompt: defPrompt,
           type: template.type,
           userCreated: template.userCreated,
           requirement: effectiveRequirement,
+          interpolations: interpolations,
         ),
       'MultipleChoice' => MultipleChoice(
           id: newId,
-          prompt: newPrompt,
+          prompt: defPrompt,
           type: template.type,
           userCreated: template.userCreated,
           requirement: effectiveRequirement,
+          interpolations: interpolations,
           choices: choices ?? [],
         ),
       'AllThatApply' => AllThatApply(
           id: newId,
-          prompt: newPrompt,
+          prompt: defPrompt,
           type: template.type,
           userCreated: template.userCreated,
           requirement: effectiveRequirement,
+          interpolations: interpolations,
           choices: choices ?? [],
         ),
-      _ => _copyQuestionWithPromptAndId(template, newPrompt, newId),
+      _ => _copyQuestionWithIdAndInterpolations(
+          template,
+          newId,
+          interpolations,
+        ),
     };
   }
 
@@ -317,24 +345,28 @@ List<String> _extractValues(Response resp) {
   };
 }
 
-Question _copyQuestionWithPrompt(Question question, String newPrompt) {
+Question _copyQuestionWithInterpolations(
+    Question question, Map<String, String> interpolations) {
   return switch (question) {
-    FreeResponse() => question.copyWith(prompt: newPrompt),
-    Numeric() => question.copyWith(prompt: newPrompt),
-    Check() => question.copyWith(prompt: newPrompt),
-    MultipleChoice() => question.copyWith(prompt: newPrompt),
-    AllThatApply() => question.copyWith(prompt: newPrompt),
+    FreeResponse() => question.copyWith(interpolations: interpolations),
+    Numeric() => question.copyWith(interpolations: interpolations),
+    Check() => question.copyWith(interpolations: interpolations),
+    MultipleChoice() => question.copyWith(interpolations: interpolations),
+    AllThatApply() => question.copyWith(interpolations: interpolations),
   };
 }
 
-Question _copyQuestionWithPromptAndId(
-    Question question, String newPrompt, String newId) {
+Question _copyQuestionWithIdAndInterpolations(
+    Question question, String newId, Map<String, String> interpolations) {
   return switch (question) {
-    FreeResponse() => question.copyWith(prompt: newPrompt, id: newId),
-    Numeric() => question.copyWith(prompt: newPrompt, id: newId),
-    Check() => question.copyWith(prompt: newPrompt, id: newId),
-    MultipleChoice() => question.copyWith(prompt: newPrompt, id: newId),
-    AllThatApply() => question.copyWith(prompt: newPrompt, id: newId),
+    FreeResponse() =>
+      question.copyWith(id: newId, interpolations: interpolations),
+    Numeric() => question.copyWith(id: newId, interpolations: interpolations),
+    Check() => question.copyWith(id: newId, interpolations: interpolations),
+    MultipleChoice() =>
+      question.copyWith(id: newId, interpolations: interpolations),
+    AllThatApply() =>
+      question.copyWith(id: newId, interpolations: interpolations),
   };
 }
 

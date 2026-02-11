@@ -80,9 +80,10 @@ void main() {
       // Resolve
       final resolved = question.resolveFromBaseline(baseline: baseline);
 
-      // Expect transformation to happen (generateForEach -> Headache)
+      // Expect transformation to store interpolation, not replace prompt
       expect(resolved.length, 1);
-      expect(resolved.first.prompt, 'How is your Headache?');
+      expect(resolved.first.prompt, 'How is your {value}?');
+      expect(resolved.first.interpolations, {'value': 'Headache'});
       expect(resolved.first.id, contains('headache'));
     });
 

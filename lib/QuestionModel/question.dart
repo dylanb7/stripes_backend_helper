@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo_base.dart';
@@ -21,6 +23,8 @@ sealed class Question with EquatableMixin {
 
   final String? transform;
 
+  final Map<String, String>? interpolations;
+
   const Question(
       {required this.id,
       required this.prompt,
@@ -34,7 +38,8 @@ sealed class Question with EquatableMixin {
       this.dependsOn,
       this.requirement,
       this.fromBaseline,
-      this.transform});
+      this.transform,
+      this.interpolations});
 
   factory Question.ofType({required String type}) =>
       Check(id: '', prompt: '', type: type);
@@ -52,6 +57,8 @@ sealed class Question with EquatableMixin {
         'isBaseline': isBaseline ? 1 : 0,
         'fromBaseline': fromBaseline,
         'transform': transform,
+        'interpolations':
+            interpolations != null ? jsonEncode(interpolations) : null,
         'questionType': QuestionType.from(this).id,
         'dependsOn': dependsOn?.toString(),
         'requirement': requirement?.toString(),
@@ -73,6 +80,19 @@ sealed class Question with EquatableMixin {
     }
   }
 
+  static Map<String, String>? parseInterpolations(dynamic value) {
+    if (value == null) return null;
+    if (value is Map) return Map<String, String>.from(value);
+    if (value is String) {
+      try {
+        return Map<String, String>.from(jsonDecode(value) as Map);
+      } catch (_) {
+        return null;
+      }
+    }
+    return null;
+  }
+
   @override
   List<Object?> get props => [
         id,
@@ -83,6 +103,7 @@ sealed class Question with EquatableMixin {
         isBaseline,
         fromBaseline,
         transform,
+        interpolations,
         dependsOn,
         requirement
       ];
@@ -101,6 +122,7 @@ class FreeResponse extends Question {
       super.isBaseline,
       super.fromBaseline,
       super.transform,
+      super.interpolations,
       super.dependsOn,
       super.requirement,
       bool? isRequired})
@@ -123,6 +145,7 @@ class FreeResponse extends Question {
       isBaseline: json['isBaseline'] == 1,
       fromBaseline: json['fromBaseline'],
       transform: json['transform'],
+      interpolations: Question.parseInterpolations(json['interpolations']),
       dependsOn: json["dependsOn"] == null
           ? const DependsOn.nothing()
           : DependsOn.fromString(
@@ -148,6 +171,7 @@ class FreeResponse extends Question {
     bool? isBaseline,
     String? fromBaseline,
     String? transform,
+    Map<String, String>? interpolations,
     DependsOn? dependsOn,
     Requirement? requirement,
     bool? isRequired,
@@ -164,6 +188,7 @@ class FreeResponse extends Question {
       isBaseline: isBaseline ?? this.isBaseline,
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
+      interpolations: interpolations ?? this.interpolations,
       dependsOn: dependsOn ?? this.dependsOn,
       requirement: requirement ?? this.requirement,
     );
@@ -184,6 +209,7 @@ class Numeric extends Question {
       super.isBaseline,
       super.fromBaseline,
       super.transform,
+      super.interpolations,
       super.dependsOn,
       super.requirement,
       bool? isRequired,
@@ -210,6 +236,7 @@ class Numeric extends Question {
       isBaseline: json['isBaseline'] == 1,
       fromBaseline: json['fromBaseline'],
       transform: json['transform'],
+      interpolations: Question.parseInterpolations(json['interpolations']),
       dependsOn: json["dependsOn"] == null
           ? const DependsOn.nothing()
           : DependsOn.fromString(
@@ -238,6 +265,7 @@ class Numeric extends Question {
     bool? isBaseline,
     String? fromBaseline,
     String? transform,
+    Map<String, String>? interpolations,
     DependsOn? dependsOn,
     Requirement? requirement,
     bool? isRequired,
@@ -256,6 +284,7 @@ class Numeric extends Question {
       isBaseline: isBaseline ?? this.isBaseline,
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
+      interpolations: interpolations ?? this.interpolations,
       dependsOn: dependsOn ?? this.dependsOn,
       requirement: requirement ?? this.requirement,
       min: min ?? this.min,
@@ -285,6 +314,7 @@ class Check extends Question {
     super.isBaseline,
     super.fromBaseline,
     super.transform,
+    super.interpolations,
     super.dependsOn,
     super.requirement,
   }) : super(
@@ -305,6 +335,7 @@ class Check extends Question {
       isBaseline: json['isBaseline'] == 1,
       fromBaseline: json['fromBaseline'],
       transform: json['transform'],
+      interpolations: Question.parseInterpolations(json['interpolations']),
       dependsOn: json["dependsOn"] == null
           ? const DependsOn.nothing()
           : DependsOn.fromString(
@@ -330,6 +361,7 @@ class Check extends Question {
     bool? isBaseline,
     String? fromBaseline,
     String? transform,
+    Map<String, String>? interpolations,
     DependsOn? dependsOn,
     Requirement? requirement,
     bool? isRequired,
@@ -346,6 +378,7 @@ class Check extends Question {
       isBaseline: isBaseline ?? this.isBaseline,
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
+      interpolations: interpolations ?? this.interpolations,
       dependsOn: dependsOn ?? this.dependsOn,
       requirement: requirement ?? this.requirement,
     );
@@ -368,6 +401,7 @@ class MultipleChoice extends Question {
       super.isBaseline,
       super.fromBaseline,
       super.transform,
+      super.interpolations,
       super.dependsOn,
       super.requirement,
       bool? isRequired})
@@ -393,6 +427,7 @@ class MultipleChoice extends Question {
       isBaseline: json['isBaseline'] == 1,
       fromBaseline: json['fromBaseline'],
       transform: json['transform'],
+      interpolations: Question.parseInterpolations(json['interpolations']),
       dependsOn: json["dependsOn"] == null
           ? const DependsOn.nothing()
           : DependsOn.fromString(
@@ -422,6 +457,7 @@ class MultipleChoice extends Question {
     bool? isBaseline,
     String? fromBaseline,
     String? transform,
+    Map<String, String>? interpolations,
     DependsOn? dependsOn,
     Requirement? requirement,
     bool? isRequired,
@@ -439,6 +475,7 @@ class MultipleChoice extends Question {
       isBaseline: isBaseline ?? this.isBaseline,
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
+      interpolations: interpolations ?? this.interpolations,
       dependsOn: dependsOn ?? this.dependsOn,
       requirement: requirement ?? this.requirement,
     );
@@ -468,6 +505,7 @@ class AllThatApply extends Question {
     super.isBaseline,
     super.fromBaseline,
     super.transform,
+    super.interpolations,
     super.dependsOn,
     super.requirement,
   }) : super(
@@ -491,6 +529,7 @@ class AllThatApply extends Question {
       isBaseline: json['isBaseline'] == 1,
       fromBaseline: json['fromBaseline'],
       transform: json['transform'],
+      interpolations: Question.parseInterpolations(json['interpolations']),
       dependsOn: json["dependsOn"] == null
           ? const DependsOn.nothing()
           : DependsOn.fromString(
@@ -520,6 +559,7 @@ class AllThatApply extends Question {
     bool? isBaseline,
     String? fromBaseline,
     String? transform,
+    Map<String, String>? interpolations,
     DependsOn? dependsOn,
     Requirement? requirement,
     bool? isRequired,
@@ -537,6 +577,7 @@ class AllThatApply extends Question {
       isBaseline: isBaseline ?? this.isBaseline,
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
+      interpolations: interpolations ?? this.interpolations,
       dependsOn: dependsOn ?? this.dependsOn,
       requirement: requirement ?? this.requirement,
     );

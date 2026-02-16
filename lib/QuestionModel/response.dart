@@ -33,7 +33,7 @@ sealed class Response<E extends Question> extends Stamp with EquatableMixin {
   }
 
   Response encodeGeneratedQuestion() {
-    if (!_isGeneratedQuestion) return this;
+    if (!isGeneratedQuestion) return this;
 
     final String jsonValues = jsonEncode(question.toJson());
     Question newQ;
@@ -90,11 +90,11 @@ sealed class Response<E extends Question> extends Stamp with EquatableMixin {
     }
   }
 
-  bool get _isGeneratedQuestion => question.id.contains(generatedIdDelimiter);
+  bool get isGeneratedQuestion => question.id.contains(generatedIdDelimiter);
 
   @override
   Map<String, dynamic> toJson() {
-    if (_isGeneratedQuestion) {
+    if (isGeneratedQuestion) {
       return {...super.toJson(), ID_FIELD: jsonEncode(question.toJson())};
     }
     return {...super.toJson(), ID_FIELD: question.id};

@@ -8,15 +8,15 @@ import 'RepositoryBase/AuthBase/auth_user.dart';
 import 'RepositoryBase/AuthBase/base_auth_repo.dart';
 import 'RepositoryBase/QuestionBase/question_repo_base.dart';
 import 'RepositoryBase/StampBase/base_stamp_repo.dart';
-import 'RepositoryBase/StampBase/stamp.dart';
 import 'RepositoryBase/SubBase/base_sub_repo.dart';
 import 'RepositoryBase/SubBase/sub_user.dart';
-import 'RepositoryBase/TestBase/base_test_repo.dart';
 import 'TestingReposImpl/test_access.dart';
 import 'TestingReposImpl/test_auth_repo.dart';
 import 'TestingReposImpl/test_stamp_repo.dart';
 import 'TestingReposImpl/test_sub_repo.dart';
-import 'TestingReposImpl/test_test_repo.dart';
+import 'RepositoryBase/EntryBase/base_entry_repo.dart';
+import 'RepositoryBase/ModularTestBase/modular_test_base_repo.dart';
+import 'TestingReposImpl/test_entry_repo.dart';
 
 abstract class StripesRepoPackage {
   AccessCodeRepo access();
@@ -30,13 +30,13 @@ abstract class StripesRepoPackage {
       required SubUser subUser,
       required QuestionRepo questionRepo});
 
-  TestsRepo test(
-      {required AuthUser user,
-      required SubUser subUser,
-      required StampRepo stampRepo,
-      required QuestionRepo questionRepo});
+  ModularTestsRepo? test(
+          {required AuthUser user, required SubUser subUser}) =>
+      null;
 
   QuestionRepo questions({required AuthUser user, required SubUser subUser});
+
+  EntryRepo? entry({required AuthUser user, required SubUser subUser}) => null;
 
   SyncManagerBase? syncManager({required SubUser subUser});
 }
@@ -66,18 +66,20 @@ class LocalRepoPackage extends StripesRepoPackage {
   }
 
   @override
-  TestsRepo test(
-      {required AuthUser user,
-      required SubUser subUser,
-      required StampRepo<Stamp> stampRepo,
-      required QuestionRepo questionRepo}) {
-    return TestTestRepo(stampRepo, subUser);
+  ModularTestsRepo? test(
+      {required AuthUser user, required SubUser subUser}) {
+    return null;
   }
 
   @override
   QuestionRepo<QuestionHome> questions(
       {required AuthUser user, required SubUser subUser}) {
     return TestQuestionRepo(subUser: subUser);
+  }
+
+  @override
+  EntryRepo entry({required AuthUser user, required SubUser subUser}) {
+    return TestEntryRepo(user, subUser);
   }
 
   @override
@@ -117,12 +119,14 @@ class LocalStockedRepoPackage extends StripesRepoPackage {
   }
 
   @override
-  TestsRepo test(
-      {required AuthUser user,
-      required SubUser subUser,
-      required StampRepo<Stamp> stampRepo,
-      required QuestionRepo questionRepo}) {
-    return TestTestRepo(stampRepo, subUser);
+  ModularTestsRepo? test(
+      {required AuthUser user, required SubUser subUser}) {
+    return null;
+  }
+
+  @override
+  EntryRepo entry({required AuthUser user, required SubUser subUser}) {
+    return TestEntryRepo(user, subUser);
   }
 
   @override

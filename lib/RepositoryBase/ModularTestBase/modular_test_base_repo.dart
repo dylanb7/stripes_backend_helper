@@ -1,261 +1,119 @@
-import 'package:equatable/equatable.dart';
-
-import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:stripes_backend_helper/QuestionModel/question.dart';
+import 'package:stripes_backend_helper/RepositoryBase/EntryBase/entry.dart';
 
-abstract class TestEnrollmentSource {
+import 'test_definition.dart';
+import 'test_engine.dart';
 
-
-  TestEnrollmentSource();
-
-  Future<List<TestEnrollment>> loadAllEnrollments();
-  
-  Future<void> updateEnrollment(TestEnrollment enrollment); 
+abstract class ActiveTestProtocolSource {
+  Future<List<ActiveTestProtocol>> loadAllActiveProtocols();
+  Future<void> updateActiveProtocol(ActiveTestProtocol protocol);
 }
 
-class TestsRepo {
+class ModularTestsRepo {
+  final ActiveTestProtocolSource source;
+  final TestEngine engine;
+  final List<TestDefinition> definitions;
 
-  final TestEnrollmentSource source;
-
-  final BehaviorSubject<List<TestEnrollment>> _enrollmentsSubject =
+  final BehaviorSubject<List<ActiveTestProtocol>> _protocolsSubject =
       BehaviorSubject();
 
-  TestsRepo({required this.source}) {
-    _loadInEnrollments();
-  }
-
-  _loadInEnrollments() async {
-    final List<TestEnrollment> loadedEnrollments = await source.loadAllEnrollments();
-    _enrollmentsSubject.add(loadedEnrollments);
-  }
-
-  Stream<List<TestEnrollment>> get enrollments => _enrollmentsSubject.stream;
-
-  List<Question> getRecordAdditions(BuildContext context, String logType) {
-    List<Question> additions = [];
-
-    final activeEnrollments =
-        _enrollmentsSubject.value.where((e) => e.status == TestStatus.active);
-
-    /*for (final enrollment in activeEnrollments) {
-      final protocol =
-          protocols.firstWhere((p) => p.id == enrollment.protocolId);
-
-      if (protocol.triggerTypes.contains(logType)) {
-        final currentPhaseId = enrollment.metadata['currentPhaseId'];
-
-        final activePhase = protocol.phases.firstWhere(
-            (p) => p.id == currentPhaseId,
-            orElse: () => protocol.phases.first);
-
-        additions.addAll(activePhase.injectedQuestions);
-      }
-    }*/
-    return additions;
-  }
-}
-
-@immutable
-class TestProtocol extends Equatable {
-  final String id;
-  final String name;
-  final String description;
-
-  final List<String> triggerTypes;
-
-  final Duration duration;
-
-  final TestContent content;
-
-  final List<TestPhase> phases;
-
-  const TestProtocol({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.triggerTypes,
-    required this.duration,
-    required this.content,
-    required this.phases,
-  });
-
-  factory TestProtocol.fromJson(Map<String, dynamic> json) {
-    return TestProtocol(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] ?? '',
-      triggerTypes: (json['triggerTypes'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
-      duration: Duration(seconds: json['durationSeconds'] ?? 0),
-      content: TestContent.fromJson(json['content'] ?? {}),
-      phases: (json['phases'] as List<dynamic>?)
-              ?.map((e) => TestPhase.fromJson(e))
-              .toList() ??
-          [],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'description': description,
-      'triggerTypes': triggerTypes,
-      'durationSeconds': duration.inSeconds,
-      'content': content.toJson(),
-      'phases': phases.map((p) => p.toJson()).toList(),
-    };
-  }
-
-  @override
-  List<Object?> get props => [id, name, triggerTypes, phases];
-}
-
-class TestContent extends Equatable {
-  final String instructionMarkdown;
-  final String consentMarkdown;
-  final String completionMarkdown;
-
-  const TestContent({
-    this.instructionMarkdown = '',
-    this.consentMarkdown = '',
-    this.completionMarkdown = '',
-  });
-
-  factory TestContent.fromJson(Map<String, dynamic> json) {
-    return TestContent(
-      instructionMarkdown: json['instructionMarkdown'] ?? '',
-      consentMarkdown: json['consentMarkdown'] ?? '',
-      completionMarkdown: json['completionMarkdown'] ?? '',
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'instructionMarkdown': instructionMarkdown,
-      'consentMarkdown': consentMarkdown,
-      'completionMarkdown': completionMarkdown,
-    };
-  }
-
-  @override
-  List<Object?> get props => [instructionMarkdown, consentMarkdown];
-}
-
-class TestPhase extends Equatable {
-  final String id;
-  final String name;
-
-  final List<Question> injectedQuestions;
-
-  const TestPhase({
-    required this.id,
-    required this.name,
-    required this.injectedQuestions,
-  });
-
-  factory TestPhase.fromJson(Map<String, dynamic> json) {
-    return TestPhase(
-      id: json['id'] as String,
-      name: json['name'] ?? 'Standard',
-      injectedQuestions: (json['questions'] as List<dynamic>?)
-              ?.map((q) => Question.fromJson(q as Map<String, dynamic>))
-              .toList() ??
-          [],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'questions': injectedQuestions.map((q) => q.toJson()).toList(),
-    };
-  }
-
-  @override
-  List<Object?> get props => [id, injectedQuestions];
-}
-
-enum TestStatus {
-  pending,
-  active,
-  completed,
-  withdrawn,
-}
-
-@immutable
-class TestEnrollment extends Equatable {
-  final String id;
-  final String userId;
-  final String protocolId;
-
-  final DateTime startDate;
-  final DateTime? endDate;
-  final TestStatus status;
-
-  final Map<String, dynamic> metadata;
-
-  const TestEnrollment({
-    required this.id,
-    required this.userId,
-    required this.protocolId,
-    required this.startDate,
-    this.endDate,
-    this.status = TestStatus.pending,
-    this.metadata = const {},
-  });
-
-  String? get currentPhaseId => metadata['currentPhaseId'] as String?;
-
-  factory TestEnrollment.fromJson(Map<String, dynamic> json) {
-    return TestEnrollment(
-      id: json['id'],
-      userId: json['userId'],
-      protocolId: json['protocolId'],
-      startDate: DateTime.parse(json['startDate']),
-      endDate: json['endDate'] != null ? DateTime.parse(json['endDate']) : null,
-      status: TestStatus.values.firstWhere((e) => e.name == json['status'],
-          orElse: () => TestStatus.active),
-      metadata: json['metadata'] ?? {},
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'userId': userId,
-      'protocolId': protocolId,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate?.toIso8601String(),
-      'status': status.name,
-      'metadata': metadata,
-    };
-  }
-
-  TestEnrollment copyWith({
-    String? id,
-    String? userId,
-    String? protocolId,
-    DateTime? startDate,
-    DateTime? endDate,
-    TestStatus? status,
-    Map<String, dynamic>? metadata,
+  ModularTestsRepo({
+    required this.source,
+    required this.engine,
+    required this.definitions,
+    List<ActiveTestProtocol>? initialProtocols,
   }) {
-    return TestEnrollment(
-      id: id ?? this.id,
-      userId: userId ?? this.userId,
-      protocolId: protocolId ?? this.protocolId,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
-      status: status ?? this.status,
-      metadata: metadata ?? this.metadata,
-    );
+    if (initialProtocols != null) {
+      _protocolsSubject.add(initialProtocols);
+    }
+    _loadInProtocols();
   }
 
-  @override
-  List<Object?> get props => [id, userId, protocolId, status, metadata];
+  Future<void> _loadInProtocols() async {
+    final loaded = await source.loadAllActiveProtocols();
+    _protocolsSubject.add(loaded);
+  }
+
+  Stream<List<ActiveTestProtocol>> get activeProtocols =>
+      _protocolsSubject.stream;
+
+  List<ActiveTestProtocol> get currentProtocols =>
+      _protocolsSubject.valueOrNull ?? [];
+
+  Future<void> updateProtocol(ActiveTestProtocol protocol) async {
+    await source.updateActiveProtocol(protocol);
+    final current = currentProtocols.toList();
+    final index = current.indexWhere((p) => p.id == protocol.id);
+    if (index != -1) {
+      current[index] = protocol;
+    } else {
+      current.add(protocol);
+    }
+    _protocolsSubject.add(current);
+  }
+
+  Future<List<TestEvaluationResult>> processEntry(
+    Entry entry, {
+    List<Entry> historicalResponses = const [],
+  }) async {
+    final results = <TestEvaluationResult>[];
+    final activeList = currentProtocols.where((p) => !p.isCompleted).toList();
+
+    for (final activeTest in activeList) {
+      final res = await engine.processEntry(
+        activeTest: activeTest,
+        currentResponse: entry,
+        historicalResponses: historicalResponses,
+      );
+      if (res.stageChanged) {
+        await updateProtocol(res.updatedTest);
+      }
+      results.add(res);
+    }
+    return results;
+  }
+
+  Future<TestEvaluationResult?> advanceStage({
+    required String activeTestId,
+    String? targetStageId,
+  }) async {
+    final activeList = currentProtocols.toList();
+    final index = activeList.indexWhere((p) => p.id == activeTestId);
+    if (index == -1) return null;
+
+    final activeTest = activeList[index];
+    final res = engine.advanceStage(
+      activeTest: activeTest,
+      targetStageId: targetStageId,
+    );
+
+    if (res.stageChanged) {
+      await updateProtocol(res.updatedTest);
+    }
+    return res;
+  }
+
+  List<String> getInjectedQuestionIds(
+    String flowType, {
+    TestQuestionPlacement placement = TestQuestionPlacement.page,
+    int pageIndex = 0,
+  }) {
+    final questionIds = <String>[];
+    final activeList = currentProtocols.where((p) => !p.isCompleted);
+
+    for (final activeTest in activeList) {
+      final injected = engine.getInjectedQuestionIds(
+        activeTest: activeTest,
+        flowType: flowType,
+        placement: placement,
+        pageIndex: pageIndex,
+      );
+      questionIds.addAll(injected);
+    }
+    return questionIds;
+  }
+
+  void dispose() {
+    _protocolsSubject.close();
+  }
 }

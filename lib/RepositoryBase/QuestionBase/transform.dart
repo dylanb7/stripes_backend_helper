@@ -230,6 +230,7 @@ class GeneratedDefinition with EquatableMixin {
   final num? max;
   final List<String>? choices;
   final Requirement? requirement;
+  final bool? isRequired;
 
   const GeneratedDefinition({
     this.prompt,
@@ -238,6 +239,7 @@ class GeneratedDefinition with EquatableMixin {
     this.max,
     this.choices,
     this.requirement,
+    this.isRequired,
   });
 
   Question build(
@@ -258,6 +260,7 @@ class GeneratedDefinition with EquatableMixin {
           prompt: defPrompt,
           type: template.type,
           userCreated: template.userCreated,
+          isRequired: isRequired ?? template.isRequired,
           requirement: effectiveRequirement,
           interpolations: interpolations,
         ),
@@ -266,6 +269,7 @@ class GeneratedDefinition with EquatableMixin {
           prompt: defPrompt,
           type: template.type,
           userCreated: template.userCreated,
+          isRequired: isRequired ?? template.isRequired,
           requirement: effectiveRequirement,
           interpolations: interpolations,
           min: min,
@@ -276,6 +280,7 @@ class GeneratedDefinition with EquatableMixin {
           prompt: defPrompt,
           type: template.type,
           userCreated: template.userCreated,
+          isRequired: isRequired ?? template.isRequired,
           requirement: effectiveRequirement,
           interpolations: interpolations,
         ),
@@ -284,6 +289,7 @@ class GeneratedDefinition with EquatableMixin {
           prompt: defPrompt,
           type: template.type,
           userCreated: template.userCreated,
+          isRequired: isRequired ?? template.isRequired,
           requirement: effectiveRequirement,
           interpolations: interpolations,
           choices: choices ?? [],
@@ -293,6 +299,7 @@ class GeneratedDefinition with EquatableMixin {
           prompt: defPrompt,
           type: template.type,
           userCreated: template.userCreated,
+          isRequired: isRequired ?? template.isRequired,
           requirement: effectiveRequirement,
           interpolations: interpolations,
           choices: choices ?? [],
@@ -311,6 +318,7 @@ class GeneratedDefinition with EquatableMixin {
         if (min != null) 'min': min,
         if (max != null) 'max': max,
         if (choices != null) 'choices': choices,
+        if (isRequired != null) 'isRequired': isRequired,
         if (requirement != null) 'requirement': requirement.toString(),
       };
 
@@ -323,6 +331,7 @@ class GeneratedDefinition with EquatableMixin {
         choices: json[TransformKeys.choices] != null
             ? List<String>.from(json[TransformKeys.choices])
             : null,
+        isRequired: json['isRequired'] as bool?,
         requirement: json[TransformKeys.requirement] != null
             ? Requirement.fromString(json[TransformKeys.requirement] as String)
             : null,
@@ -330,7 +339,7 @@ class GeneratedDefinition with EquatableMixin {
 
   @override
   List<Object?> get props =>
-      [prompt, questionType, min, max, choices, requirement];
+      [prompt, questionType, min, max, choices, requirement, isRequired];
 }
 
 // Helper functions

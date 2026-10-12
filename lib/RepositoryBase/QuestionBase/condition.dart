@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show immutable, listEquals;
 import 'package:stripes_backend_helper/QuestionModel/question.dart';
 import 'package:stripes_backend_helper/QuestionModel/response.dart';
-import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_listener.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/session_data.dart';
 
 sealed class Condition {
   final String? questionId;
@@ -14,13 +14,19 @@ sealed class Condition {
 
   String toReadableString(String? Function(String qid) promptProvider);
 
-  static Condition? fromYaml(Map<String, dynamic> yaml,
-      {String? defaultQuestionId}) {
+  static Condition? fromYaml(
+    Map<String, dynamic> yaml, {
+    String? defaultQuestionId,
+  }) {
     if (yaml.containsKey(YamlKeys.oneOf)) {
       final List<dynamic> nested = yaml[YamlKeys.oneOf] as List<dynamic>;
       final conditions = nested
-          .map((i) => fromYaml(Map<String, dynamic>.from(i),
-              defaultQuestionId: defaultQuestionId))
+          .map(
+            (i) => fromYaml(
+              Map<String, dynamic>.from(i),
+              defaultQuestionId: defaultQuestionId,
+            ),
+          )
           .whereType<Condition>()
           .toList();
       if (conditions.isNotEmpty) {
@@ -32,8 +38,12 @@ sealed class Condition {
     if (yaml.containsKey(YamlKeys.allOf)) {
       final List<dynamic> nested = yaml[YamlKeys.allOf] as List<dynamic>;
       final conditions = nested
-          .map((i) => fromYaml(Map<String, dynamic>.from(i),
-              defaultQuestionId: defaultQuestionId))
+          .map(
+            (i) => fromYaml(
+              Map<String, dynamic>.from(i),
+              defaultQuestionId: defaultQuestionId,
+            ),
+          )
           .whereType<Condition>()
           .toList();
       if (conditions.isNotEmpty) {
@@ -101,7 +111,8 @@ class ExistsCondition extends Condition with EquatableMixin {
   const ExistsCondition([super.questionId]);
 
   @override
-  bool evaluate(Response? response) => response != null;
+  bool evaluate(Response? response) =>
+      response != null && response is! UnresolvedResponse;
 
   @override
   String serialize() => 'exists:${questionId ?? ""}';
@@ -168,8 +179,11 @@ class EqualsExact extends Condition with EquatableMixin {
 
     // Try parsing as int list first
     if (valueStr.contains('|')) {
-      final indices =
-          valueStr.split('|').map(int.tryParse).whereType<int>().toList();
+      final indices = valueStr
+          .split('|')
+          .map(int.tryParse)
+          .whereType<int>()
+          .toList();
       return EqualsExact(qid, indices);
     }
     // Try as num
@@ -319,28 +333,36 @@ class ConditionGroup extends Condition with EquatableMixin {
   final List<Condition> conditions;
   final GroupOp op;
 
-  const ConditionGroup({
-    required this.conditions,
-    required this.op,
-  }) : super(null);
+  const ConditionGroup({required this.conditions, required this.op})
+    : super(null);
 
   @override
   bool evaluate(Response? response) {
     throw UnsupportedError(
-        'ConditionGroup.evaluate(Response?) not supported. Use evaluateWithListener.');
+      'ConditionGroup.evaluate(Response?) not supported. Use evaluateWithResponses or evaluateWithData.',
+    );
   }
 
-  bool evaluateWithListener(QuestionsListener listener, {String? contextId}) {
+  bool evaluateWithData(SessionData data, {String? contextId}) =>
+      evaluateWithResponses(data.responses, contextId: contextId);
+
+  bool evaluateWithResponses(
+    Map<String, Response> responses, {
+    String? contextId,
+  }) {
     for (final condition in conditions) {
       bool result;
       if (condition is ConditionGroup) {
-        result = condition.evaluateWithListener(listener, contextId: contextId);
+        result = condition.evaluateWithResponses(
+          responses,
+          contextId: contextId,
+        );
       } else {
         final targetId = condition.questionId ?? contextId;
         if (targetId == null) {
           return false;
         }
-        final response = listener.questions[targetId];
+        final response = responses[targetId];
         result = condition.evaluate(response);
       }
 
@@ -367,8 +389,8 @@ class ConditionGroup extends Condition with EquatableMixin {
     final op = opStr == 'all'
         ? GroupOp.all
         : opStr == 'one'
-            ? GroupOp.one
-            : null;
+        ? GroupOp.one
+        : null;
     if (op == null) return null;
 
     final innerStr = serialized.substring(1, lastParen);
@@ -406,8 +428,9 @@ class ConditionGroup extends Condition with EquatableMixin {
   @override
   String toReadableString(String? Function(String qid) promptProvider) {
     final opWord = op == GroupOp.all ? 'ALL of' : 'ONE of';
-    final conditionStrings =
-        conditions.map((c) => c.toReadableString(promptProvider)).toList();
+    final conditionStrings = conditions
+        .map((c) => c.toReadableString(promptProvider))
+        .toList();
     if (conditionStrings.length == 1) {
       return conditionStrings.first;
     }

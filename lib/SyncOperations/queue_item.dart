@@ -76,7 +76,8 @@ enum SyncType {
   detailResponse,
   blueDyeResponse,
   subUser,
-  blueDyeState;
+  blueDyeState,
+  entry;
 
   String get name {
     switch (this) {
@@ -88,6 +89,8 @@ enum SyncType {
         return 'SubUser';
       case SyncType.blueDyeState:
         return 'BlueDyeState';
+      case SyncType.entry:
+        return 'Entry';
     }
   }
 

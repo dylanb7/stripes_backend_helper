@@ -1,5 +1,6 @@
 /// Utilities for baseline response ID encoding/decoding.
-/// Format: baseline::{questionId}::v{version}
+/// New IDs include a profile: baseline::{questionId}::v{version}::{profileId}.
+/// Legacy unscoped IDs remain readable.
 /// Example: baseline::seizure-types::v1
 class BaselineId {
   static const String prefix = 'baseline';
@@ -7,14 +8,19 @@ class BaselineId {
 
   BaselineId._();
 
-  static String create(String questionId, int version) {
+  static String create(String questionId, int version, {String? subUserId}) {
+    if (subUserId != null) {
+      if (subUserId.isEmpty) throw ArgumentError.value(subUserId, 'subUserId');
+      return '$prefix$separator$questionId${separator}v$version$separator${Uri.encodeComponent(subUserId)}';
+    }
     return '$prefix$separator$questionId${separator}v$version';
   }
 
   static ({String questionId, int version})? parse(String id) {
     if (!id.startsWith('$prefix$separator')) return null;
     final parts = id.split(separator);
-    if (parts.length != 3) return null;
+    if (parts.length != 3 && parts.length != 4) return null;
+    if (parts.length == 4 && parts[3].isEmpty) return null;
     final versionStr = parts[2];
     if (!versionStr.startsWith('v')) return null;
     final version = int.tryParse(versionStr.substring(1));

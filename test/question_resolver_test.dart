@@ -324,6 +324,7 @@ void main() {
       final generated = parentQuestion.resolve(current: detailResponse);
 
       expect(generated.length, 2);
+      expect(generated.every((question) => question.isRequired), isTrue);
 
       // First generated question
       expect(generated[0], isA<MultipleChoice>());

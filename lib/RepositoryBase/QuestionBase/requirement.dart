@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show immutable;
+import 'package:stripes_backend_helper/QuestionModel/response.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/condition.dart';
-import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_listener.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/session_data.dart';
 import 'package:yaml/yaml.dart';
 
 export 'condition.dart';
@@ -34,16 +35,19 @@ class Requirement with EquatableMixin {
   Requirement oneOf(List<Condition> conditions) => Requirement(
       [...groups, ConditionGroup(conditions: conditions, op: GroupOp.one)]);
 
-  bool eval(QuestionsListener listener, {String? contextId}) {
+  bool evalResponses(Map<String, Response> responses, {String? contextId}) {
     if (groups.isEmpty) return true;
 
     for (final group in groups) {
-      if (!group.evaluateWithListener(listener, contextId: contextId)) {
+      if (!group.evaluateWithResponses(responses, contextId: contextId)) {
         return false;
       }
     }
     return true;
   }
+
+  bool eval(SessionData data, {String? contextId}) =>
+      evalResponses(data.responses, contextId: contextId);
 
   String toReadableString(String? Function(String qid) promptProvider) {
     if (groups.isEmpty) return 'No requirements';

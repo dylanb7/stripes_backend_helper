@@ -28,6 +28,7 @@ enum Period {
   }
 
   DateTime getValue(DateTime entry) {
+    entry = entry.toLocal();
     switch (this) {
       case Period.day:
         return DateTime(entry.year, entry.month, entry.day);
@@ -99,6 +100,7 @@ int daysInMonth(DateTime date) {
 }
 
 DateTime previous(DateTime date, int day) {
+  date = date.toLocal();
   if (day == date.weekday) {
     return date;
   } else {

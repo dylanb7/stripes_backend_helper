@@ -115,7 +115,7 @@ void main() {
       );
 
       // Baseline response containing the types from baseline
-      final baselineQuestion = AllThatApply(
+      const baselineQuestion = AllThatApply(
           id: 'baselineTypes',
           prompt: 'Select types',
           type: 'Seizure',
@@ -124,7 +124,7 @@ void main() {
       final baselineResp = AllResponse(
           question: baselineQuestion,
           stamp: 1,
-          responses: [0, 2] // Selected Type A and Type C
+          responses: const [0, 2] // Selected Type A and Type C
           );
 
       final baseline = DetailResponse(

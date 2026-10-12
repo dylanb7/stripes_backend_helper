@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show immutable;
+import 'package:stripes_backend_helper/QuestionModel/response.dart';
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/condition.dart';
-import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_listener.dart';
+import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/session_data.dart';
 import 'package:yaml/yaml.dart';
 
 export 'condition.dart';
@@ -20,14 +21,16 @@ class DependsOn with EquatableMixin {
   DependsOn oneOf(List<Condition> conditions) => DependsOn(
       [...groups, ConditionGroup(conditions: conditions, op: GroupOp.one)]);
 
-  bool eval(QuestionsListener listener) {
+  bool evalResponses(Map<String, Response> responses) {
     if (groups.isEmpty) return true;
 
     for (final group in groups) {
-      if (!group.evaluateWithListener(listener)) return false;
+      if (!group.evaluateWithResponses(responses)) return false;
     }
     return true;
   }
+
+  bool eval(SessionData data) => evalResponses(data.responses);
 
   String toReadableString(String? Function(String qid) promptProvider) {
     if (groups.isEmpty) return 'Always shown';

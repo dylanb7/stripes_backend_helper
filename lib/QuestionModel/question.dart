@@ -6,14 +6,20 @@ import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/question_repo
 import 'package:stripes_backend_helper/RepositoryBase/QuestionBase/requirement.dart';
 
 @immutable
-sealed class Question with EquatableMixin {
+sealed class Question with Equatable {
   final String id;
 
   final String prompt;
 
   final String type;
 
-  final bool userCreated, isAddition, deleted, enabled, locked, isBaseline;
+  final bool isRequired,
+      userCreated,
+      isAddition,
+      deleted,
+      enabled,
+      locked,
+      isBaseline;
 
   final DependsOn? dependsOn;
 
@@ -25,21 +31,28 @@ sealed class Question with EquatableMixin {
 
   final Map<String, String>? interpolations;
 
-  const Question(
-      {required this.id,
-      required this.prompt,
-      required this.type,
-      this.enabled = true,
-      this.locked = false,
-      this.userCreated = false,
-      this.isAddition = false,
-      this.deleted = false,
-      this.isBaseline = false,
-      this.dependsOn,
-      this.requirement,
-      this.fromBaseline,
-      this.transform,
-      this.interpolations});
+  /// Baseline question IDs whose previous answers should be shown as
+  /// contextual reference when presenting this question in the UI.
+  final List<String>? baselineContext;
+
+  const Question({
+    required this.id,
+    required this.prompt,
+    required this.type,
+    this.enabled = true,
+    this.locked = false,
+    this.userCreated = false,
+    this.isAddition = false,
+    this.deleted = false,
+    this.isBaseline = false,
+    this.isRequired = false,
+    this.dependsOn,
+    this.requirement,
+    this.fromBaseline,
+    this.transform,
+    this.interpolations,
+    this.baselineContext,
+  });
 
   factory Question.ofType({required String type}) =>
       Check(id: '', prompt: '', type: type);
@@ -47,22 +60,27 @@ sealed class Question with EquatableMixin {
   static Question empty() => const Check(id: 'empty', prompt: '', type: '');
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'prompt': prompt,
-        'type': type,
-        'userCreated': userCreated ? 1 : 0,
-        'isAddition': isAddition ? 1 : 0,
-        'deleted': deleted ? 1 : 0,
-        'enabled': enabled ? 1 : 0,
-        'isBaseline': isBaseline ? 1 : 0,
-        'fromBaseline': fromBaseline,
-        'transform': transform,
-        'interpolations':
-            interpolations != null ? jsonEncode(interpolations) : null,
-        'questionType': QuestionType.from(this).id,
-        'dependsOn': dependsOn?.toString(),
-        'requirement': requirement?.toString(),
-      };
+    'id': id,
+    'prompt': prompt,
+    'type': type,
+    'isRequired': isRequired ? 1 : 0,
+    'userCreated': userCreated ? 1 : 0,
+    'isAddition': isAddition ? 1 : 0,
+    'deleted': deleted ? 1 : 0,
+    'enabled': enabled ? 1 : 0,
+    'isBaseline': isBaseline ? 1 : 0,
+    'fromBaseline': fromBaseline,
+    'transform': transform,
+    'interpolations': interpolations != null
+        ? jsonEncode(interpolations)
+        : null,
+    'baselineContext': baselineContext != null
+        ? jsonEncode(baselineContext)
+        : null,
+    'questionType': QuestionType.from(this).id,
+    'dependsOn': dependsOn?.toString(),
+    'requirement': requirement?.toString(),
+  };
 
   factory Question.fromJson(Map<String, dynamic> json) {
     final questionType = json['questionType'];
@@ -93,44 +111,56 @@ sealed class Question with EquatableMixin {
     return null;
   }
 
+  static List<String>? parseBaselineContext(dynamic value) {
+    if (value == null) return null;
+    if (value is List) return List<String>.from(value);
+    if (value is String) {
+      try {
+        return List<String>.from(jsonDecode(value) as List);
+      } catch (_) {
+        return null;
+      }
+    }
+    return null;
+  }
+
   @override
   List<Object?> get props => [
-        id,
-        prompt,
-        type,
-        deleted,
-        userCreated,
-        isBaseline,
-        fromBaseline,
-        transform,
-        interpolations,
-        dependsOn,
-        requirement
-      ];
+    id,
+    prompt,
+    type,
+    isRequired,
+    deleted,
+    userCreated,
+    isBaseline,
+    fromBaseline,
+    transform,
+    interpolations,
+    baselineContext,
+    dependsOn,
+    requirement,
+  ];
 }
 
 class FreeResponse extends Question {
-  const FreeResponse(
-      {required String id,
-      required String prompt,
-      required String type,
-      super.userCreated,
-      super.locked,
-      super.isAddition,
-      super.deleted,
-      super.enabled,
-      super.isBaseline,
-      super.fromBaseline,
-      super.transform,
-      super.interpolations,
-      super.dependsOn,
-      super.requirement,
-      bool? isRequired})
-      : super(
-          id: id,
-          prompt: prompt,
-          type: type,
-        );
+  const FreeResponse({
+    required super.id,
+    required super.prompt,
+    required super.type,
+    super.userCreated,
+    super.locked,
+    super.isAddition,
+    super.deleted,
+    super.enabled,
+    super.isBaseline,
+    super.fromBaseline,
+    super.transform,
+    super.interpolations,
+    super.baselineContext,
+    super.dependsOn,
+    super.requirement,
+    bool? isRequired,
+  }) : super(isRequired: isRequired ?? false);
 
   factory FreeResponse.fromJson(Map<String, dynamic> json) {
     return FreeResponse(
@@ -146,16 +176,13 @@ class FreeResponse extends Question {
       fromBaseline: json['fromBaseline'],
       transform: json['transform'],
       interpolations: Question.parseInterpolations(json['interpolations']),
+      baselineContext: Question.parseBaselineContext(json['baselineContext']),
       dependsOn: json["dependsOn"] == null
           ? const DependsOn.nothing()
-          : DependsOn.fromString(
-              json["dependsOn"],
-            ),
+          : DependsOn.fromString(json["dependsOn"]),
       requirement: json["requirement"] == null
           ? const Requirement.nothing()
-          : Requirement.fromString(
-              json["requirement"],
-            ),
+          : Requirement.fromString(json["requirement"]),
     );
   }
 
@@ -172,6 +199,7 @@ class FreeResponse extends Question {
     String? fromBaseline,
     String? transform,
     Map<String, String>? interpolations,
+    List<String>? baselineContext,
     DependsOn? dependsOn,
     Requirement? requirement,
     bool? isRequired,
@@ -189,37 +217,36 @@ class FreeResponse extends Question {
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
       interpolations: interpolations ?? this.interpolations,
+      baselineContext: baselineContext ?? this.baselineContext,
       dependsOn: dependsOn ?? this.dependsOn,
       requirement: requirement ?? this.requirement,
+      isRequired: isRequired ?? this.isRequired,
     );
   }
 }
 
 class Numeric extends Question {
   final num? min, max;
-  const Numeric(
-      {required String id,
-      required String prompt,
-      required String type,
-      super.userCreated,
-      super.locked,
-      super.isAddition,
-      super.deleted,
-      super.enabled,
-      super.isBaseline,
-      super.fromBaseline,
-      super.transform,
-      super.interpolations,
-      super.dependsOn,
-      super.requirement,
-      bool? isRequired,
-      this.min,
-      this.max})
-      : super(
-          id: id,
-          prompt: prompt,
-          type: type,
-        );
+  const Numeric({
+    required super.id,
+    required super.prompt,
+    required super.type,
+    super.userCreated,
+    super.locked,
+    super.isAddition,
+    super.deleted,
+    super.enabled,
+    super.isBaseline,
+    super.fromBaseline,
+    super.transform,
+    super.interpolations,
+    super.baselineContext,
+    super.dependsOn,
+    super.requirement,
+    bool? isRequired,
+    this.min,
+    this.max,
+  }) : super(isRequired: isRequired ?? false);
 
   factory Numeric.fromJson(Map<String, dynamic> json) {
     return Numeric(
@@ -237,16 +264,13 @@ class Numeric extends Question {
       fromBaseline: json['fromBaseline'],
       transform: json['transform'],
       interpolations: Question.parseInterpolations(json['interpolations']),
+      baselineContext: Question.parseBaselineContext(json['baselineContext']),
       dependsOn: json["dependsOn"] == null
           ? const DependsOn.nothing()
-          : DependsOn.fromString(
-              json["dependsOn"],
-            ),
+          : DependsOn.fromString(json["dependsOn"]),
       requirement: json["requirement"] == null
           ? const Requirement.nothing()
-          : Requirement.fromString(
-              json["requirement"],
-            ),
+          : Requirement.fromString(json["requirement"]),
     );
   }
 
@@ -266,6 +290,7 @@ class Numeric extends Question {
     String? fromBaseline,
     String? transform,
     Map<String, String>? interpolations,
+    List<String>? baselineContext,
     DependsOn? dependsOn,
     Requirement? requirement,
     bool? isRequired,
@@ -285,8 +310,10 @@ class Numeric extends Question {
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
       interpolations: interpolations ?? this.interpolations,
+      baselineContext: baselineContext ?? this.baselineContext,
       dependsOn: dependsOn ?? this.dependsOn,
       requirement: requirement ?? this.requirement,
+      isRequired: isRequired ?? this.isRequired,
       min: min ?? this.min,
       max: max ?? this.max,
     );
@@ -303,9 +330,9 @@ class Numeric extends Question {
 
 class Check extends Question {
   const Check({
-    required String id,
-    required String prompt,
-    required String type,
+    required super.id,
+    required super.prompt,
+    required super.type,
     super.isAddition,
     super.locked,
     super.userCreated,
@@ -315,19 +342,18 @@ class Check extends Question {
     super.fromBaseline,
     super.transform,
     super.interpolations,
+    super.baselineContext,
     super.dependsOn,
     super.requirement,
-  }) : super(
-          id: id,
-          prompt: prompt,
-          type: type,
-        );
+    bool? isRequired,
+  }) : super(isRequired: isRequired ?? false);
 
   factory Check.fromJson(Map<String, dynamic> json) {
     return Check(
       id: json['id'],
       prompt: json['prompt'],
       type: json['type'],
+      isRequired: json['isRequired'] == 1,
       userCreated: json['userCreated'] == 1,
       isAddition: json['isAddition'] == 1,
       deleted: json['deleted'] == 1,
@@ -336,16 +362,13 @@ class Check extends Question {
       fromBaseline: json['fromBaseline'],
       transform: json['transform'],
       interpolations: Question.parseInterpolations(json['interpolations']),
+      baselineContext: Question.parseBaselineContext(json['baselineContext']),
       dependsOn: json["dependsOn"] == null
           ? const DependsOn.nothing()
-          : DependsOn.fromString(
-              json["dependsOn"],
-            ),
+          : DependsOn.fromString(json["dependsOn"]),
       requirement: json["requirement"] == null
           ? const Requirement.nothing()
-          : Requirement.fromString(
-              json["requirement"],
-            ),
+          : Requirement.fromString(json["requirement"]),
     );
   }
 
@@ -362,6 +385,7 @@ class Check extends Question {
     String? fromBaseline,
     String? transform,
     Map<String, String>? interpolations,
+    List<String>? baselineContext,
     DependsOn? dependsOn,
     Requirement? requirement,
     bool? isRequired,
@@ -379,8 +403,10 @@ class Check extends Question {
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
       interpolations: interpolations ?? this.interpolations,
+      baselineContext: baselineContext ?? this.baselineContext,
       dependsOn: dependsOn ?? this.dependsOn,
       requirement: requirement ?? this.requirement,
+      isRequired: isRequired ?? this.isRequired,
     );
   }
 }
@@ -388,28 +414,25 @@ class Check extends Question {
 class MultipleChoice extends Question {
   final List<String> choices;
 
-  const MultipleChoice(
-      {required String id,
-      required String prompt,
-      required String type,
-      required this.choices,
-      super.deleted,
-      super.locked,
-      super.isAddition,
-      super.userCreated,
-      super.enabled,
-      super.isBaseline,
-      super.fromBaseline,
-      super.transform,
-      super.interpolations,
-      super.dependsOn,
-      super.requirement,
-      bool? isRequired})
-      : super(
-          id: id,
-          prompt: prompt,
-          type: type,
-        );
+  const MultipleChoice({
+    required super.id,
+    required super.prompt,
+    required super.type,
+    required this.choices,
+    super.deleted,
+    super.locked,
+    super.isAddition,
+    super.userCreated,
+    super.enabled,
+    super.isBaseline,
+    super.fromBaseline,
+    super.transform,
+    super.interpolations,
+    super.baselineContext,
+    super.dependsOn,
+    super.requirement,
+    bool? isRequired,
+  }) : super(isRequired: isRequired ?? false);
 
   factory MultipleChoice.fromJson(Map<String, dynamic> json) {
     return MultipleChoice(
@@ -428,16 +451,13 @@ class MultipleChoice extends Question {
       fromBaseline: json['fromBaseline'],
       transform: json['transform'],
       interpolations: Question.parseInterpolations(json['interpolations']),
+      baselineContext: Question.parseBaselineContext(json['baselineContext']),
       dependsOn: json["dependsOn"] == null
           ? const DependsOn.nothing()
-          : DependsOn.fromString(
-              json["dependsOn"],
-            ),
+          : DependsOn.fromString(json["dependsOn"]),
       requirement: json["requirement"] == null
           ? const Requirement.nothing()
-          : Requirement.fromString(
-              json["requirement"],
-            ),
+          : Requirement.fromString(json["requirement"]),
     );
   }
 
@@ -458,6 +478,7 @@ class MultipleChoice extends Question {
     String? fromBaseline,
     String? transform,
     Map<String, String>? interpolations,
+    List<String>? baselineContext,
     DependsOn? dependsOn,
     Requirement? requirement,
     bool? isRequired,
@@ -476,8 +497,10 @@ class MultipleChoice extends Question {
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
       interpolations: interpolations ?? this.interpolations,
+      baselineContext: baselineContext ?? this.baselineContext,
       dependsOn: dependsOn ?? this.dependsOn,
       requirement: requirement ?? this.requirement,
+      isRequired: isRequired ?? this.isRequired,
     );
   }
 
@@ -493,9 +516,9 @@ class AllThatApply extends Question {
   final List<String> choices;
 
   const AllThatApply({
-    required String id,
-    required String prompt,
-    required String type,
+    required super.id,
+    required super.prompt,
+    required super.type,
     required this.choices,
     super.isAddition,
     super.locked,
@@ -506,19 +529,18 @@ class AllThatApply extends Question {
     super.fromBaseline,
     super.transform,
     super.interpolations,
+    super.baselineContext,
     super.dependsOn,
     super.requirement,
-  }) : super(
-          id: id,
-          prompt: prompt,
-          type: type,
-        );
+    bool? isRequired,
+  }) : super(isRequired: isRequired ?? false);
 
   factory AllThatApply.fromJson(Map<String, dynamic> json) {
     return AllThatApply(
       id: json['id'],
       prompt: json['prompt'],
       type: json['type'],
+      isRequired: json['isRequired'] == 1,
       choices: json['choices'] is String
           ? (json['choices'] as String).split(',')
           : [],
@@ -530,16 +552,13 @@ class AllThatApply extends Question {
       fromBaseline: json['fromBaseline'],
       transform: json['transform'],
       interpolations: Question.parseInterpolations(json['interpolations']),
+      baselineContext: Question.parseBaselineContext(json['baselineContext']),
       dependsOn: json["dependsOn"] == null
           ? const DependsOn.nothing()
-          : DependsOn.fromString(
-              json["dependsOn"],
-            ),
+          : DependsOn.fromString(json["dependsOn"]),
       requirement: json["requirement"] == null
           ? const Requirement.nothing()
-          : Requirement.fromString(
-              json["requirement"],
-            ),
+          : Requirement.fromString(json["requirement"]),
     );
   }
 
@@ -560,6 +579,7 @@ class AllThatApply extends Question {
     String? fromBaseline,
     String? transform,
     Map<String, String>? interpolations,
+    List<String>? baselineContext,
     DependsOn? dependsOn,
     Requirement? requirement,
     bool? isRequired,
@@ -578,8 +598,10 @@ class AllThatApply extends Question {
       fromBaseline: fromBaseline ?? this.fromBaseline,
       transform: transform ?? this.transform,
       interpolations: interpolations ?? this.interpolations,
+      baselineContext: baselineContext ?? this.baselineContext,
       dependsOn: dependsOn ?? this.dependsOn,
       requirement: requirement ?? this.requirement,
+      isRequired: isRequired ?? this.isRequired,
     );
   }
 
@@ -646,6 +668,6 @@ enum QuestionType {
     freeResponse,
     slider,
     multipleChoice,
-    allThatApply
+    allThatApply,
   ];
 }

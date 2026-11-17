@@ -11,6 +11,13 @@ sealed class Question with Equatable {
 
   final String prompt;
 
+  /// Optional concise prompt or translation key for compact history previews.
+  /// The full [prompt] remains the fallback and accessible question text.
+  final String? shortPrompt;
+
+  /// Optional preview order. Lower values appear first; null uses UI defaults.
+  final int? previewPriority;
+
   final String type;
 
   final bool isRequired,
@@ -38,6 +45,8 @@ sealed class Question with Equatable {
   const Question({
     required this.id,
     required this.prompt,
+    this.shortPrompt,
+    this.previewPriority,
     required this.type,
     this.enabled = true,
     this.locked = false,
@@ -62,6 +71,8 @@ sealed class Question with Equatable {
   Map<String, dynamic> toJson() => {
     'id': id,
     'prompt': prompt,
+    'shortPrompt': shortPrompt,
+    'previewPriority': previewPriority,
     'type': type,
     'isRequired': isRequired ? 1 : 0,
     'userCreated': userCreated ? 1 : 0,
@@ -98,6 +109,16 @@ sealed class Question with Equatable {
     }
   }
 
+  /// Optional presentation metadata never makes a question unloadable.
+  static String? parseShortPrompt(dynamic value) {
+    if (value is! String) return null;
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
+
+  static int? parsePreviewPriority(dynamic value) =>
+      value is int ? value : null;
+
   static Map<String, String>? parseInterpolations(dynamic value) {
     if (value == null) return null;
     if (value is Map) return Map<String, String>.from(value);
@@ -128,6 +149,8 @@ sealed class Question with Equatable {
   List<Object?> get props => [
     id,
     prompt,
+    shortPrompt,
+    previewPriority,
     type,
     isRequired,
     deleted,
@@ -146,6 +169,8 @@ class FreeResponse extends Question {
   const FreeResponse({
     required super.id,
     required super.prompt,
+    super.shortPrompt,
+    super.previewPriority,
     required super.type,
     super.userCreated,
     super.locked,
@@ -166,6 +191,8 @@ class FreeResponse extends Question {
     return FreeResponse(
       id: json['id'],
       prompt: json['prompt'],
+      shortPrompt: Question.parseShortPrompt(json['shortPrompt']),
+      previewPriority: Question.parsePreviewPriority(json['previewPriority']),
       type: json['type'],
       isRequired: json['isRequired'] == 1,
       userCreated: json['userCreated'] == 1,
@@ -189,6 +216,8 @@ class FreeResponse extends Question {
   FreeResponse copyWith({
     String? id,
     String? prompt,
+    String? shortPrompt,
+    int? previewPriority,
     String? type,
     bool? userCreated,
     bool? locked,
@@ -207,6 +236,8 @@ class FreeResponse extends Question {
     return FreeResponse(
       id: id ?? this.id,
       prompt: prompt ?? this.prompt,
+      shortPrompt: shortPrompt ?? this.shortPrompt,
+      previewPriority: previewPriority ?? this.previewPriority,
       type: type ?? this.type,
       userCreated: userCreated ?? this.userCreated,
       locked: locked ?? this.locked,
@@ -230,6 +261,8 @@ class Numeric extends Question {
   const Numeric({
     required super.id,
     required super.prompt,
+    super.shortPrompt,
+    super.previewPriority,
     required super.type,
     super.userCreated,
     super.locked,
@@ -252,6 +285,8 @@ class Numeric extends Question {
     return Numeric(
       id: json['id'],
       prompt: json['prompt'],
+      shortPrompt: Question.parseShortPrompt(json['shortPrompt']),
+      previewPriority: Question.parsePreviewPriority(json['previewPriority']),
       type: json['type'],
       min: json['min'],
       max: json['max'],
@@ -280,6 +315,8 @@ class Numeric extends Question {
   Numeric copyWith({
     String? id,
     String? prompt,
+    String? shortPrompt,
+    int? previewPriority,
     String? type,
     bool? userCreated,
     bool? locked,
@@ -300,6 +337,8 @@ class Numeric extends Question {
     return Numeric(
       id: id ?? this.id,
       prompt: prompt ?? this.prompt,
+      shortPrompt: shortPrompt ?? this.shortPrompt,
+      previewPriority: previewPriority ?? this.previewPriority,
       type: type ?? this.type,
       userCreated: userCreated ?? this.userCreated,
       locked: locked ?? this.locked,
@@ -332,6 +371,8 @@ class Check extends Question {
   const Check({
     required super.id,
     required super.prompt,
+    super.shortPrompt,
+    super.previewPriority,
     required super.type,
     super.isAddition,
     super.locked,
@@ -352,6 +393,8 @@ class Check extends Question {
     return Check(
       id: json['id'],
       prompt: json['prompt'],
+      shortPrompt: Question.parseShortPrompt(json['shortPrompt']),
+      previewPriority: Question.parsePreviewPriority(json['previewPriority']),
       type: json['type'],
       isRequired: json['isRequired'] == 1,
       userCreated: json['userCreated'] == 1,
@@ -375,6 +418,8 @@ class Check extends Question {
   Check copyWith({
     String? id,
     String? prompt,
+    String? shortPrompt,
+    int? previewPriority,
     String? type,
     bool? isAddition,
     bool? locked,
@@ -393,6 +438,8 @@ class Check extends Question {
     return Check(
       id: id ?? this.id,
       prompt: prompt ?? this.prompt,
+      shortPrompt: shortPrompt ?? this.shortPrompt,
+      previewPriority: previewPriority ?? this.previewPriority,
       type: type ?? this.type,
       isAddition: isAddition ?? this.isAddition,
       locked: locked ?? this.locked,
@@ -417,6 +464,8 @@ class MultipleChoice extends Question {
   const MultipleChoice({
     required super.id,
     required super.prompt,
+    super.shortPrompt,
+    super.previewPriority,
     required super.type,
     required this.choices,
     super.deleted,
@@ -438,6 +487,8 @@ class MultipleChoice extends Question {
     return MultipleChoice(
       id: json['id'],
       prompt: json['prompt'],
+      shortPrompt: Question.parseShortPrompt(json['shortPrompt']),
+      previewPriority: Question.parsePreviewPriority(json['previewPriority']),
       type: json['type'],
       choices: json['choices'] is String
           ? (json['choices'] as String).split(',')
@@ -467,6 +518,8 @@ class MultipleChoice extends Question {
   MultipleChoice copyWith({
     String? id,
     String? prompt,
+    String? shortPrompt,
+    int? previewPriority,
     String? type,
     List<String>? choices,
     bool? deleted,
@@ -486,6 +539,8 @@ class MultipleChoice extends Question {
     return MultipleChoice(
       id: id ?? this.id,
       prompt: prompt ?? this.prompt,
+      shortPrompt: shortPrompt ?? this.shortPrompt,
+      previewPriority: previewPriority ?? this.previewPriority,
       type: type ?? this.type,
       choices: choices ?? this.choices,
       deleted: deleted ?? this.deleted,
@@ -518,6 +573,8 @@ class AllThatApply extends Question {
   const AllThatApply({
     required super.id,
     required super.prompt,
+    super.shortPrompt,
+    super.previewPriority,
     required super.type,
     required this.choices,
     super.isAddition,
@@ -539,6 +596,8 @@ class AllThatApply extends Question {
     return AllThatApply(
       id: json['id'],
       prompt: json['prompt'],
+      shortPrompt: Question.parseShortPrompt(json['shortPrompt']),
+      previewPriority: Question.parsePreviewPriority(json['previewPriority']),
       type: json['type'],
       isRequired: json['isRequired'] == 1,
       choices: json['choices'] is String
@@ -568,6 +627,8 @@ class AllThatApply extends Question {
   AllThatApply copyWith({
     String? id,
     String? prompt,
+    String? shortPrompt,
+    int? previewPriority,
     String? type,
     List<String>? choices,
     bool? isAddition,
@@ -587,6 +648,8 @@ class AllThatApply extends Question {
     return AllThatApply(
       id: id ?? this.id,
       prompt: prompt ?? this.prompt,
+      shortPrompt: shortPrompt ?? this.shortPrompt,
+      previewPriority: previewPriority ?? this.previewPriority,
       type: type ?? this.type,
       choices: choices ?? this.choices,
       isAddition: isAddition ?? this.isAddition,

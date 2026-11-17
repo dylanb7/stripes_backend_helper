@@ -111,6 +111,8 @@ List<Question> loadInQuestions({
     final QuestionType kind = QuestionType.fromString(q['kind']);
 
     final promptKey = q['promptKey'] as String;
+    final shortPrompt = Question.parseShortPrompt(q['shortPromptKey']);
+    final previewPriority = Question.parsePreviewPriority(q['previewPriority']);
 
     final bool isRequired = boolVal(q['isRequired']);
     DependsOn dependsOn = const DependsOn.nothing();
@@ -147,6 +149,8 @@ List<Question> loadInQuestions({
           FreeResponse(
             id: id,
             prompt: promptKey,
+            shortPrompt: shortPrompt,
+            previewPriority: previewPriority,
             type: type,
             isRequired: isRequired,
             dependsOn: dependsOn,
@@ -164,6 +168,8 @@ List<Question> loadInQuestions({
           Numeric(
             id: id,
             prompt: promptKey,
+            shortPrompt: shortPrompt,
+            previewPriority: previewPriority,
             type: type,
             min: q['min'],
             max: q['max'],
@@ -183,6 +189,8 @@ List<Question> loadInQuestions({
           Check(
             id: id,
             prompt: promptKey,
+            shortPrompt: shortPrompt,
+            previewPriority: previewPriority,
             type: type,
             isRequired: isRequired,
             dependsOn: dependsOn,
@@ -206,6 +214,8 @@ List<Question> loadInQuestions({
             MultipleChoice(
               id: id,
               prompt: promptKey,
+              shortPrompt: shortPrompt,
+              previewPriority: previewPriority,
               type: type,
               choices: choices,
               isRequired: isRequired,
@@ -222,6 +232,8 @@ List<Question> loadInQuestions({
             AllThatApply(
               id: id,
               prompt: promptKey,
+              shortPrompt: shortPrompt,
+              previewPriority: previewPriority,
               type: type,
               choices: choices,
               isRequired: isRequired,

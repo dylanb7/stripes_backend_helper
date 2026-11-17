@@ -225,6 +225,8 @@ class GenerateForEach extends Transform with EquatableMixin {
 @immutable
 class GeneratedDefinition with EquatableMixin {
   final String? prompt;
+  final String? shortPrompt;
+  final int? previewPriority;
   final String? questionType;
   final num? min;
   final num? max;
@@ -234,6 +236,8 @@ class GeneratedDefinition with EquatableMixin {
 
   const GeneratedDefinition({
     this.prompt,
+    this.shortPrompt,
+    this.previewPriority,
     this.questionType,
     this.min,
     this.max,
@@ -249,6 +253,13 @@ class GeneratedDefinition with EquatableMixin {
     Map<String, String> interpolations,
   ) {
     final defPrompt = prompt ?? template.prompt;
+    // A new question prompt may have a different meaning from the template.
+    // Reuse its shorthand and ordering only while the prompt is unchanged.
+    final inheritsPrompt = prompt == null || prompt == template.prompt;
+    final effectiveShortPrompt =
+        shortPrompt ?? (inheritsPrompt ? template.shortPrompt : null);
+    final effectivePreviewPriority =
+        previewPriority ?? (inheritsPrompt ? template.previewPriority : null);
 
     final type = questionType ?? template.type;
 
@@ -256,75 +267,91 @@ class GeneratedDefinition with EquatableMixin {
 
     return switch (type) {
       'FreeResponse' => FreeResponse(
-          id: newId,
-          prompt: defPrompt,
-          type: template.type,
-          userCreated: template.userCreated,
-          isRequired: isRequired ?? template.isRequired,
-          requirement: effectiveRequirement,
-          interpolations: interpolations,
-        ),
+        id: newId,
+        prompt: defPrompt,
+        shortPrompt: effectiveShortPrompt,
+        previewPriority: effectivePreviewPriority,
+        type: template.type,
+        userCreated: template.userCreated,
+        isRequired: isRequired ?? template.isRequired,
+        requirement: effectiveRequirement,
+        interpolations: interpolations,
+      ),
       'Numeric' => Numeric(
-          id: newId,
-          prompt: defPrompt,
-          type: template.type,
-          userCreated: template.userCreated,
-          isRequired: isRequired ?? template.isRequired,
-          requirement: effectiveRequirement,
-          interpolations: interpolations,
-          min: min,
-          max: max,
-        ),
+        id: newId,
+        prompt: defPrompt,
+        shortPrompt: effectiveShortPrompt,
+        previewPriority: effectivePreviewPriority,
+        type: template.type,
+        userCreated: template.userCreated,
+        isRequired: isRequired ?? template.isRequired,
+        requirement: effectiveRequirement,
+        interpolations: interpolations,
+        min: min,
+        max: max,
+      ),
       'Check' => Check(
-          id: newId,
-          prompt: defPrompt,
-          type: template.type,
-          userCreated: template.userCreated,
-          isRequired: isRequired ?? template.isRequired,
-          requirement: effectiveRequirement,
-          interpolations: interpolations,
-        ),
+        id: newId,
+        prompt: defPrompt,
+        shortPrompt: effectiveShortPrompt,
+        previewPriority: effectivePreviewPriority,
+        type: template.type,
+        userCreated: template.userCreated,
+        isRequired: isRequired ?? template.isRequired,
+        requirement: effectiveRequirement,
+        interpolations: interpolations,
+      ),
       'MultipleChoice' => MultipleChoice(
-          id: newId,
-          prompt: defPrompt,
-          type: template.type,
-          userCreated: template.userCreated,
-          isRequired: isRequired ?? template.isRequired,
-          requirement: effectiveRequirement,
-          interpolations: interpolations,
-          choices: choices ?? [],
-        ),
+        id: newId,
+        prompt: defPrompt,
+        shortPrompt: effectiveShortPrompt,
+        previewPriority: effectivePreviewPriority,
+        type: template.type,
+        userCreated: template.userCreated,
+        isRequired: isRequired ?? template.isRequired,
+        requirement: effectiveRequirement,
+        interpolations: interpolations,
+        choices: choices ?? [],
+      ),
       'AllThatApply' => AllThatApply(
-          id: newId,
-          prompt: defPrompt,
-          type: template.type,
-          userCreated: template.userCreated,
-          isRequired: isRequired ?? template.isRequired,
-          requirement: effectiveRequirement,
-          interpolations: interpolations,
-          choices: choices ?? [],
-        ),
+        id: newId,
+        prompt: defPrompt,
+        shortPrompt: effectiveShortPrompt,
+        previewPriority: effectivePreviewPriority,
+        type: template.type,
+        userCreated: template.userCreated,
+        isRequired: isRequired ?? template.isRequired,
+        requirement: effectiveRequirement,
+        interpolations: interpolations,
+        choices: choices ?? [],
+      ),
       _ => _copyQuestionWithIdAndInterpolations(
-          template,
-          newId,
-          interpolations,
-        ),
+        template,
+        newId,
+        interpolations,
+      ),
     };
   }
 
   Map<String, dynamic> toJson() => {
-        if (prompt != null) 'prompt': prompt,
-        if (questionType != null) 'type': questionType,
-        if (min != null) 'min': min,
-        if (max != null) 'max': max,
-        if (choices != null) 'choices': choices,
-        if (isRequired != null) 'isRequired': isRequired,
-        if (requirement != null) 'requirement': requirement.toString(),
-      };
+    if (prompt != null) 'prompt': prompt,
+    if (shortPrompt != null) 'shortPrompt': shortPrompt,
+    if (previewPriority != null) 'previewPriority': previewPriority,
+    if (questionType != null) 'type': questionType,
+    if (min != null) 'min': min,
+    if (max != null) 'max': max,
+    if (choices != null) 'choices': choices,
+    if (isRequired != null) 'isRequired': isRequired,
+    if (requirement != null) 'requirement': requirement.toString(),
+  };
 
   static GeneratedDefinition fromJson(Map<String, dynamic> json) =>
       GeneratedDefinition(
         prompt: json[TransformKeys.prompt] as String?,
+        shortPrompt: Question.parseShortPrompt(
+          json['shortPromptKey'] ?? json['shortPrompt'],
+        ),
+        previewPriority: Question.parsePreviewPriority(json['previewPriority']),
         questionType: json[TransformKeys.type] as String?,
         min: json[TransformKeys.min] as num?,
         max: json[TransformKeys.max] as num?,
@@ -338,8 +365,17 @@ class GeneratedDefinition with EquatableMixin {
       );
 
   @override
-  List<Object?> get props =>
-      [prompt, questionType, min, max, choices, requirement, isRequired];
+  List<Object?> get props => [
+    prompt,
+    shortPrompt,
+    previewPriority,
+    questionType,
+    min,
+    max,
+    choices,
+    requirement,
+    isRequired,
+  ];
 }
 
 // Helper functions

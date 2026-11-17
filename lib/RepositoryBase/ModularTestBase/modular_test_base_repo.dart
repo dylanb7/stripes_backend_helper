@@ -16,6 +16,13 @@ class ModularTestsRepo {
 
   final BehaviorSubject<List<ActiveTestProtocol>> _protocolsSubject =
       BehaviorSubject();
+  bool _disposed = false;
+  bool _loading = false;
+  bool _loadFailed = false;
+  late Future<void> _ready;
+
+  /// Completes when the current persisted-protocol load finishes.
+  Future<void> get ready => _ready;
 
   ModularTestsRepo({
     required this.source,
@@ -26,12 +33,49 @@ class ModularTestsRepo {
     if (initialProtocols != null) {
       _protocolsSubject.add(initialProtocols);
     }
-    _loadInProtocols();
+    reload();
+  }
+
+  /// Reload persisted protocols, sharing any load already in progress.
+  Future<void> reload() {
+    if (_disposed) {
+      return Future.error(StateError('Test repository is disposed'));
+    }
+    if (_loading) return ready;
+    _loading = true;
+    _loadFailed = false;
+    _ready = _loadInProtocols();
+    // Stream consumers receive failures even without awaiting readiness.
+    // Keep the original future's error available to waiting mutations.
+    _ready.ignore();
+    return ready;
+  }
+
+  /// Wait for startup, retrying a previous failure without reloading successes.
+  Future<void> ensureReady() {
+    if (_disposed) {
+      return Future.error(StateError('Test repository is disposed'));
+    }
+    return _loadFailed ? reload() : ready;
   }
 
   Future<void> _loadInProtocols() async {
-    final loaded = await source.loadAllActiveProtocols();
-    _protocolsSubject.add(loaded);
+    try {
+      final loaded = await source.loadAllActiveProtocols();
+      if (!_disposed) _protocolsSubject.add(loaded);
+    } catch (error, stack) {
+      _loadFailed = true;
+      if (!_disposed) _protocolsSubject.addError(error, stack);
+      rethrow;
+    } finally {
+      _loading = false;
+    }
+  }
+
+  Future<void> _requireReady() async {
+    if (_disposed) throw StateError('Test repository is disposed');
+    await ready;
+    if (_disposed) throw StateError('Test repository is disposed');
   }
 
   Stream<List<ActiveTestProtocol>> get activeProtocols =>
@@ -41,7 +85,9 @@ class ModularTestsRepo {
       _protocolsSubject.valueOrNull ?? [];
 
   Future<void> updateProtocol(ActiveTestProtocol protocol) async {
+    await _requireReady();
     await source.updateActiveProtocol(protocol);
+    if (_disposed) return;
     final current = currentProtocols.toList();
     final index = current.indexWhere((p) => p.id == protocol.id);
     if (index != -1) {
@@ -56,6 +102,7 @@ class ModularTestsRepo {
     Entry entry, {
     List<Entry> historicalResponses = const [],
   }) async {
+    await _requireReady();
     final results = <TestEvaluationResult>[];
     final activeList = currentProtocols.where((p) => !p.isCompleted).toList();
 
@@ -77,6 +124,7 @@ class ModularTestsRepo {
     required String activeTestId,
     String? targetStageId,
   }) async {
+    await _requireReady();
     final activeList = currentProtocols.toList();
     final index = activeList.indexWhere((p) => p.id == activeTestId);
     if (index == -1) return null;
@@ -114,6 +162,8 @@ class ModularTestsRepo {
   }
 
   void dispose() {
+    if (_disposed) return;
+    _disposed = true;
     _protocolsSubject.close();
   }
 }

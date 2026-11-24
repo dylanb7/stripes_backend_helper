@@ -13,7 +13,7 @@ class TestEntryRepo extends EntryRepo {
   final BehaviorSubject<List<Entry>> _controller = BehaviorSubject.seeded([]);
 
   TestEntryRepo(AuthUser user, SubUser subUser)
-      : super(authUser: user, currentUser: subUser);
+    : super(authUser: user, currentUser: subUser);
 
   void _emit() {
     // Sort entries by stamp descending
@@ -76,14 +76,27 @@ class TestEntryRepo extends EntryRepo {
 
   @override
   Future<List<Entry>> findBySession(String sessionId) async {
-    return _inMemoryEntries
-        .where((e) => e.sessionId == sessionId)
-        .toList()
+    return _inMemoryEntries.where((e) => e.sessionId == sessionId).toList()
       ..sort((a, b) => a.stamp.compareTo(b.stamp));
   }
 
   @override
-  Future<void> refresh() async {}
+  Future<List<Entry>> findByIds(Iterable<String> ids) async {
+    final requested = ids.toSet();
+    return _inMemoryEntries
+        .where(
+          (entry) =>
+              entry.subUserId == currentUser.uid &&
+              requested.contains(entry.id),
+        )
+        .toList();
+  }
+
+  @override
+  Future<void> refreshLocal() async => _emit();
+
+  @override
+  Future<void> refresh() => refreshLocal();
 
   @override
   set earliestDate(DateTime time) {

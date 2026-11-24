@@ -19,6 +19,13 @@ abstract class EntryRepo {
   Future<RepoResult<void>> removeEntry(String entryId);
   Future<Entry?> findOne({required String subtype});
   Future<List<Entry>> findBySession(String sessionId);
+
+  /// Read persisted local entries for this profile, independent of the visible
+  /// history window. Wait for local storage readiness, never for cloud sync.
+  Future<List<Entry>> findByIds(Iterable<String> ids);
+
+  /// Publish the current local history without waiting for cloud sync.
+  Future<void> refreshLocal();
   Future<void> refresh();
   set earliestDate(DateTime time) => earliest = time;
 }

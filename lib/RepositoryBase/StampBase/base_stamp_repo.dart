@@ -10,16 +10,23 @@ abstract class StampRepo<T extends Stamp> {
   final SubUser currentUser;
   final QuestionRepo questionRepo;
   DateTime? earliest;
-  StampRepo(
-      {required this.authUser,
-      required this.currentUser,
-      required this.questionRepo,
-      this.earliest});
+  StampRepo({
+    required this.authUser,
+    required this.currentUser,
+    required this.questionRepo,
+    this.earliest,
+  });
   Stream<List<T>> get stamps;
   Future<RepoResult<T?>> addStamp(T stamp);
   Future<RepoResult<void>> removeStamp(T stamp);
   Future<RepoResult<T?>> updateStamp(T stamp);
   Future<void> refresh();
+
+  /// Refresh the view after a local mutation. Synced repositories must override
+  /// this to publish local state without waiting for a network round trip.
+  /// Legacy repositories retain their existing refresh behavior.
+  Future<void> refreshLocal() => refresh();
+
   Future<void> refreshCheckins({Iterable<String>? types});
 
   set earliestDate(DateTime time) => earliest = time;
